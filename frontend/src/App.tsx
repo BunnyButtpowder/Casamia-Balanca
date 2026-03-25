@@ -228,18 +228,42 @@ function App() {
         </div>
       </section>
 
-      <section>
+      <section id="map">
         <div className="relative">
           <img
             src="/map-balanca.svg"
             alt=""
             className="w-full object-contain rounded-3xl"
           />
+          <div className="group/pin absolute left-[39.8%] top-[59%] w-[8%] -translate-x-1/2 -translate-y-1/2">
+            <img 
+              src="/balanca-sign.png"
+              alt=""
+              className="peer/pin relative z-40 w-full object-contain hover:scale-120 transition-[scale] duration-500"
+            />
+            <span className="peer/inner absolute left-1/2 top-[150%] z-30 -translate-x-1/2 -translate-y-1/2 w-[380%] aspect-square rounded-full border border-dashed border-secondary transition-[scale] duration-600 hover:scale-105 peer-hover/pin:scale-105" />
+            <span className="peer/middle absolute left-1/2 top-[150%] z-20 -translate-x-1/2 -translate-y-1/2 w-[610%] aspect-square rounded-full border border-dashed border-secondary/40 transition-[scale] duration-600 hover:scale-105 peer-hover/inner:scale-105 peer-hover/pin:scale-105" />
+            <span className="absolute left-1/2 top-[150%] z-10 -translate-x-1/2 -translate-y-1/2 w-[850%] aspect-square rounded-full border border-dashed border-secondary/20 transition-[scale] duration-600 hover:scale-105 peer-hover/inner:scale-105 peer-hover/middle:scale-105 peer-hover/pin:scale-105" />
+          </div>
+          <div className="absolute inset-x-0 top-[10%] z-20 px-4 sm:top-[14%] sm:px-6 md:top-[18%] lg:top-[20%]">
+            <div className="mx-auto max-w-6xl">
+              <div className="w-full md:w-auto md:pl-[23%]">
+                <div className="flex flex-col items-center text-center text-secondary md:items-end md:text-right">
+                  <h1 className="font-sagire leading-[1.05] text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl">
+                    Đô thị sinh thái hiếm hoi
+                  </h1>
+                  <span className="mt-2 font-inter font-normal uppercase text-2xl sm:text-3xl md:text-7xl">
+                    Nằm trong lõi di sản hội an
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="residences" className="bg-primary px-4 py-16 sm:px-6 sm:py-24 md:py-32">
+      <section id="residences" className="bg-white px-4 py-16 sm:px-6 sm:py-24 md:py-32">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center sm:mb-16">
             <p className="mb-3 text-xs tracking-[0.3em] text-secondary uppercase sm:mb-4 sm:text-sm">
