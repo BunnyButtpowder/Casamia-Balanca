@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLenis } from './hooks/useLenis'
+import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const NAV_LEFT = ['Giới thiệu', 'Vị trí', 'Tiện ích']
 const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']
@@ -9,6 +10,58 @@ const NAV_LINK_CLASS =
 function App() {
   useLenis()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [carouselCat, setCarouselCat] = useState('all')
+
+  const allSlides = [
+    {
+      src: '/carousel-1.png',
+      title: 'Công viên chủ đề và các tuyến phố cây xanh',
+      desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp  tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.',
+      cat: 'landscape',
+    },
+    {
+      src: '/carousel-2.jpg',
+      title: 'Tiện ích sống chăm sóc sức khoẻ hàng ngày',
+      desc: 'Hồ bơi tràn viền hướng biển, mang đến trải nghiệm nghỉ dưỡng đẳng cấp quốc tế.',
+      cat: 'service',
+    },
+    {
+      src: '/carousel-3.jpg',
+      title: 'Tiện ích nghỉ dưỡng chuyên sâu',
+      desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
+      cat: 'service',
+    },
+  ]
+
+  const carouselSlides = carouselCat === 'all' ? allSlides : allSlides.filter((s) => s.cat === carouselCat)
+
+  const [slideIdx, setSlideIdx] = useState(1)
+  const [animate, setAnimate] = useState(true)
+
+  const handleCatChange = (cat: string) => {
+    setCarouselCat(cat)
+    setAnimate(false)
+    setSlideIdx(1)
+  }
+
+  const extendedSlides = [
+    carouselSlides[carouselSlides.length - 1],
+    ...carouselSlides,
+    carouselSlides[0],
+  ]
+
+  const prevSlide = () => { setAnimate(true); setSlideIdx((i) => i - 1) }
+  const nextSlide = () => { setAnimate(true); setSlideIdx((i) => i + 1) }
+
+  const handleCarouselTransitionEnd = () => {
+    if (slideIdx === 0) {
+      setAnimate(false)
+      setSlideIdx(carouselSlides.length)
+    } else if (slideIdx === extendedSlides.length - 1) {
+      setAnimate(false)
+      setSlideIdx(1)
+    }
+  }
 
   return (
     <div className="min-h-screen overflow-x-hidden">
@@ -123,14 +176,14 @@ function App() {
             className="h-full w-full object-cover"
           />
           <div className="absolute bottom-6 left-1/2 z-10 mx-auto w-full max-w-4xl -translate-x-1/2 px-4 text-center sm:bottom-12 md:bottom-24 sm:px-6">
-            <div className="font-sagire flex items-center justify-center gap-3 font-light text-[#8B181B] ">
+            <div className="font-sagire flex items-center justify-center gap-3 font-light text-secondary ">
               <span className="text-2xl sm:text-3xl md:text-6xl">
                 Là mỗi ngày sống
               </span>
               <span className="text-3xl sm:text-4xl md:text-7xl">Khoẻ</span>
             </div>
             <div className="mt-2 sm:mt-4" />
-            <div className="font-sagire flex items-center justify-center gap-3 font-light text-[#8B181B] ">
+            <div className="font-sagire flex items-center justify-center gap-3 font-light text-secondary ">
               <span className="text-2xl sm:text-3xl md:text-6xl">
                 Là nếp nhà sống
               </span>
@@ -175,7 +228,7 @@ function App() {
             alt=""
             className="pointer-events-none absolute top-0 left-0 w-screen object-cover"
           />
-          <div className="absolute top-30 left-0 z-20 flex w-screen flex-col items-center font-light text-[#8B181B]">
+          <div className="absolute top-30 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
             <div className="flex justify-center gap-5">
               <span className="font-sagire text-2xl sm:text-3xl md:text-7xl">
                 An tâm
@@ -215,10 +268,10 @@ function App() {
                   key={stat.value}
                   className={`text-center px-4${i > 0 ? ' md:border-l md:border-black/20' : ''}`}
                 >
-                  <p className="whitespace-pre-line text-sm leading-snug font-medium text-[#8B181B] sm:text-base">
+                  <p className="whitespace-pre-line text-sm leading-snug font-medium text-secondary sm:text-base">
                     {stat.label}
                   </p>
-                  <p className="mt-2 font-sagire text-3xl text-[#8B181B] sm:text-3xl md:text-4xl">
+                  <p className="mt-2 font-sagire text-3xl text-secondary sm:text-3xl md:text-4xl">
                     {stat.value}
                   </p>
                 </div>
@@ -228,7 +281,7 @@ function App() {
         </div>
       </section>
 
-      <section id="map">
+      <section id="map" className="relative z-0">
         <div className="relative">
           <img
             src="/map-balanca.svg"
@@ -236,7 +289,7 @@ function App() {
             className="w-full object-contain rounded-3xl"
           />
           <div className="group/pin absolute left-[39.8%] top-[59%] w-[8%] -translate-x-1/2 -translate-y-1/2">
-            <img 
+            <img
               src="/balanca-sign.png"
               alt=""
               className="peer/pin relative z-40 w-full object-contain hover:scale-120 transition-[scale] duration-500"
@@ -245,16 +298,41 @@ function App() {
             <span className="peer/middle absolute left-1/2 top-[150%] z-20 -translate-x-1/2 -translate-y-1/2 w-[610%] aspect-square rounded-full border border-dashed border-secondary/40 transition-[scale] duration-600 hover:scale-105 peer-hover/inner:scale-105 peer-hover/pin:scale-105" />
             <span className="absolute left-1/2 top-[150%] z-10 -translate-x-1/2 -translate-y-1/2 w-[850%] aspect-square rounded-full border border-dashed border-secondary/20 transition-[scale] duration-600 hover:scale-105 peer-hover/inner:scale-105 peer-hover/middle:scale-105 peer-hover/pin:scale-105" />
           </div>
-          <div className="absolute inset-x-0 top-[10%] z-20 px-4 sm:top-[14%] sm:px-6 md:top-[18%] lg:top-[20%]">
-            <div className="mx-auto max-w-6xl">
-              <div className="w-full md:w-auto md:pl-[23%]">
-                <div className="flex flex-col items-center text-center text-secondary md:items-end md:text-right">
-                  <h1 className="font-sagire leading-[1.05] text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl">
+          <div className="pointer-events-none absolute inset-x-0 top-[10%] z-20 px-4 sm:top-[14%] sm:px-6 md:top-[18%] lg:top-[20%]">
+            <div className="mx-auto max-w-6xl md:max-w-6xl 2xl:max-w-7xl">
+              <div className="w-full md:w-auto md:pl-[23%] xl:pl-[40%]">
+                <div className="flex flex-col items-center text-center md:items-end md:text-right">
+                  <h1 className="font-sagire leading-[1.05] text-2xl sm:text-3xl md:text-5xl text-secondary">
                     Đô thị sinh thái hiếm hoi
                   </h1>
-                  <span className="mt-2 font-inter font-normal uppercase text-2xl sm:text-3xl md:text-7xl">
+                  <span className="mt-2 font-inter font-medium uppercase text-2xl sm:text-lg md:text-xl text-secondary">
                     Nằm trong lõi di sản hội an
                   </span>
+                  <div className="mt-10 text-sm sm:text-base md:text-lg font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm - Hội An, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
+                  <div className="pointer-events-auto mt-6 w-full max-w-md overflow-y-auto max-h-60 location-scrollbar" data-lenis-prevent>
+                    {[
+                      { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
+                      { name: 'Biển Cửa Đại / Cầu Cửa Đại', time: '5 phút' },
+                      { name: 'Bãi biển An Bàng', time: '5 - 7 phút' },
+                      { name: 'Phố cổ Hội An', time: '5 - 10 phút' },
+                      { name: 'Sân bay quốc tế', time: '30 - 40 phút' },
+                      { name: 'Bãi biển An Bàng', time: '5 - 7 phút' },
+                      { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
+                      { name: 'Phố cổ Hội An', time: '5 - 10 phút' },
+                    ].map((item, i, arr) => (
+                      <div
+                        key={`${item.name}-${i}`}
+                        className={`location-item group flex items-center gap-3 px-4 py-3 cursor-default ${i < arr.length - 1 ? 'border-b border-gray-300' : ''}`}
+                      >
+                        <MapPin className="w-4 h-4 shrink-0 text-[#0F4672] group-hover:text-secondary transition-colors duration-300" />
+                        <span className="flex-1 text-sm text-start font-medium text-black group-hover:text-secondary group-hover:translate-x-1.5 transition-all duration-300">{item.name}</span>
+                        <span className="text-sm font-semibold text-black group-hover:text-secondary transition-colors duration-300 whitespace-nowrap">{item.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button className="pointer-events-auto btn-inverted-corners mt-4 bg-secondary px-5 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer">
+                    Tải tài liệu dự án
+                  </button>
                 </div>
               </div>
             </div>
@@ -262,63 +340,114 @@ function App() {
         </div>
       </section>
 
-      {/* Features */}
-      <section id="residences" className="bg-white px-4 py-16 sm:px-6 sm:py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 text-center sm:mb-16">
-            <p className="mb-3 text-xs tracking-[0.3em] text-secondary uppercase sm:mb-4 sm:text-sm">
-              Residences
+      {/* Features — overlaps bottom of map */}
+      <section
+        id="residences"
+        className="relative z-10 rounded-t-3xl bg-white py-16"
+      >
+        <div className="mx-auto">
+          <div className="mx-auto max-w-7xl 2xl:max-w-max flex flex-col gap-8 rounded-2xl px-6 py-10 sm:px-10 sm:py-12 md:flex-row md:items-center md:gap-12 lg:px-14">
+            <p className="max-w-sm text-sm text-justify leading-relaxed text-black font-medium md:shrink-0 md:text-base">
+              Hệ thống cây xanh, mặt nước được kết nối, xếp lớp&nbsp;&nbsp;tạo nên la phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị, đồng thời xây dựng di sản sống xanh cho thế hệ tương lai.
             </p>
-            <h2 className="font-serif text-2xl font-light text-white sm:text-3xl md:text-5xl">
-              Thoughtfully Designed Spaces
-            </h2>
+            <div className="grid flex-1 grid-cols-3 gap-6 sm:grid-cols-5 md:gap-0">
+              {[
+                { value: '08', label: 'Ha\ncây xanh' },
+                { value: '05', label: 'Công viên\nchủ đề' },
+                { value: '19', label: 'Trụ hoa giấy\nkỷ lục' },
+                { value: '25 m', label: 'Hệ thống\nkênh nội khu' },
+                { value: '70 m', label: 'Đường kính\nhồ trung tâm' },
+              ].map((stat, i) => (
+                <div
+                  key={stat.value}
+                  className={`text-start px-5 ${i > 0 ? ' md:border-l md:border-black/20' : ''}`}
+                >
+                  <p className="font-sagire text-3xl text-secondary md:text-4xl">
+                    {stat.value}
+                  </p>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-snug font-medium text-[#0F4672] sm:text-base 2xl:text-lg">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="grid gap-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: 'Heritage Villas',
-                desc: 'Inspired by traditional Hoi An architecture with modern comforts and private gardens.',
-              },
-              {
-                title: 'Riverside Apartments',
-                desc: 'Contemporary living spaces with panoramic views of the Thu Bon River.',
-              },
-              {
-                title: 'Garden Townhouses',
-                desc: 'Family-oriented homes surrounded by lush tropical landscaping.',
-              },
-            ].map((item) => (
+          <div className="relative">
+            <div className="overflow-hidden">
               <div
-                key={item.title}
-                className="border border-white/10 p-6 transition-colors hover:border-secondary/50 sm:p-8"
+                className={`flex ${animate ? 'transition-transform duration-700 ease-in-out' : ''}`}
+                style={{ transform: `translateX(calc(17.5% - ${slideIdx * 65}% - ${slideIdx * 12}px))` }}
+                onTransitionEnd={handleCarouselTransitionEnd}
               >
-                <h3 className="mb-3 font-serif text-lg text-white sm:mb-4 sm:text-xl">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-white/60 sm:text-base">{item.desc}</p>
+                {extendedSlides.map((slide, i) => (
+                  <div
+                    key={`${slide.src}-${i}`}
+                    className={`w-[65%] shrink-0 px-1.5 ${animate ? 'transition-opacity duration-700' : ''}`}
+                  >
+                    <div className="inverted-corners-lg relative overflow-hidden">
+                      <img
+                        src={slide.src}
+                        alt={slide.title}
+                        className="aspect-video w-full object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/30 via-black/30 to-transparent backdrop-blur-[2px] px-6 pb-6 sm:px-10 sm:pb-8">
+                        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between">
+                          <h3 className="font-sagire text-xl text-balance text-white sm:text-2xl md:text-3xl">
+                            {slide.title}
+                          </h3>
+                          <p className="max-w-md text-sm text-justify text-white/80 sm:text-base 2xl:max-w-2xl">
+                            {slide.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <button
+              onClick={prevSlide}
+              aria-label="Previous slide"
+              className="btn-inverted-corners absolute left-[2%] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-white text-secondary transition-colors duration-500 hover:bg-secondary hover:text-white cursor-pointer sm:h-12 sm:w-12"
+            >
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              aria-label="Next slide"
+              className="btn-inverted-corners absolute right-[2%] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-white text-secondary transition-colors duration-500 hover:bg-secondary hover:text-white cursor-pointer sm:h-12 sm:w-12"
+            >
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
+          </div>
+          <div className="mt-10 flex flex-col items-center gap-6">
+            <div className="flex items-center gap-8 sm:gap-12">
+              {[
+                { key: 'all', label: 'Tất cả' },
+                { key: 'landscape', label: 'Tiện ích cảnh quan' },
+                { key: 'service', label: 'Tiện ích dịch vụ' },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => handleCatChange(tab.key)}
+                  className={`relative cursor-pointer pb-1 text-sm font-medium tracking-widest transition-colors duration-300 sm:text-base ${
+                    carouselCat === tab.key
+                      ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
+                      : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="h-px w-full bg-black/10" />
           </div>
         </div>
       </section>
 
       {/* Contact */}
       <section id="contact" className="bg-warm px-4 py-16 sm:px-6 sm:py-24 md:py-32">
-        <div className="mx-auto max-w-xl text-center">
-          <p className="mb-3 text-xs tracking-[0.3em] text-secondary uppercase sm:mb-4 sm:text-sm">
-            Get in Touch
-          </p>
-          <h2 className="font-serif text-2xl font-light text-primary sm:text-3xl md:text-5xl">
-            Begin Your Journey
-          </h2>
-          <p className="mt-4 text-sm text-primary/70 sm:mt-6 sm:text-base">
-            Register your interest to receive exclusive updates about Casamia Balance Hoi An.
-          </p>
-          <a
-            href="mailto:info@casamiabalance.vn"
-            className="mt-6 inline-block bg-primary px-8 py-3.5 text-xs tracking-widest text-white uppercase transition-opacity hover:opacity-90 sm:mt-8 sm:px-10 sm:py-4 sm:text-sm"
-          >
-            Contact Us
-          </a>
-        </div>
+        
       </section>
 
       {/* Footer */}
