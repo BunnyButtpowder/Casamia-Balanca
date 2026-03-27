@@ -5,7 +5,7 @@ import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 const NAV_LEFT = ['Giới thiệu', 'Vị trí', 'Tiện ích']
 const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']
 const NAV_LINK_CLASS =
-  'relative text-sm font-medium tracking-widest text-[#0F4672] transition-colors hover:text-[#0F4672] after:absolute after:bottom-[-4px] after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+  'relative text-sm uppercase font-semibold tracking-widest text-[#0F4672] transition-colors hover:text-[#0F4672] after:absolute after:bottom-[-4px] after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
 
 function App() {
   useLenis()
@@ -37,6 +37,17 @@ function App() {
 
   const [slideIdx, setSlideIdx] = useState(1)
   const [animate, setAnimate] = useState(true)
+
+  // Exterior carousel
+  const exteriorImages = [
+    '/carousel-1.png',
+    '/carousel-2.jpg',
+    '/carousel-3.jpg',
+  ]
+  const [extIdx, setExtIdx] = useState(0)
+  const extMax = exteriorImages.length - 1
+  const extPrev = () => setExtIdx((i) => Math.max(0, i - 1))
+  const extNext = () => setExtIdx((i) => Math.min(extMax, i + 1))
 
   const handleCatChange = (cat: string) => {
     setCarouselCat(cat)
@@ -224,7 +235,7 @@ function App() {
             className="pointer-events-none absolute -top-10 -left-10 hidden w-auto object-contain sm:-top-45 sm:-left-20 sm:block z-10"
           />
           <img
-            src="/rectangle-2.png"
+            src="/gradient-from-t.png"
             alt=""
             className="pointer-events-none absolute top-0 left-0 w-screen object-cover"
           />
@@ -342,8 +353,8 @@ function App() {
 
       {/* Features — overlaps bottom of map */}
       <section
-        id="residences"
-        className="relative z-10 rounded-t-3xl bg-white py-16"
+        id="features"
+        className="relative z-10 rounded-t-3xl bg-white py-8"
       >
         <div className="mx-auto">
           <div className="mx-auto max-w-7xl 2xl:max-w-max flex flex-col gap-8 rounded-2xl px-6 py-10 sm:px-10 sm:py-12 md:flex-row md:items-center md:gap-12 lg:px-14">
@@ -420,34 +431,149 @@ function App() {
               <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           </div>
-          <div className="mt-10 flex flex-col items-center gap-6">
-            <div className="flex items-center gap-8 sm:gap-12">
-              {[
-                { key: 'all', label: 'Tất cả' },
-                { key: 'landscape', label: 'Tiện ích cảnh quan' },
-                { key: 'service', label: 'Tiện ích dịch vụ' },
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => handleCatChange(tab.key)}
-                  className={`relative cursor-pointer pb-1 text-sm font-medium tracking-widest transition-colors duration-300 sm:text-base ${
-                    carouselCat === tab.key
+          <div className="mt-10">
+            <div className="relative flex justify-center">
+              <div className="pointer-events-none absolute bottom-0 h-px w-[80%] bg-black/10" />
+              <div className="relative z-10 flex items-center gap-8 sm:gap-12">
+                {[
+                  { key: 'all', label: 'Tất cả' },
+                  { key: 'landscape', label: 'Tiện ích cảnh quan' },
+                  { key: 'service', label: 'Tiện ích dịch vụ' },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => handleCatChange(tab.key)}
+                    className={`relative cursor-pointer pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${carouselCat === tab.key
                       ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
                       : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+                      }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="h-px w-full bg-black/10" />
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section id="contact" className="bg-warm px-4 py-16 sm:px-6 sm:py-24 md:py-32">
-        
+      {/* Exterior */}
+      <section id="exterior" className="relative py-16">
+        <img
+          src="/gradient-from-t.png"
+          alt=""
+          className="pointer-events-none absolute top-0 left-0 w-screen object-cover z-10"
+        />
+        <div className="relative">
+          <img
+            src="/leaf.png"
+            alt=""
+            className="pointer-events-none absolute -top-30 -right-70 hidden w-auto object-contain sm:block z-20"
+          />
+
+          <div className="absolute top-18 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
+            <div className="flex justify-center gap-5">
+              <span className="font-sagire text-2xl sm:text-3xl md:text-7xl">
+                An nhàn
+              </span>
+              <span className="font-alishanty text-3xl sm:text-4xl md:text-8xl">khai thác</span>
+            </div>
+            <div className="flex justify-center gap-5">
+              <span className="font-sagire text-2xl sm:text-3xl md:text-7xl">
+                An tâm
+              </span>
+              <span className="font-alishanty text-3xl sm:text-4xl md:text-8xl">sinh lời</span>
+            </div>
+          </div>
+          <img
+            src="/exterior.jpg"
+            alt=""
+            className="mt-10 w-full object-contain sm:mt-14 md:mt-20 rounded-b-3xl"
+          />
+          <div className="absolute bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 py-8 pr-3 sm:py-5 sm:pr-7">
+            <p className="mx-auto max-w-xl text-center text-sm font-medium leading-relaxed text-white sm:text-base 2xl:text-lg">
+              Kiến trúc của dự án là sự tiếp nối tinh tế của di sản kiến trúc Hội An với nếp nhà của những mái ngói nâu xếp lớp, vật liệu đá sa thạch từ Thánh địa Mỹ Sơn. 100% biệt thự thiết kế mở, thông tầng và hệ cửa kính lớn để đón trọn ánh sáng tự nhiên và gió trời.
+            </p>
+          </div>
+        </div>
+        <div className="relative min-h-[700px] sm:min-h-[800px] md:min-h-[900px]">
+          <img
+            src="/bg-pattern.png"
+            alt=""
+            className="pointer-events-none object-cover sm:block "
+          />
+          {/* Overlay: title + description + award | carousel */}
+          <div className="absolute inset-0 z-10 flex items-center">
+            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 pl-6 pr-0 md:flex-row md:items-stretch md:gap-10 lg:pl-14">
+              {/* Left column */}
+              <div className="flex flex-col justify-center md:shrink-0">
+                <h2 className="font-sagire text-3xl leading-tight text-secondary sm:text-4xl md:text-5xl">
+                  Kiệt tác xanh
+                </h2>
+                <p className="font-alishanty text-4xl text-secondary sm:text-5xl md:text-6xl">
+                  “<span className="text-5xl sm:text-6xl md:text-8xl">3</span> trong <span className="text-5xl sm:text-6xl md:text-8xl">1</span>”
+                </p>
+                <span className="mt-1 text-xs font-semibold uppercase tracking-widest text-secondary sm:text-sm">
+                  Thiết kế bởi KTS Võ Trọng Nghĩa
+                </span>
+                <p className="mt-5 max-w-sm text-sm leading-relaxed font-medium text-justify text-black sm:text-base">
+                  Mỗi nếp nhà là một sắc xanh, toàn khu đô thị là một khu vườn xanh mang nét đẹp hoài cổ và bình tâm của phố Hội. Lối kiến trúc giao thoa giữa bảo tồn di sản và tư duy xanh hiện đại mang đến dòng sản phẩm biệt thự đẹp bất biến với thời gian, công năng linh hoạt, vừa phù hợp với hoạt động nghỉ dưỡng, vừa phù hợp với nhu cầu cho thuê, khai thác, vận hành du lịch.
+                </p>
+                <div className='flex justify-center'>
+                  <img
+                    src="/award.png"
+                    alt="Asia Property Awards 2021"
+                    className="mt-6 w-28 object-contain sm:w-52"
+                  />
+                </div>
+
+              </div>
+
+              {/* Right column — carousel, touches right edge */}
+              <div className="relative min-h-0 flex-1 pr-6 md:pr-0">
+                <div className="h-full overflow-hidden">
+                  <div
+                    className="flex h-full gap-3 transition-transform duration-500 ease-in-out"
+                    style={{
+                      transform: extIdx === extMax
+                        ? 'translateX(calc(-100% + 60%))'
+                        : `translateX(calc(-${extIdx * 60}% - ${extIdx * 12}px))`,
+                    }}
+                  >
+                    {exteriorImages.map((src) => (
+                      <div
+                        key={src}
+                        className="h-full w-[60%] shrink-0"
+                      >
+                        <div className="inverted-corners-lg h-full overflow-hidden">
+                          <img
+                            src={src}
+                            alt=""
+                            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  onClick={extPrev}
+                  aria-label="Previous"
+                  className="btn-inverted-corners absolute -left-6 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer sm:h-12 sm:w-12"
+                >
+                  <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                </button>
+                <button
+                  onClick={extNext}
+                  aria-label="Next"
+                  className="btn-inverted-corners absolute right-30 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer sm:h-12 sm:w-12"
+                >
+                  <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
