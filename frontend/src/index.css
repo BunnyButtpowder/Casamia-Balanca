@@ -16,12 +16,29 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "SVN-Snell Roundhand Script";
+  src: url("/SVN-Snell-Roundhand-Script.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SVN-Snell Roundhand Script Bold";
+  src: url("/SVN-Snell-Roundhand-Script-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sagire: "1FTV Sagire", "Playfair Display", Georgia, serif;
   --font-alishanty: "1FTV Alishanty Signature", "Playfair Display", Georgia, serif;
-
+  --font-snell: "SVN-Snell Roundhand Script", "Playfair Display", Georgia, serif;
+  --font-snell-bold: "SVN-Snell Roundhand Script Bold", "Playfair Display", Georgia, serif;
   --color-primary: #1a1a2e;
   --color-secondary: #8B181B;
   --color-accent: #d4af37;
@@ -126,6 +143,25 @@ html.lenis, html.lenis body {
     radial-gradient(var(--r) at 0 0, #0000 98%, #000) 0 0,
     radial-gradient(var(--r) at 100% 0, #0000 98%, #000) 100% 0,
     radial-gradient(var(--r) at 0 100%, #0000 98%, #000) 0 100%,
+    radial-gradient(var(--r) at 100% 100%, #0000 98%, #000) 100% 100%;
+  mask-size: 51% 51%;
+  mask-repeat: no-repeat;
+}
+
+/* Same radius as .inverted-corners-lg; square corners on the left, inverted only top-right + bottom-right */
+.inverted-corners-lg-r {
+  --r: 20px;
+  -webkit-mask:
+    linear-gradient(#000 0 0, #000 100%) 0 0,
+    linear-gradient(#000 0 0, #000 100%) 0 100%,
+    radial-gradient(var(--r) at 100% 0, #0000 98%, #000) 100% 0,
+    radial-gradient(var(--r) at 100% 100%, #0000 98%, #000) 100% 100%;
+  -webkit-mask-size: 51% 51%;
+  -webkit-mask-repeat: no-repeat;
+  mask:
+    linear-gradient(#000 0 0, #000 100%) 0 0,
+    linear-gradient(#000 0 0, #000 100%) 0 100%,
+    radial-gradient(var(--r) at 100% 0, #0000 98%, #000) 100% 0,
     radial-gradient(var(--r) at 100% 100%, #0000 98%, #000) 100% 100%;
   mask-size: 51% 51%;
   mask-repeat: no-repeat;

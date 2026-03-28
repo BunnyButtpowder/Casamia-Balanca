@@ -49,6 +49,60 @@ function App() {
   const extPrev = () => setExtIdx((i) => Math.max(0, i - 1))
   const extNext = () => setExtIdx((i) => Math.min(extMax, i + 1))
 
+  const productSlides = [
+    {
+      src: '/carousel-5.png',
+      title: 'Biệt thự đơn lập',
+      specs: [
+        { label: 'QUY MÔ', value: '270 căn' },
+        { label: 'LOẠI HÌNH', value: 'Biệt thự đơn lập' },
+        { label: 'DIỆN TÍCH', value: '80 m²' },
+        { label: 'QUY MÔ', value: '270 căn' },
+        { label: 'LOẠI HÌNH', value: 'Biệt thự đơn lập' },
+        { label: 'DIỆN TÍCH', value: '80 m²' },
+      ],
+    },
+    {
+      src: '/carousel-1.png',
+      title: 'Biệt thự song lập',
+      specs: [
+        { label: 'QUY MÔ', value: '180 căn' },
+        { label: 'LOẠI HÌNH', value: 'Biệt thự song lập' },
+        { label: 'DIỆN TÍCH', value: '150–250 m²' },
+        { label: 'QUY MÔ', value: '180 căn' },
+        { label: 'LOẠI HÌNH', value: 'Biệt thự song lập' },
+        { label: 'DIỆN TÍCH', value: '150–250 m²' },
+      ],
+    },
+    {
+      src: '/carousel-2.jpg',
+      title: 'Nhà phố thương mại',
+      specs: [
+        { label: 'QUY MÔ', value: '320 căn' },
+        { label: 'LOẠI HÌNH', value: 'Nhà phố thương mại' },
+        { label: 'DIỆN TÍCH', value: '80–120 m²' },
+        { label: 'QUY MÔ', value: '320 căn' },
+        { label: 'LOẠI HÌNH', value: 'Nhà phố thương mại' },
+        { label: 'DIỆN TÍCH', value: '80–120 m²' },
+      ],
+    },
+    {
+      src: '/carousel-3.jpg',
+      title: 'Căn hộ nghỉ dưỡng',
+      specs: [
+        { label: 'QUY MÔ', value: '450 căn' },
+        { label: 'LOẠI HÌNH', value: 'Căn hộ nghỉ dưỡng' },
+        { label: 'DIỆN TÍCH', value: '45–90 m²' },
+        { label: 'QUY MÔ', value: '450 căn' },
+        { label: 'LOẠI HÌNH', value: 'Căn hộ nghỉ dưỡng' },
+        { label: 'DIỆN TÍCH', value: '45–90 m²' },
+      ],
+    },
+  ]
+  const [prodIdx, setProdIdx] = useState(0)
+  const prodPrev = () => setProdIdx((i) => (i === 0 ? productSlides.length - 1 : i - 1))
+  const prodNext = () => setProdIdx((i) => (i === productSlides.length - 1 ? 0 : i + 1))
+
   const handleCatChange = (cat: string) => {
     setCarouselCat(cat)
     setAnimate(false)
@@ -458,7 +512,7 @@ function App() {
       </section>
 
       {/* Exterior */}
-      <section id="exterior" className="relative py-16">
+      <section id="exterior" className="relative pt-16">
         <img
           src="/gradient-from-t.png"
           alt=""
@@ -504,19 +558,19 @@ function App() {
           />
           {/* Overlay: title + description + award | carousel */}
           <div className="absolute inset-0 z-10 flex items-center">
-            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 pl-6 pr-0 md:flex-row md:items-stretch md:gap-10 lg:pl-14">
+            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 pl-6 pr-0 md:flex-row md:items-stretch md:gap-15 lg:pl-20">
               {/* Left column */}
               <div className="flex flex-col justify-center md:shrink-0">
-                <h2 className="font-sagire text-3xl leading-tight text-secondary sm:text-4xl md:text-5xl">
+                <h2 className="font-sagire text-3xl leading-tight text-secondary sm:text-4xl">
                   Kiệt tác xanh
                 </h2>
-                <p className="font-alishanty text-4xl text-secondary sm:text-5xl md:text-6xl">
-                  “<span className="text-5xl sm:text-6xl md:text-8xl">3</span> trong <span className="text-5xl sm:text-6xl md:text-8xl">1</span>”
+                <p className="-mt-2 font-alishanty text-4xl leading-none text-secondary sm:text-5xl md:-mt-4 md:text-8xl">
+                  “<span className="text-5xl sm:text-6xl md:text-9xl">3</span> trong <span className="text-5xl sm:text-6xl md:text-9xl">1</span>”
                 </p>
-                <span className="mt-1 text-xs font-semibold uppercase tracking-widest text-secondary sm:text-sm">
-                  Thiết kế bởi KTS Võ Trọng Nghĩa
+                <span className="-mt-1 text-xs text-end font-medium uppercase text-secondary sm:text-lg md:-mt-2">
+                  Thiết kế bởi KTS <br /> Võ Trọng Nghĩa
                 </span>
-                <p className="mt-5 max-w-sm text-sm leading-relaxed font-medium text-justify text-black sm:text-base">
+                <p className="mt-5 max-w-sm text-sm leading-relaxed text-justify text-black sm:text-base">
                   Mỗi nếp nhà là một sắc xanh, toàn khu đô thị là một khu vườn xanh mang nét đẹp hoài cổ và bình tâm của phố Hội. Lối kiến trúc giao thoa giữa bảo tồn di sản và tư duy xanh hiện đại mang đến dòng sản phẩm biệt thự đẹp bất biến với thời gian, công năng linh hoạt, vừa phù hợp với hoạt động nghỉ dưỡng, vừa phù hợp với nhu cầu cho thuê, khai thác, vận hành du lịch.
                 </p>
                 <div className='flex justify-center'>
@@ -531,12 +585,12 @@ function App() {
 
               {/* Right column — carousel, touches right edge */}
               <div className="relative min-h-0 flex-1 pr-6 md:pr-0">
-                <div className="h-full overflow-hidden">
+                <div className="h-full overflow-hidden rounded-l-3xl">
                   <div
                     className="flex h-full gap-3 transition-transform duration-500 ease-in-out"
                     style={{
                       transform: extIdx === extMax
-                        ? 'translateX(calc(-100% + 60%))'
+                        ? `translateX(calc(-${exteriorImages.length * 60 - 100}% - ${(exteriorImages.length - 1) * 12}px))`
                         : `translateX(calc(-${extIdx * 60}% - ${extIdx * 12}px))`,
                     }}
                   >
@@ -574,6 +628,171 @@ function App() {
             </div>
           </div>
         </div>
+        <div className="relative">
+          <img
+            src="/bg-pattern-2.png"
+            alt=""
+            className="pointer-events-none justify-self-end"
+          />
+          <div className="absolute inset-0 z-10 flex items-center py-6 sm:py-10">
+            <div className="flex h-full min-h-0 w-full flex-col justify-center gap-8 md:flex-row md:items-stretch md:justify-start md:gap-0 lg:pr-10">
+              {/* Left — image carousel */}
+              <div className="relative flex min-w-0 items-center justify-center md:w-[65%] md:shrink-0">
+                <div className="rounded-r-3xl aspect-3/2 w-full max-h-[min(42dvh,300px)] overflow-hidden sm:max-h-[min(44dvh,340px)] md:max-h-[360px] lg:max-h-[1000px]">
+                  <div
+                    className="flex h-full min-h-0 shrink-0 transition-transform duration-600 ease-in-out"
+                    style={{
+                      width: `${productSlides.length * 100}%`,
+                      transform: `translateX(-${(prodIdx * 100) / productSlides.length}%)`,
+                    }}
+                  >
+                    {productSlides.map((slide, i) => (
+                      <div
+                        key={`prod-${i}`}
+                        className="box-border h-full min-h-0 shrink-0 overflow-hidden"
+                        style={{ flex: `0 0 ${100 / productSlides.length}%` }}
+                      >
+                        <div className="inverted-corners-lg-r h-full min-h-0 overflow-hidden">
+                          <img
+                            src={slide.src}
+                            alt={slide.title}
+                            className="h-full max-h-full w-full max-w-full object-cover hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right — info panel */}
+              <div className="flex flex-1 flex-col justify-center px-6 sm:px-10 md:px-12 lg:px-16">
+                <p className="font-snell-bold text-4xl text-secondary sm:text-5xl md:text-8xl">
+                  <span>{String(prodIdx + 1).padStart(2, '0')}</span>
+                  <span className="ml-1 align-bottom text-lg font-normal text-secondary/40 sm:text-xl md:text-3xl">
+                    /{String(productSlides.length).padStart(2, '0')}
+                  </span>
+                </p>
+                <h3 className="mt-4 font-sagire text-2xl text-secondary sm:text-3xl md:text-3xl">
+                  {productSlides[prodIdx].title}
+                </h3>
+                <div className="mt-6 w-full max-w-md border-t border-black/15">
+                  {productSlides[prodIdx].specs.map((row, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-2 border-b border-black/15 py-3 text-start"
+                    >
+                      <span className="min-w-0 text-xs font-bold uppercase tracking-wide text-black sm:text-sm">
+                        {row.label}
+                      </span>
+                      <span className="min-w-0 text-sm font-normal text-black sm:text-base">
+                        {row.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 flex items-center gap-4">
+                  <button
+                    onClick={prodPrev}
+                    aria-label="Previous product"
+                    className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                  >
+                    <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </button>
+                  <button
+                    onClick={prodNext}
+                    aria-label="Next product"
+                    className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                  >
+                    <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </button>
+                  <button className="btn-inverted-corners ml-auto bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:py-4">
+                    Tải tài liệu dự án
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="relative">
+          <img
+            src="/bg-pattern-3.png"
+            alt=""
+            className="pointer-events-none object-cover sm:block"
+          />
+          <div className="absolute inset-0 z-10 flex items-center px-6 py-10 sm:px-10 sm:py-14 lg:px-20 lg:py-16">
+            {/* Village image + title + white card */}
+            <div className="relative h-full w-full min-h-0 overflow-hidden inverted-corners-lg">
+              <img
+                src="/village.png"
+                alt=""
+                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+              {/* Title + white card column */}
+              <div className="pointer-events-none absolute inset-y-6 left-6 flex w-[280px] flex-col sm:inset-y-8 sm:left-10 sm:w-[320px] lg:left-15 lg:inset-y-18 lg:w-[50%]">
+                {/* Title */}
+                <div>
+                  <h2 className="font-sagire text-secondary">
+                    <span className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl">Vận hành</span>
+                    <span className="inline-block px-3 translate-y-[0.35em] font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}& </span>
+                    <span className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl">Sinh lời ngay</span>
+                  </h2>
+                  <p className="mt-7 text-sm font-medium uppercase tracking-[0.15em] text-secondary sm:text-base">
+                    Cùng đơn vị chuyên nghiệp
+                  </p>
+                </div>
+                {/* White card — fills from mt-10 below title to bottom */}
+                <div className="mt-10 flex flex-1 min-h-0 flex-col items-center justify-center rounded-3xl bg-white/80 px-6 py-6 backdrop-blur-xs sm:px-8 sm:py-8 w-[80%]">
+                  <img
+                    src="/logo-village.png"
+                    alt="M Village"
+                    className="mb-5 h-20 object-contain sm:h-24 lg:h-28"
+                  />
+                  <p className="px-2 mt-5 text-center text-sm leading-relaxed text-black sm:px-5 sm:text-base">
+                    Mỗi nếp nhà là một sắc xanh, toàn khu đô thị là một khu vườn xanh mang nét đẹp hoài cổ và bình lặng của phố Hội. Lối kiến trúc giao thoa giữa bảo tồn di sản và tư duy xanh hiện đại mang đến dòng sản phẩm biệt thự đẹp bất biến với thời gian, công năng linh hoạt, vừa phù hợp với hoạt động nghỉ dưỡng, vừa phù hợp với nhu cầu cho thuê, khai thác, vận hành du lịch.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <img
+            src="/bg-emblem.png"
+            alt=""
+            className="pointer-events-none object-cover sm:block absolute -bottom-120 right-0"
+          />
+        </div>
+      </section>
+
+      <section id="safety">
+        <div className="relative rounded-t-3xl overflow-hidden">
+          <img
+            src="/safety.png"
+            alt=""
+            className="w-full object-contain"
+          />
+          {/* Title + description overlay */}
+          <div className="pointer-events-none absolute top-20 right-[3%] flex pr-6">
+            <div className="max-w-md text-right lg:max-w-lg">
+              <h2 className="text-secondary">
+                <span className="font-sagire text-4xl sm:text-5xl md:text-6xl lg:text-7xl">An toàn</span>
+                <span className="inline-block translate-y-[0.35em] px-5 font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}tích sản</span>
+              </h2>
+              <h2 className="-mt-2 text-secondary sm:-mt-3">
+                <span className="font-sagire text-4xl sm:text-5xl md:text-6xl lg:text-7xl">An giữ</span>
+                <span className="inline-block translate-y-[0.35em] px-5 font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}truyền đời</span>
+              </h2>
+              <p className="mt-4 pl-5 text-sm font-medium justify-end text-black sm:mt-10 sm:text-base">
+                Dự án hiếm hoi tại Hội An sở hữu pháp lý và sổ đỏ lâu dài cho 100% sản phẩm. Quỹ đất sinh thái cuối cùng ở vùng lõi phát triển Đà Nẵng – Hội An.
+              </p>
+            </div>
+          </div>
+          <img
+            src="/gradient-from-b.png"
+            alt=""
+            className="pointer-events-none object-cover sm:block absolute bottom-0 right-0"
+          />
+        </div>
+
       </section>
 
       {/* Footer */}
