@@ -254,9 +254,12 @@ function App() {
 
       {/* Hero */}
       <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl">
-        <img
-          src="/hero.gif"
-          alt=""
+        <video
+          src="/hero.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/10" />
@@ -290,13 +293,13 @@ function App() {
 
       {/* About */}
       <section id="about">
-        <div className="relative overflow-hidden">
+        <div className="relative">
           <img
             src="/vector.png"
             alt=""
             className="h-full w-full object-cover"
           />
-          <div className="absolute -bottom-30 left-1/2 z-10 mx-auto w-full max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24">
+          <div className="absolute -bottom-30 left-1/2 z-10 mx-auto w-full max-w-sm md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24">
             <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
               <span className="text-3xl sm:text-3xl md:text-6xl">
                 Là mỗi ngày sống{' '}
@@ -314,17 +317,13 @@ function App() {
           <img
             src="/leaf.png"
             alt=""
-            className="pointer-events-none absolute bottom-0 -right-20 hidden w-auto object-contain sm:-right-40 sm:block md:-right-110"
+            className="pointer-events-none absolute bottom-0 -right-20 w-auto object-contain sm:-right-40 sm:block md:-right-110"
           />
         </div>
 
         {/* Video thumbnail */}
-        <div className="group relative -top-4 mx-auto max-w-6xl overflow-hidden px-4 sm:-top-10 sm:px-6 lg:px-0">
-          <div className="pointer-events-none absolute -top-7 left-[-12px] z-10 hidden h-14 w-14 rounded-full bg-white sm:block lg:-left-7" />
-          <div className="pointer-events-none absolute -top-7 right-[-12px] z-10 hidden h-14 w-14 rounded-full bg-white sm:block lg:-right-7" />
-          <div className="pointer-events-none absolute -bottom-7 left-[-12px] z-10 hidden h-14 w-14 rounded-full bg-white sm:block lg:-left-7" />
-          <div className="pointer-events-none absolute -bottom-7 right-[-12px] z-10 hidden h-14 w-14 rounded-full bg-white sm:block lg:-right-7" />
-          <div className="overflow-hidden rounded-lg sm:rounded-none">
+        <div className="group relative top-30 mx-auto max-w-6xl px-4 sm:-top-10 sm:px-6 lg:px-0">
+          <div className="overflow-hidden inverted-corners-lg">
             <img
               src="/img.png"
               alt=""
@@ -342,12 +341,12 @@ function App() {
           <img
             src="/leaf.png"
             alt=""
-            className="pointer-events-none absolute -top-10 -left-10 hidden w-auto object-contain sm:-top-45 sm:-left-20 sm:block z-10"
+            className="pointer-events-none absolute top-10 -left-10 w-auto object-contain sm:-top-45 sm:-left-20 sm:block z-10"
           />
           <img
             src="/gradient-from-t.png"
             alt=""
-            className="pointer-events-none absolute top-0 left-0 w-screen object-cover"
+            className="pointer-events-none absolute top-30 md:top-0 md:left-0 w-screen object-cover"
           />
           <div className="absolute top-30 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
             <div className="flex justify-center gap-5">
@@ -366,10 +365,15 @@ function App() {
           <img
             src="/3.png"
             alt=""
-            className="mt-10 w-full object-contain sm:mt-14 md:mt-20 rounded-b-3xl"
+            className="mt-10 w-full object-contain hidden md:block sm:mt-14 md:mt-20 rounded-b-3xl"
+          />
+          <img
+            src="/3-mobile.png"
+            alt=""
+            className="mt-30 w-full object-contain md:hidden rounded-b-3xl"
           />
           {/* Stats card */}
-          <div className="absolute -bottom-30 sm:bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 rounded-2xl bg-[#FFFFFFCC] py-8 pr-3 backdrop-blur-xs sm:py-5 sm:pr-7">
+          <div className="absolute -bottom-80 sm:bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 rounded-2xl bg-[#FFFFFFCC] py-8 pr-3 backdrop-blur-xs sm:py-5 sm:pr-7">
             <p className="mx-auto max-w-3xl text-center text-sm font-medium leading-relaxed text-black sm:text-base">
               Địa thế đắc địa hiếm có, Casamia Balanca là nơi mỗi ngày cư dân sống an,
             </p>
@@ -407,9 +411,14 @@ function App() {
           <img
             src="/map-balanca.svg"
             alt=""
-            className="w-full object-contain rounded-3xl"
+            className="w-full h-full hidden md:block object-cover rounded-3xl"
           />
-          <div className="group/pin absolute left-[39.8%] top-[59%] w-[8%] -translate-x-1/2 -translate-y-1/2">
+          <img
+            src="/map-balanca-mobile.png"
+            alt=""
+            className="w-full md:hidden object-contain rounded-3xl scale-200"
+          />
+          <div className="group/pin hidden md:block absolute left-[39.8%] top-[59%] w-[8%] -translate-x-1/2 -translate-y-1/2">
             <img
               src="/balanca-sign.png"
               alt=""
