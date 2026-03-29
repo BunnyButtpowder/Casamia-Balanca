@@ -266,16 +266,16 @@ function App() {
         <div className="relative z-10 px-4 text-center sm:px-6">
           <h1 className="leading-tight font-light text-white">
             <span className="-ml-6 flex items-center justify-center gap-3 sm:-ml-10 md:-ml-27">
-              <span className="text-3xl font-alishanty md:text-7xl">Sống</span>
-              <span className="text-2xl font-sagire md:text-5xl">đủ sâu</span>
+              <span className="text-7xl font-alishanty md:text-7xl">Sống</span>
+              <span className="text-5xl font-sagire md:text-5xl">đủ sâu</span>
             </span>
-            <span className="ml-6 flex items-center justify-center gap-3 sm:ml-10 md:ml-29">
-              <span className="text-3xl font-alishanty md:text-7xl">Giữ</span>
-              <span className="text-2xl font-sagire md:text-5xl">đủ lâu</span>
+            <span className=" flex items-center justify-center gap-3 sm:ml-10 md:ml-29">
+              <span className="text-7xl font-alishanty md:text-7xl">Giữ</span>
+              <span className="text-5xl font-sagire md:text-5xl">đủ lâu</span>
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-white uppercase sm:mt-4 sm:text-md">
-            Đâu là điều quý giá nhất đời người?
+            Đâu là điều quý giá nhất <br /> đời người?
           </p>
         </div>
 
@@ -858,7 +858,7 @@ function App() {
           <img
             src="/gradient-from-b.png"
             alt=""
-            className="pointer-events-none object-cover sm:block absolute bottom-0 right-0"
+            className="pointer-events-none object-cover sm:block w-full absolute bottom-0 right-0"
           />
         </div>
         <div className="relative flex flex-col gap-8 pl-6 py-12 sm:pl-10 sm:py-16 md:flex-row md:items-stretch md:gap-0 lg:pl-20 lg:py-20">
