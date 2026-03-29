@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useLenis } from './hooks/useLenis'
-import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MapPin, ChevronLeft, ChevronRight, Phone } from 'lucide-react'
 
 const NAV_LEFT = ['Giới thiệu', 'Vị trí', 'Tiện ích']
 const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']
@@ -11,6 +11,57 @@ function App() {
   useLenis()
   const [menuOpen, setMenuOpen] = useState(false)
   const [carouselCat, setCarouselCat] = useState('all')
+  const contentRef = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLElement>(null)
+  const spacerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const content = contentRef.current
+    const footer = footerRef.current
+    const spacer = spacerRef.current
+    if (!content || !footer || !spacer) return
+
+    const updateLayout = () => {
+      const contentH = content.offsetHeight
+      const footerH = footer.offsetHeight
+      spacer.style.height = `${footerH}px`
+      content.style.top = `${-(contentH - window.innerHeight)}px`
+    }
+    updateLayout()
+
+    const ro = new ResizeObserver(updateLayout)
+    ro.observe(content)
+    ro.observe(footer)
+    window.addEventListener('resize', updateLayout)
+
+    const handleScroll = () => {
+      const spacerRect = spacer.getBoundingClientRect()
+      const fh = footer.offsetHeight
+      if (spacerRect.top < window.innerHeight) {
+        const p = Math.min((window.innerHeight - spacerRect.top) / fh, 1)
+        footer.style.translate = `0 ${(1 - p) * 100}%`
+      } else {
+        footer.style.translate = '0 100%'
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', updateLayout)
+      ro.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [menuOpen])
 
   const allSlides = [
     {
@@ -129,27 +180,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-clip">
+      <div ref={contentRef} className="sticky">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-xs">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 md:justify-center">
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            aria-label="Toggle menu"
-            className="z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            <span
-              className={`h-0.5 w-6 rounded bg-[#0F4672] transition-transform duration-300 ${menuOpen ? 'translate-y-2 rotate-45' : ''}`}
-            />
-            <span
-              className={`h-0.5 w-6 rounded bg-[#0F4672] transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
-            />
-            <span
-              className={`h-0.5 w-6 rounded bg-[#0F4672] transition-transform duration-300 ${menuOpen ? '-translate-y-2 -rotate-45' : ''}`}
-            />
-          </button>
+        <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 md:justify-center">
+          {/* Mobile: balances hamburger on the right so logo stays centered */}
+          <div className="w-10 shrink-0 md:hidden" aria-hidden />
 
           <div className="hidden items-center gap-8 md:flex">
             {NAV_LEFT.map((item) => (
@@ -159,7 +196,10 @@ function App() {
             ))}
           </div>
 
-          <a href="#" className="block md:mx-10">
+          <a
+            href="#"
+            className="absolute left-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 md:static md:translate-x-0 md:translate-y-0 md:mx-10"
+          >
             <img
               src="/logo.png"
               alt="Casamia Balance Hoi An"
@@ -175,19 +215,35 @@ function App() {
             ))}
           </div>
 
-          {/* Spacer to balance hamburger on mobile */}
-          <div className="w-10 md:hidden" />
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            className="z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 md:hidden"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span
+              className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? 'translate-y-2 rotate-45' : ''}`}
+            />
+            <span
+              className={`h-0.5 w-6 rounded bg-secondary transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+            />
+            <span
+              className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? '-translate-y-2 -rotate-45' : ''}`}
+            />
+          </button>
         </nav>
 
-        {/* Mobile menu overlay */}
+        {/* Mobile menu overlay — full viewport, safe areas, no click-through when closed */}
         <div
-          className={`fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-white/95 backdrop-blur-sm transition-all duration-300 md:hidden ${menuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}
+          className={`fixed inset-0 z-40 flex min-h-dvh flex-col items-center justify-center gap-6 overflow-y-auto bg-white/95 px-6 py-8 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+          aria-hidden={!menuOpen}
         >
           {[...NAV_LEFT, ...NAV_RIGHT].map((item) => (
             <a
               key={item}
               href="#"
-              className="text-lg font-medium tracking-widest text-[#0F4672]"
+              className="shrink-0 text-center text-lg font-medium tracking-widest text-secondary"
               onClick={() => setMenuOpen(false)}
             >
               {item}
@@ -240,19 +296,19 @@ function App() {
             alt=""
             className="h-full w-full object-cover"
           />
-          <div className="absolute bottom-6 left-1/2 z-10 mx-auto w-full max-w-4xl -translate-x-1/2 px-4 text-center sm:bottom-12 md:bottom-24 sm:px-6">
-            <div className="font-sagire flex items-center justify-center gap-3 font-light text-secondary ">
-              <span className="text-2xl sm:text-3xl md:text-6xl">
-                Là mỗi ngày sống
+          <div className="absolute -bottom-30 left-1/2 z-10 mx-auto w-full max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24">
+            <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
+              <span className="text-3xl sm:text-3xl md:text-6xl">
+                Là mỗi ngày sống{' '}
               </span>
-              <span className="text-3xl sm:text-4xl md:text-7xl">Khoẻ</span>
+              <span className="text-[2.5rem] sm:text-4xl md:text-7xl">Khoẻ</span>
             </div>
             <div className="mt-2 sm:mt-4" />
-            <div className="font-sagire flex items-center justify-center gap-3 font-light text-secondary ">
-              <span className="text-2xl sm:text-3xl md:text-6xl">
-                Là nếp nhà sống
+            <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
+              <span className="text-3xl sm:text-3xl md:text-6xl">
+                Là nếp nhà sống{' '}
               </span>
-              <span className="text-3xl sm:text-4xl md:text-7xl">An</span>
+              <span className="text-[2.5rem] sm:text-4xl md:text-7xl">An</span>
             </div>
           </div>
           <img
@@ -313,7 +369,7 @@ function App() {
             className="mt-10 w-full object-contain sm:mt-14 md:mt-20 rounded-b-3xl"
           />
           {/* Stats card */}
-          <div className="absolute bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 rounded-2xl bg-[#FFFFFFCC] py-8 pr-3 backdrop-blur-xs sm:py-5 sm:pr-7">
+          <div className="absolute -bottom-30 sm:bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 rounded-2xl bg-[#FFFFFFCC] py-8 pr-3 backdrop-blur-xs sm:py-5 sm:pr-7">
             <p className="mx-auto max-w-3xl text-center text-sm font-medium leading-relaxed text-black sm:text-base">
               Địa thế đắc địa hiếm có, Casamia Balanca là nơi mỗi ngày cư dân sống an,
             </p>
@@ -580,7 +636,6 @@ function App() {
                     className="mt-6 w-28 object-contain sm:w-52"
                   />
                 </div>
-
               </div>
 
               {/* Right column — carousel, touches right edge */}
@@ -763,12 +818,17 @@ function App() {
         </div>
       </section>
 
-      <section id="safety">
+      <section id="safety" className="relative">
         <div className="relative rounded-t-3xl overflow-hidden">
           <img
             src="/safety.png"
             alt=""
             className="w-full object-contain"
+          />
+          <img
+            src="/gradient-from-top-r.png"
+            alt=""
+            className="pointer-events-none object-cover sm:block absolute top-0 right-0"
           />
           {/* Title + description overlay */}
           <div className="pointer-events-none absolute top-20 right-[3%] flex pr-6">
@@ -792,16 +852,225 @@ function App() {
             className="pointer-events-none object-cover sm:block absolute bottom-0 right-0"
           />
         </div>
-
+        <div className="relative flex flex-col gap-8 pl-6 py-12 sm:pl-10 sm:py-16 md:flex-row md:items-stretch md:gap-0 lg:pl-20 lg:py-20">
+          {/* Left — text + awards */}
+          <div className="flex flex-col justify-center md:w-[38%] md:shrink-0 md:pr-10 lg:pr-16 max-w-lg">
+            <h2 className="font-sagire text-3xl text-secondary sm:text-4xl md:text-5xl">
+              Chủ đầu tư uy tín
+            </h2>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-secondary sm:text-sm">
+              Top 10 thương hiệu phát triển bền vững
+            </p>
+            <p className="mt-5 text-sm text-justify leading-relaxed text-black sm:text-base">
+              Giá trị của dự án được bảo chứng bởi tiềm lực tài chính mạnh mẽ và hơn 20 năm kinh nghiệm trong lĩnh vực xây dựng, bất động sản của Chủ đầu tư Đạt Phương, đơn vị thi công các công trình hạ tầng trọng điểm quốc gia: Cầu Cửa Đại, cầu Đế Võng.
+            </p>
+            {/* Awards */}
+            <div className="mt-15 flex flex-col gap-5">
+              <div className="relative">
+                <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
+                <div className="relative flex items-center justify-center gap-7 py-4">
+                  <img src="/award-top-10.png" alt="Top 10" className="h-16 w-16 shrink-0 object-contain sm:h-28 sm:w-28 -mt-8 sm:-mt-12" />
+                  <div>
+                    <span className="text-sm font-bold text-secondary sm:text-base">TOP 10</span>
+                    <p className="text-sm text-black sm:text-base">thương hiệu phát triển<br />bền vững (2025)</p>
+                  </div>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
+                <div className="relative flex items-center justify-center gap-7">
+                  <img src="/award-top-500.png" alt="Top 500" className="h-16 w-16 shrink-0 object-contain sm:h-30 sm:w-30" />
+                  <div>
+                    <span className="text-sm font-bold text-secondary sm:text-base">TOP 500</span>
+                    <p className="text-sm text-black sm:text-base">doanh nghiệp tư nhân<br />lớn nhất Việt Nam</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Right — aerial image */}
+          <div className="relative min-h-[300px] flex-1 sm:min-h-[400px]">
+            <div className="h-full w-full overflow-hidden inverted-corners-lg-l">
+              <img
+                src="/exterior-2.png"
+                alt="Casamia Balance aerial view"
+                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <img
+              src="/cloud.png"
+              alt=""
+              className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/4 translate-y-[60%] w-40 sm:w-100 object-contain z-20"
+            />
+          </div>
+        </div>
+        <div className="relative flex flex-col gap-8 pr-6 pb-12 sm:pr-10 sm:pb-16 md:flex-row md:items-stretch md:gap-0 lg:pr-20 lg:pb-20">
+          {/* Left — scenery image */}
+          <div className="min-h-[300px] flex-1 overflow-hidden sm:min-h-[400px] inverted-corners-lg-r">
+            <img
+              src="/scenery.png"
+              alt="Casamia Balance scenery"
+              className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          {/* Right — text + button */}
+          <div className="flex flex-col justify-center md:w-[42%] md:shrink-0 md:pl-10 lg:pl-16 max-w-lg">
+            <h2 className="font-sagire text-3xl leading-tight text-secondary sm:text-4xl md:text-5xl">
+              100% pháp lý
+            </h2>
+            <p className="font-alishanty text-3xl text-center leading-none text-secondary sm:text-4xl md:-mt-2 md:text-6xl">
+              sổ đỏ Lâu dài
+            </p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-secondary text-end sm:text-sm">
+              Quy hoạch bền vững,<br />được bảo tồn bởi UNESCO
+            </p>
+            <p className="mt-5 text-sm text-justify leading-relaxed text-black sm:text-base">
+              Nương theo địa thế hiếm có của vùng đất Cẩm Thanh – top 20 ngôi làng đẹp nhất thế giới, Casamia Balanca được quy hoạch hài hòa với tự nhiên. Dự án nằm trong quỹ đất được bảo tồn với quy định nghiêm ngặt.
+            </p>
+            <p className="mt-4 text-sm text-justify leading-relaxed text-black sm:text-base">
+              Sự khan hiếm ấy trở thành nền tảng giá trị độc tôn của Casamia Balanca. Nơi nếp sống vì sức khỏe được thiên nhiên nâng niu và giá trị sinh lời của tài sản được thời gian nâng giữ.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <a
+                href="#"
+                className="btn-inverted-corners bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+              >
+                Tải tài liệu dự án
+              </a>
+            </div>
+          </div>
+        </div>
+        <img
+          src="/leaf.png"
+          alt=""
+          className="pointer-events-none object-cover sm:block absolute -bottom-30 right-0"
+        />
       </section>
+      </div>
+      <div ref={spacerRef} />
 
       {/* Footer */}
-      <footer className="bg-dark px-4 py-10 sm:px-6 sm:py-12">
-        <div className="mx-auto max-w-6xl text-center">
-          <p className="font-serif text-base text-white/80 sm:text-lg">Casamia Balance Hoi An</p>
-          <p className="mt-2 text-xs text-white/40 sm:text-sm">
-            &copy; {new Date().getFullYear()} Casamia Balance. All rights reserved.
-          </p>
+      <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 translate-y-full overflow-hidden rounded-t-3xl bg-secondary">
+        <img
+          src="/bg-footer.png"
+          alt=""
+          className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover mt-20"
+        />
+
+        <div className="relative mx-auto max-w-6xl px-6 py-14 sm:px-10 sm:py-20 lg:px-20">
+          <div className="flex flex-col gap-12 md:flex-row md:gap-16">
+            {/* Left column — logo, info, socials */}
+            <div className="md:w-[38%] md:shrink-0">
+              <img
+                src="/logo-footer.png"
+                alt="Casamia Balanca Hoi An"
+                className="w-44 object-contain sm:w-52 justify-self-center"
+              />
+
+              <div className="mt-8 space-y-6 text-sm text-white/90 sm:text-base">
+                <div>
+                  <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hà Nội</h3>
+                  <p className="mt-2 flex items-start gap-2">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>Tầng 15, tòa nhà Handico Tower, Đường Phạm Hùng, Phường Từ Liêm, TP. Hà Nội</span>
+                  </p>
+                  <p className="mt-1 flex items-center gap-2">
+                    <Phone className="h-4 w-4 shrink-0" />
+                    <span>1800 6918</span>
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hội An</h3>
+                  <p className="mt-2 flex items-start gap-2">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>Số nhà LK3.17, KĐT Casamia Phường Hội An Đông, Đà Nẵng</span>
+                  </p>
+                  <p className="mt-1 flex items-center gap-2">
+                    <Phone className="h-4 w-4 shrink-0" />
+                    <span>1800 6918</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <p className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">Cập nhật thông tin tại</p>
+                <div className="mt-3 flex gap-3">
+                  <a href="#" className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z"/></svg>
+                  </a>
+                  <a href="#" className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <p className="mt-6 text-xs text-white/50">
+                &copy;Bản quyền thuộc về Casamia Balanca Hội An
+              </p>
+            </div>
+
+            {/* Right column — subscribe form */}
+            <div className="flex-1">
+              <div className="rounded-2xl bg-white px-8 py-8 sm:px-10 sm:py-10">
+                <h3 className="font-sagire text-center text-2xl text-secondary sm:text-3xl md:text-4xl">
+                  Đăng ký nhận tư vấn
+                </h3>
+                <p className="mt-2 text-center text-xs text-black/70 sm:text-sm">
+                  Vui lòng để lại thông tin.<br />
+                  Tư vấn viên sẽ liên hệ quý khách trong thời gian sớm nhất.
+                </p>
+
+                <form className="mt-8 space-y-5" onSubmit={(e) => e.preventDefault()}>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-semibold text-black/70 sm:text-sm">Họ tên</label>
+                    <input
+                      type="text"
+                      placeholder="Điền thông tin của bạn"
+                      className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
+                    <div className="flex flex-1 flex-col gap-1">
+                      <label className="text-xs font-semibold text-black/70 sm:text-sm">Số điện thoại</label>
+                      <input
+                        type="tel"
+                        placeholder="Tối thiểu 10 chữ số"
+                        className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                      />
+                    </div>
+                    <div className="flex flex-1 flex-col gap-1">
+                      <label className="text-xs font-semibold text-black/70 sm:text-sm">Email</label>
+                      <input
+                        type="email"
+                        placeholder="vidu@mail.com"
+                        className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-semibold text-black/70 sm:text-sm">Yêu cầu tư vấn</label>
+                    <input
+                      type="text"
+                      placeholder="Hãy để lại lời nhắn để tư vấn viên có thể hỗ trợ Quý khách"
+                      className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                    />
+                  </div>
+
+                  <div className="flex justify-center pt-2">
+                    <button
+                      type="submit"
+                      className="btn-inverted-corners bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+                    >
+                      Đăng ký tư vấn
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
