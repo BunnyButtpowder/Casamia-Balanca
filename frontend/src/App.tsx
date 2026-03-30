@@ -34,20 +34,26 @@ function App() {
     ro.observe(footer)
     window.addEventListener('resize', updateLayout)
 
+    let rafId = 0
     const handleScroll = () => {
-      const spacerRect = spacer.getBoundingClientRect()
-      const fh = footer.offsetHeight
-      if (spacerRect.top < window.innerHeight) {
-        const p = Math.min((window.innerHeight - spacerRect.top) / fh, 1)
-        footer.style.translate = `0 ${(1 - p) * 100}%`
-      } else {
-        footer.style.translate = '0 100%'
-      }
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        const spacerRect = spacer.getBoundingClientRect()
+        const fh = footer.offsetHeight
+        if (spacerRect.top < window.innerHeight) {
+          const p = Math.min((window.innerHeight - spacerRect.top) / fh, 1)
+          const eased = 1 - (1 - p) * (1 - p) * (1 - p)
+          footer.style.transform = `translateY(${(1 - eased) * 100}%)`
+        } else {
+          footer.style.transform = 'translateY(100%)'
+        }
+      })
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
     return () => {
+      cancelAnimationFrame(rafId)
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('resize', updateLayout)
       ro.disconnect()
@@ -1095,7 +1101,7 @@ function App() {
       <div ref={spacerRef} />
 
       {/* Footer */}
-      <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 translate-y-full overflow-hidden rounded-t-3xl bg-secondary">
+      <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
         <img
           src="/bg-footer.png"
           alt=""
