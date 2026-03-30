@@ -1101,7 +1101,7 @@ function App() {
       <div ref={spacerRef} />
 
       {/* Footer */}
-      <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 translate-y-full overflow-hidden rounded-t-3xl bg-secondary will-change-transform">
+      <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
         <img
           src="/bg-footer.png"
           alt=""
