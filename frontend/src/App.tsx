@@ -723,14 +723,14 @@ function App() {
             </p>
           </div>
         </div>
-        <div className="relative min-h-[700px] sm:min-h-[800px] md:min-h-[900px]">
+        <div className="relative md:min-h-[900px]">
           <img
             src="/bg-pattern.png"
             alt=""
-            className="pointer-events-none object-cover sm:block "
+            className="pointer-events-none object-cover hidden md:block"
           />
           {/* Overlay: title + description + award | carousel */}
-          <div className="absolute inset-0 z-10 flex items-center">
+          <div className="relative z-10 flex items-center md:absolute md:inset-0">
             <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:pl-6 pr-0 md:flex-row md:items-stretch md:gap-15 lg:pl-20">
               {/* Left column */}
               <div className="flex flex-col justify-center md:shrink-0">
@@ -807,7 +807,7 @@ function App() {
             alt=""
             className="pointer-events-none justify-self-end hidden md:block"
           />
-          <div className="relative z-10 flex items-center py-6 sm:py-10 md:absolute md:inset-0">
+          <div className="relative z-10 flex items-center pb-6 sm:py-10 md:absolute md:inset-0">
             <div className="flex h-full min-h-0 w-full flex-col justify-center gap-8 md:flex-row md:items-stretch md:justify-start md:gap-0 lg:pr-10">
               {/* Left — image carousel */}
               <div className="relative flex min-w-0 w-full items-center justify-center md:w-[65%] md:shrink-0">
@@ -848,9 +848,9 @@ function App() {
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
-                  <p className="font-snell-bold text-center text-4xl italic text-secondary">
+                  <p className="font-snell-bold text-center text-8xl md:text-4xl italic text-secondary">
                     <span>{String(prodIdx + 1).padStart(2, '0')}</span>
-                    <span className="ml-1 align-bottom text-base font-normal text-secondary/40 not-italic">
+                    <span className="ml-1 align-bottom text-4xl font-normal text-secondary/40 not-italic md:text-base">
                       / {String(productSlides.length).padStart(2, '0')}
                     </span>
                   </p>
@@ -920,27 +920,27 @@ function App() {
           />
           <div className="relative z-10 flex items-center px-6 py-10 sm:px-10 sm:py-14 md:absolute md:inset-0 lg:px-20 lg:py-16">
             {/* Village image + title + white card */}
-            <div className="relative w-full overflow-hidden rounded-2xl max-md:[-webkit-mask:none] max-md:[mask:none] md:rounded-none md:h-full md:min-h-0 inverted-corners-lg">
+            <div className="relative min-h-[90vh] w-full overflow-hidden rounded-2xl max-md:[-webkit-mask:none] max-md:[mask:none] md:min-h-0 md:rounded-none md:h-full inverted-corners-lg">
               <img
                 src="/village.png"
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover hover:scale-105 transition-transform duration-500"
               />
               {/* Title + white card column */}
-              <div className="pointer-events-none relative flex flex-col items-center px-6 py-8 text-center md:absolute md:inset-y-8 md:left-10 md:w-[320px] md:items-start md:text-left md:px-0 md:py-0 lg:left-15 lg:inset-y-18 lg:w-[50%]">
+              <div className="pointer-events-none relative flex min-h-[90vh] flex-col items-center px-6 py-5 text-center md:min-h-0 md:absolute md:inset-y-8 md:left-10 md:w-[320px] md:items-start md:text-left md:px-0 md:py-0 lg:left-15 lg:inset-y-18 lg:w-[50%]">
                 {/* Title */}
                 <div>
                   <h2 className="font-sagire text-secondary">
-                    <span className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl">Vận hành</span>
-                    <span className="inline-block px-3 translate-y-[0.35em] font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}& </span>
-                    <span className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl">Sinh lời ngay</span>
+                    <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">Vận hành <br className="block md:hidden" /></span>
+                    <span className="inline-block px-3 md:translate-y-[0.35em] font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}& </span>
+                    <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl"><br className="block md:hidden" />Sinh lời ngay</span>
                   </h2>
-                  <p className="mt-7 text-sm font-medium uppercase tracking-[0.15em] text-secondary sm:text-base">
+                  <p className="mt-2 md:mt-7 text-sm font-medium uppercase tracking-[0.15em] text-secondary sm:text-base">
                     Cùng đơn vị chuyên nghiệp
                   </p>
                 </div>
                 {/* White card — fills from mt-10 below title to bottom */}
-                <div className="mt-6 flex flex-1 min-h-0 flex-col items-center justify-center rounded-3xl bg-white/80 px-6 py-6 backdrop-blur-xs w-full sm:px-8 sm:py-8 md:mt-10 md:w-[80%]">
+                <div className="mt-auto flex min-h-0 flex-col items-center justify-center rounded-3xl bg-white/80 px-6 py-6 backdrop-blur-xs w-full sm:px-8 sm:py-8 md:mt-10 md:flex-1 md:w-[80%]">
                   <img
                     src="/logo-village.png"
                     alt="M Village"
@@ -979,17 +979,17 @@ function App() {
             className="pointer-events-none hidden object-cover sm:block absolute top-0 right-0"
           />
           {/* Title + description overlay */}
-          <div className="pointer-events-none absolute top-20 right-[3%] flex pr-6">
-            <div className="max-w-md text-right lg:max-w-lg">
+          <div className="pointer-events-none absolute top-10 md:top-20 justify-self-center  md:right-[3%] flex md:pr-6">
+            <div className="max-w-xs text-center md:text-right lg:max-w-lg">
               <h2 className="text-secondary">
-                <span className="font-sagire text-4xl sm:text-5xl md:text-6xl lg:text-7xl">An toàn</span>
-                <span className="inline-block translate-y-[0.35em] px-5 font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}tích sản</span>
+                <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-7xl">An toàn</span>
+                <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}tích sản</span>
               </h2>
-              <h2 className="-mt-2 text-secondary sm:-mt-3">
-                <span className="font-sagire text-4xl sm:text-5xl md:text-6xl lg:text-7xl">An giữ</span>
-                <span className="inline-block translate-y-[0.35em] px-5 font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}truyền đời</span>
+              <h2 className="mt-2 text-secondary sm:-mt-3">
+                <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-7xl">An giữ</span>
+                <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}truyền đời</span>
               </h2>
-              <p className="mt-4 pl-5 text-sm font-medium justify-end text-black sm:mt-10 sm:text-base">
+              <p className="mt-4 md:pl-5 text-sm font-medium text-center md:text-end justify-end text-black sm:mt-10 sm:text-base">
                 Dự án hiếm hoi tại Hội An sở hữu pháp lý và sổ đỏ lâu dài cho 100% sản phẩm. Quỹ đất sinh thái cuối cùng ở vùng lõi phát triển Đà Nẵng – Hội An.
               </p>
             </div>
@@ -1000,44 +1000,44 @@ function App() {
             className="pointer-events-none object-cover sm:block w-full absolute bottom-0 right-0"
           />
         </div>
-        <div className="relative flex flex-col gap-8 pl-6 py-12 sm:pl-10 sm:py-16 md:flex-row md:items-stretch md:gap-0 lg:pl-20 lg:py-20">
+        <div className="relative flex flex-col gap-8 md:pl-6 py-12 sm:pl-10 sm:py-16 md:flex-row md:items-stretch md:gap-0 lg:pl-20 lg:py-20">
           {/* Left — text + awards */}
-          <div className="flex flex-col justify-center md:w-[38%] md:shrink-0 md:pr-10 lg:pr-16 max-w-lg">
-            <h2 className="font-sagire text-3xl text-secondary sm:text-4xl md:text-5xl">
+          <div className="flex flex-col px-6 md:px-0 justify-center md:w-[38%] md:shrink-0 md:pr-10 lg:pr-16 max-w-lg">
+            <h2 className="font-sagire text-center md:text-left text-4xl text-secondary sm:text-4xl md:text-5xl">
               Chủ đầu tư uy tín
             </h2>
-            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-secondary sm:text-sm">
+            <p className="mt-2 text-center md:text-left text-sm font-semibold uppercase tracking-[0.15em] text-secondary">
               Top 10 thương hiệu phát triển bền vững
             </p>
-            <p className="mt-5 text-sm text-justify leading-relaxed text-black sm:text-base">
+            <p className="mt-5 text-base text-center md:text-justify leading-relaxed text-black">
               Giá trị của dự án được bảo chứng bởi tiềm lực tài chính mạnh mẽ và hơn 20 năm kinh nghiệm trong lĩnh vực xây dựng, bất động sản của Chủ đầu tư Đạt Phương, đơn vị thi công các công trình hạ tầng trọng điểm quốc gia: Cầu Cửa Đại, cầu Đế Võng.
             </p>
             {/* Awards */}
-            <div className="mt-15 flex flex-col gap-5">
+            <div className="mt-10 md:mt-15 flex flex-col gap-5">
               <div className="relative">
                 <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
                 <div className="relative flex items-center justify-center gap-7 py-4">
-                  <img src="/award-top-10.png" alt="Top 10" className="h-16 w-16 shrink-0 object-contain sm:h-28 sm:w-28 -mt-8 sm:-mt-12" />
+                  <img src="/award-top-10.png" alt="Top 10" className="h-28 w-28 shrink-0 object-contain -mt-8 sm:-mt-12" />
                   <div>
-                    <span className="text-sm font-bold text-secondary sm:text-base">TOP 10</span>
-                    <p className="text-sm text-black sm:text-base">thương hiệu phát triển<br />bền vững (2025)</p>
+                    <span className="font-bold text-secondary text-base">TOP 10</span>
+                    <p className="text-black text-base">thương hiệu phát triển<br />bền vững (2025)</p>
                   </div>
                 </div>
               </div>
               <div className="relative">
                 <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
                 <div className="relative flex items-center justify-center gap-7">
-                  <img src="/award-top-500.png" alt="Top 500" className="h-16 w-16 shrink-0 object-contain sm:h-30 sm:w-30" />
+                  <img src="/award-top-500.png" alt="Top 500" className="h-30 w-30 shrink-0 object-contain" />
                   <div>
-                    <span className="text-sm font-bold text-secondary sm:text-base">TOP 500</span>
-                    <p className="text-sm text-black sm:text-base">doanh nghiệp tư nhân<br />lớn nhất Việt Nam</p>
+                    <span className="font-bold text-secondary text-base">TOP 500</span>
+                    <p className="text-black text-base">doanh nghiệp tư nhân<br />lớn nhất Việt Nam</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
           {/* Right — aerial image */}
-          <div className="relative min-h-[300px] flex-1 sm:min-h-[400px]">
+          <div className="relative min-h-[300px] flex-1 sm:min-h-[400px] pl-6 md:pl-0 mt-6 md:mt-0">
             <div className="h-full w-full overflow-hidden inverted-corners-lg-l">
               <img
                 src="/exterior-2.png"
@@ -1052,9 +1052,9 @@ function App() {
             />
           </div>
         </div>
-        <div className="relative flex flex-col gap-8 pr-6 pb-12 sm:pr-10 sm:pb-16 md:flex-row md:items-stretch md:gap-0 lg:pr-20 lg:pb-20">
+        <div className="relative flex flex-col-reverse gap-8 md:pr-6 pb-12 sm:pr-10 sm:pb-16 md:flex-row md:items-stretch md:gap-0 lg:pr-20 lg:pb-20">
           {/* Left — scenery image */}
-          <div className="min-h-[300px] flex-1 overflow-hidden sm:min-h-[400px] inverted-corners-lg-r">
+          <div className="min-h-[300px] flex-1 overflow-hidden sm:min-h-[400px] inverted-corners-lg-r mr-6 md:mr-0">
             <img
               src="/scenery.png"
               alt="Casamia Balance scenery"
@@ -1062,20 +1062,20 @@ function App() {
             />
           </div>
           {/* Right — text + button */}
-          <div className="flex flex-col justify-center md:w-[42%] md:shrink-0 md:pl-10 lg:pl-16 max-w-lg">
-            <h2 className="font-sagire text-3xl leading-tight text-secondary sm:text-4xl md:text-5xl">
+          <div className="px-6 md:px-0 flex flex-col justify-center md:w-[42%] md:shrink-0 md:pl-10 lg:pl-16 max-w-lg">
+            <h2 className="font-sagire text-4xl leading-tight text-secondary sm:text-4xl md:text-5xl">
               100% pháp lý
             </h2>
-            <p className="font-alishanty text-3xl text-center leading-none text-secondary sm:text-4xl md:-mt-2 md:text-6xl">
+            <p className="font-alishanty text-6xl text-center leading-none text-secondary sm:text-4xl md:-mt-2 md:text-6xl">
               sổ đỏ Lâu dài
             </p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-secondary text-end sm:text-sm">
+            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-secondary text-end sm:text-sm">
               Quy hoạch bền vững,<br />được bảo tồn bởi UNESCO
             </p>
-            <p className="mt-5 text-sm text-justify leading-relaxed text-black sm:text-base">
+            <p className="mt-5 text-center md:text-justify leading-relaxed text-black text-base">
               Nương theo địa thế hiếm có của vùng đất Cẩm Thanh – top 20 ngôi làng đẹp nhất thế giới, Casamia Balanca được quy hoạch hài hòa với tự nhiên. Dự án nằm trong quỹ đất được bảo tồn với quy định nghiêm ngặt.
             </p>
-            <p className="mt-4 text-sm text-justify leading-relaxed text-black sm:text-base">
+            <p className="mt-4 text-center md:text-justify leading-relaxed text-black text-base">
               Sự khan hiếm ấy trở thành nền tảng giá trị độc tôn của Casamia Balanca. Nơi nếp sống vì sức khỏe được thiên nhiên nâng niu và giá trị sinh lời của tài sản được thời gian nâng giữ.
             </p>
             <div className="mt-8 flex justify-center">
@@ -1091,7 +1091,7 @@ function App() {
         <img
           src="/leaf.png"
           alt=""
-          className="pointer-events-none object-cover sm:block absolute -bottom-30 right-0"
+          className="pointer-events-none object-cover sm:block absolute -bottom-10 md:-bottom-30 right-0"
         />
       </section>
       </div>
