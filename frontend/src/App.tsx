@@ -7,8 +7,18 @@ const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']
 const NAV_LINK_CLASS =
   'relative text-sm uppercase font-semibold tracking-widest text-[#0F4672] transition-colors hover:text-[#0F4672] after:absolute after:bottom-[-4px] after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
 
+const navHref = (item: string) => {
+  if (item === 'Giới thiệu') return '#about'
+  if (item === 'Vị trí') return '#map'
+  if (item === 'Tiện ích') return '#features'
+  if (item === 'Sản phẩm') return '#products'
+  if (item === 'Giá trị') return '#value'
+  if (item === 'Liên hệ') return '#contact'
+  return '#hero'
+}
+
 function App() {
-  useLenis()
+  const lenisRef = useLenis()
   const [menuOpen, setMenuOpen] = useState(false)
   const [carouselCat, setCarouselCat] = useState('all')
   const contentRef = useRef<HTMLDivElement>(null)
@@ -276,6 +286,30 @@ function App() {
     }
   }
 
+  const handleNavClick = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!href.startsWith('#') || href === '#') return
+    e.preventDefault()
+    setMenuOpen(false)
+
+    if (href === '#contact') {
+      const target = document.documentElement.scrollHeight - window.innerHeight
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(target, { duration: 1.2 })
+      } else {
+        window.scrollTo({ top: target, behavior: 'smooth' })
+      }
+      return
+    }
+
+    const el = document.querySelector(href) as HTMLElement | null
+    if (!el) return
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(el, { offset: -88 })
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <div className="min-h-screen overflow-x-clip">
       <div ref={contentRef} className="sticky">
@@ -287,14 +321,19 @@ function App() {
 
             <div className="hidden items-center gap-8 md:flex">
               {NAV_LEFT.map((item) => (
-                <a key={item} href="#" className={NAV_LINK_CLASS}>
+                <a
+                  key={item}
+                  href={navHref(item)}
+                  className={NAV_LINK_CLASS}
+                  onClick={handleNavClick(navHref(item))}
+                >
                   {item}
                 </a>
               ))}
             </div>
 
             <a
-              href="#"
+              href="#hero"
               className="absolute left-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 md:static md:translate-x-0 md:translate-y-0 md:mx-10"
             >
               <img
@@ -306,7 +345,12 @@ function App() {
 
             <div className="hidden items-center gap-8 md:flex">
               {NAV_RIGHT.map((item) => (
-                <a key={item} href="#" className={NAV_LINK_CLASS}>
+                <a
+                  key={item}
+                  href={navHref(item)}
+                  className={NAV_LINK_CLASS}
+                  onClick={handleNavClick(navHref(item))}
+                >
                   {item}
                 </a>
               ))}
@@ -339,9 +383,9 @@ function App() {
             {[...NAV_LEFT, ...NAV_RIGHT].map((item) => (
               <a
                 key={item}
-                href="#"
+                href={navHref(item)}
                 className="shrink-0 text-center text-lg font-medium tracking-widest text-secondary"
-                onClick={() => setMenuOpen(false)}
+                onClick={handleNavClick(navHref(item))}
               >
                 {item}
               </a>
@@ -350,7 +394,7 @@ function App() {
         </header>
 
         {/* Hero */}
-        <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl">
+        <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
           <video
             src="/hero.mp4"
             autoPlay
@@ -682,8 +726,8 @@ function App() {
           </div>
         </section>
 
-        {/* Exterior */}
-        <section id="exterior" className="relative pt-0 md:pt-16">
+        {/* Products */}
+        <section id="products" className="relative pt-0 md:pt-16">
           <img
             src="/gradient-from-t.png"
             alt=""
@@ -964,7 +1008,8 @@ function App() {
           </div>
         </section>
 
-        <section id="safety" className="relative">
+        {/* Value */}
+        <section id="value" className="relative">
           <div className="relative rounded-t-3xl overflow-hidden">
             <img
               src="/safety.png"
