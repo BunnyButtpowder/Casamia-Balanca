@@ -24,6 +24,14 @@ const FOOTER_NEWS = [
   },
 ]
 
+const FOOTER_GALLERY = [
+  '/carousel-1.png',
+  '/carousel-5.png',
+  '/carousel-2.jpg',
+  '/carousel-3.jpg',
+  '/exterior.jpg',
+]
+
 const navHref = (item: string) => {
   if (item === 'Giới thiệu') return '#about'
   if (item === 'Vị trí') return '#map'
@@ -38,6 +46,11 @@ function App() {
   const lenisRef = useLenis()
   const [menuOpen, setMenuOpen] = useState(false)
   const [showDesktopNav, setShowDesktopNav] = useState(true)
+  const [galleryIdx, setGalleryIdx] = useState(1)
+  const [galleryAnimate, setGalleryAnimate] = useState(true)
+  const [galleryDragOffset, setGalleryDragOffset] = useState(0)
+  const galleryDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
+  const galleryTrackRef = useRef<HTMLDivElement>(null)
   const [carouselCat, setCarouselCat] = useState('all')
   const contentRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLElement>(null)
@@ -326,6 +339,67 @@ function App() {
     } else if (slideIdx === extendedSlides.length - 1) {
       setAnimate(false)
       setSlideIdx(1)
+    }
+  }
+
+  // Footer gallery carousel
+  const extendedGallery = [
+    FOOTER_GALLERY[FOOTER_GALLERY.length - 1],
+    ...FOOTER_GALLERY,
+    FOOTER_GALLERY[0],
+  ]
+  const galleryIsFirst = galleryIdx <= 1
+  const galleryIsLast = galleryIdx >= FOOTER_GALLERY.length
+
+  const prevGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i - 1) }
+  const nextGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i + 1) }
+
+  const handleGalleryTouchStart = (e: React.TouchEvent) => {
+    setGalleryAnimate(false)
+    galleryDragRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, locked: null, startTime: Date.now() }
+  }
+  const handleGalleryTouchMove = (e: React.TouchEvent) => {
+    if (!galleryDragRef.current) return
+    const dx = e.touches[0].clientX - galleryDragRef.current.startX
+    const dy = e.touches[0].clientY - galleryDragRef.current.startY
+    if (galleryDragRef.current.locked === null) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        galleryDragRef.current.locked = Math.abs(dx) > Math.abs(dy)
+      }
+      return
+    }
+    if (!galleryDragRef.current.locked) return
+    e.preventDefault()
+    const atEdge = (galleryIsFirst && dx > 0) || (galleryIsLast && dx < 0)
+    setGalleryDragOffset(atEdge ? dx * 0.2 : dx)
+  }
+  const handleGalleryTouchEnd = (e: React.TouchEvent) => {
+    if (!galleryDragRef.current || !galleryDragRef.current.locked) {
+      galleryDragRef.current = null
+      setGalleryDragOffset(0)
+      return
+    }
+    const dx = e.changedTouches[0].clientX - galleryDragRef.current.startX
+    const elapsed = Date.now() - galleryDragRef.current.startTime
+    const velocity = Math.abs(dx) / elapsed
+    const containerW = galleryTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+    const threshold = containerW * 0.2
+    setGalleryAnimate(true)
+    setGalleryDragOffset(0)
+    if (!galleryIsLast && (dx < -threshold || (velocity > 0.3 && dx < 0))) {
+      nextGallery()
+    } else if (!galleryIsFirst && (dx > threshold || (velocity > 0.3 && dx > 0))) {
+      prevGallery()
+    }
+    galleryDragRef.current = null
+  }
+  const handleGalleryTransitionEnd = () => {
+    if (galleryIdx === 0) {
+      setGalleryAnimate(false)
+      setGalleryIdx(FOOTER_GALLERY.length)
+    } else if (galleryIdx === extendedGallery.length - 1) {
+      setGalleryAnimate(false)
+      setGalleryIdx(1)
     }
   }
 
@@ -1197,17 +1271,17 @@ function App() {
       {/* Footer */}
       <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
         <section
-          className="relative overflow-hidden"
+          className="relative"
           style={{
             backgroundImage: "url('/footer-pattern.png')",
             backgroundPosition: 'center',
-            backgroundRepeat: 'repeat',
+            backgroundRepeat: 'no-repeat',
             backgroundSize: 'auto',
           }}
         >
-          <div className="absolute inset-0 bg-secondary" />
-          <div className="relative mx-auto max-w-7xl px-6 py-14 sm:px-10 sm:py-16 lg:px-20">
-            <div className="grid gap-12 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
+          <div className="absolute inset-0 bg-secondary/10" />
+          <div className="relative py-14 sm:py-16 px-6 sm:px-10 lg:pl-20 lg:pr-0">
+            <div className="grid gap-12 xl:grid-cols-[minmax(0,480px)_minmax(0,1fr)] xl:items-start">
               <div>
                 <h3 className="font-sagire text-4xl text-white sm:text-5xl">Tin tức</h3>
                 <div className="mt-8 space-y-5">
@@ -1240,8 +1314,8 @@ function App() {
                 </a>
               </div>
 
-              <div>
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between lg:pr-20 xl:pr-10">
                   <h3 className="font-sagire text-4xl text-white sm:text-5xl">Thư viện</h3>
                   <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
                     <span className="text-white">Hình ảnh</span>
@@ -1252,30 +1326,42 @@ function App() {
                   </div>
                 </div>
 
-                <div className="mt-8 flex items-center gap-3">
-                  <button
-                    type="button"
-                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-secondary shadow-lg transition-opacity hover:opacity-90 md:inline-flex"
-                    aria-label="Previous gallery item"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <div className="grid flex-1 gap-4 md:grid-cols-[minmax(0,1fr)_170px]">
-                    <img
-                      src="/carousel-1.png"
-                      alt="Thư viện Casamia Balanca"
-                      className="h-[250px] w-full rounded-4xl object-cover sm:h-[340px]"
-                    />
-                    <img
-                      src="/carousel-5.png"
-                      alt="Xem trước thư viện"
-                      className="hidden h-[340px] w-full rounded-4xl object-cover md:block"
-                    />
+                <div className="relative mt-8">
+                  <div className="overflow-hidden touch-pan-y rounded-l-3xl" onTouchStart={handleGalleryTouchStart} onTouchMove={handleGalleryTouchMove} onTouchEnd={handleGalleryTouchEnd}>
+                    <div
+                      ref={galleryTrackRef}
+                      className={`flex ${galleryAnimate ? 'transition-transform duration-700 ease-in-out' : ''}`}
+                      style={{ transform: `translateX(calc(-${galleryIdx} * 76% - ${galleryIdx} * 16px + ${galleryDragOffset}px))` }}
+                      onTransitionEnd={handleGalleryTransitionEnd}
+                    >
+                      {extendedGallery.map((src, i) => (
+                        <div
+                          key={`${src}-${i}`}
+                          className="w-[78%] shrink-0 pr-4"
+                        >
+                          <img
+                            src={src}
+                            alt="Thư viện Casamia Balanca"
+                            className="h-[250px] w-full rounded-3xl object-cover sm:h-[340px]"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <button
                     type="button"
-                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-secondary shadow-lg transition-opacity hover:opacity-90 md:inline-flex"
+                    className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 hidden h-11 w-11 items-center justify-center rounded-xl bg-white text-secondary transition-opacity hover:opacity-90 md:inline-flex"
+                    aria-label="Previous gallery item"
+                    onClick={prevGallery}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    className="absolute top-1/2 -translate-y-1/2 z-10 hidden h-11 w-11 items-center justify-center rounded-xl bg-white text-secondary transition-opacity hover:opacity-90 md:inline-flex"
+                    style={{ right: 'calc(22%)' }}
                     aria-label="Next gallery item"
+                    onClick={nextGallery}
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
