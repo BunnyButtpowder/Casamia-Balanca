@@ -6,6 +6,23 @@ const NAV_LEFT = ['Giới thiệu', 'Vị trí', 'Tiện ích']
 const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']
 const NAV_LINK_CLASS =
   'relative text-sm uppercase font-semibold tracking-widest text-[#0F4672] transition-colors hover:text-[#0F4672] after:absolute after:bottom-[-4px] after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+const FOOTER_NEWS = [
+  {
+    title: 'Bỏ ra 8 tỷ mua Villa Casamia Hội An: Liệu có đáng?',
+    date: '20.10',
+    image: '/carousel-1.png',
+  },
+  {
+    title: 'Casamia Balanca Hội An: “Mỏ Vàng” Hay “Vũng Lầy” Rủi Ro?',
+    date: '20.10',
+    image: '/carousel-2.jpg',
+  },
+  {
+    title: 'Đừng Mua Casamia Hội An Nếu Chưa Đọc Điều Này: Lợi Nhuận Thật Sự?',
+    date: '20.10',
+    image: '/carousel-3.jpg',
+  },
+]
 
 const navHref = (item: string) => {
   if (item === 'Giới thiệu') return '#about'
@@ -20,6 +37,7 @@ const navHref = (item: string) => {
 function App() {
   const lenisRef = useLenis()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showDesktopNav, setShowDesktopNav] = useState(true)
   const [carouselCat, setCarouselCat] = useState('all')
   const contentRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLElement>(null)
@@ -78,6 +96,31 @@ function App() {
       document.body.style.overflow = prev
     }
   }, [menuOpen])
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY
+
+    const updateHeaderState = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY < 24) {
+        setShowDesktopNav(true)
+      } else if (currentScrollY < lastScrollY) {
+        setShowDesktopNav(true)
+      } else if (currentScrollY > lastScrollY) {
+        setShowDesktopNav(false)
+      }
+
+      lastScrollY = currentScrollY
+    }
+
+    updateHeaderState()
+    window.addEventListener('scroll', updateHeaderState, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', updateHeaderState)
+    }
+  }, [])
 
   const allSlides = [
     {
@@ -319,7 +362,10 @@ function App() {
             {/* Mobile: balances hamburger on the right so logo stays centered */}
             <div className="w-10 shrink-0 md:hidden" aria-hidden />
 
-            <div className="hidden items-center gap-8 md:flex">
+            <div
+              className={`hidden items-center gap-8 transition-all duration-300 md:flex ${showDesktopNav ? 'opacity-100' : 'pointer-events-none opacity-0'
+                }`}
+            >
               {NAV_LEFT.map((item) => (
                 <a
                   key={item}
@@ -343,7 +389,10 @@ function App() {
               />
             </a>
 
-            <div className="hidden items-center gap-8 md:flex">
+            <div
+              className={`hidden items-center gap-8 transition-all duration-300 md:flex ${showDesktopNav ? 'opacity-100' : 'pointer-events-none opacity-0'
+                }`}
+            >
               {NAV_RIGHT.map((item) => (
                 <a
                   key={item}
@@ -442,22 +491,22 @@ function App() {
             />
             <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-sm md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24">
               <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
-                <span className="block text-4xl sm:inline sm:text-3xl md:text-6xl">
+                <span className="block text-4xl sm:inline sm:text-3xl md:text-5xl">
                   Là mỗi ngày
                 </span>
-                <span className="text-4xl sm:text-3xl md:text-6xl">
+                <span className="text-4xl sm:text-3xl md:text-5xl">
                   sống{' '}
                 </span>
-                <span className="text-[3rem] sm:text-4xl md:text-7xl">Khoẻ</span>
+                <span className="text-[3rem] sm:text-4xl md:text-6xl">Khoẻ</span>
               </div>
               <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
-                <span className="block text-4xl sm:inline sm:text-3xl md:text-6xl">
+                <span className="block text-4xl sm:inline sm:text-3xl md:text-5xl">
                   Là nếp nhà
                 </span>
-                <span className="text-4xl sm:text-3xl md:text-6xl">
+                <span className="text-4xl sm:text-3xl md:text-5xl">
                   sống{' '}
                 </span>
-                <span className="text-[3rem] sm:text-4xl md:text-7xl">An</span>
+                <span className="text-[3rem] sm:text-4xl md:text-6xl">An</span>
               </div>
             </div>
             <img
@@ -487,7 +536,7 @@ function App() {
             <img
               src="/leaf.png"
               alt=""
-              className="pointer-events-none absolute top-0 left-4 w-90 md:w-auto object-contain sm:-top-45 sm:-left-20 sm:block z-10"
+              className="pointer-events-none absolute top-0 left-4 w-90 md:w-auto object-contain sm:-top-25 sm:-left-20 sm:block z-10"
             />
             <img
               src="/gradient-from-t.png"
@@ -496,22 +545,22 @@ function App() {
             />
             <div className="absolute top-35 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
               <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
-                <span className="font-sagire text-7xl sm:text-3xl md:text-7xl">
+                <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
                   An tâm
                 </span>
-                <span className="font-alishanty text-6xl sm:text-4xl md:text-8xl">giữa thiên nhiên</span>
+                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">giữa thiên nhiên</span>
               </div>
               <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
-                <span className="font-sagire text-7xl sm:text-3xl md:text-7xl">
+                <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
                   An lành
                 </span>
-                <span className="font-alishanty text-6xl sm:text-4xl md:text-8xl">từng hơi thở</span>
+                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">từng hơi thở</span>
               </div>
             </div>
             <img
               src="/3.png"
               alt=""
-              className="mt-10 w-full object-contain hidden md:block sm:mt-14 md:mt-20 rounded-b-3xl"
+              className="mt-10 w-full object-contain hidden md:block sm:mt-0 rounded-b-3xl"
             />
             <img
               src="/3-mobile.png"
@@ -607,7 +656,7 @@ function App() {
                         </div>
                       ))}
                     </div>
-                    <button className="pointer-events-auto btn-inverted-corners mt-4 bg-secondary px-5 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer">
+                    <button className="pointer-events-auto rounded-xl mt-4 bg-secondary px-5 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer">
                       Tải tài liệu dự án
                     </button>
                   </div>
@@ -651,6 +700,29 @@ function App() {
                 ))}
               </div>
             </div>
+            <div className="mb-5">
+              <div className="relative flex max-sm:justify-start sm:justify-center max-sm:overflow-x-auto max-sm:scrollbar-none">
+                <div className="pointer-events-none absolute bottom-0 h-px w-[80%] bg-black/10 max-sm:hidden" />
+                <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-6 max-sm:pr-6">
+                  {[
+                    { key: 'all', label: 'Tất cả' },
+                    { key: 'landscape', label: 'Tiện ích cảnh quan' },
+                    { key: 'service', label: 'Tiện ích dịch vụ' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => handleCatChange(tab.key)}
+                      className={`relative cursor-pointer whitespace-nowrap pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${carouselCat === tab.key
+                        ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
+                        : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                        }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
             <div className={`relative [--carousel-sw:88%] [--carousel-gap:0px] ${isFirst ? '[--carousel-so:7%]' : isLast ? '[--carousel-so:7%]' : '[--carousel-so:6%]'} sm:[--carousel-sw:65%] sm:[--carousel-so:17.5%] sm:[--carousel-gap:12px]`}>
               <div className="overflow-hidden touch-pan-y" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
                 <div
@@ -688,76 +760,53 @@ function App() {
               <button
                 onClick={prevSlide}
                 aria-label="Previous slide"
-                className="btn-inverted-corners absolute left-[2%] top-1/2 z-10 hidden items-center justify-center bg-white text-secondary transition-colors duration-500 hover:bg-secondary hover:text-white cursor-pointer sm:flex sm:h-12 sm:w-12"
+                className="rounded-xl absolute left-[2%] top-1/2 z-10 hidden items-center justify-center bg-white text-secondary transition-colors duration-500 hover:bg-secondary hover:text-white cursor-pointer sm:flex sm:h-12 sm:w-12"
               >
                 <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
               <button
                 onClick={nextSlide}
                 aria-label="Next slide"
-                className="btn-inverted-corners absolute right-[2%] top-1/2 z-10 hidden items-center justify-center bg-white text-secondary transition-colors duration-500 hover:bg-secondary hover:text-white cursor-pointer sm:flex sm:h-12 sm:w-12"
+                className="rounded-xl absolute right-[2%] top-1/2 z-10 hidden items-center justify-center bg-white text-secondary transition-colors duration-500 hover:bg-secondary hover:text-white cursor-pointer sm:flex sm:h-12 sm:w-12"
               >
                 <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
-            </div>
-            <div className="mt-10">
-              <div className="relative flex max-sm:justify-start sm:justify-center max-sm:overflow-x-auto max-sm:scrollbar-none">
-                <div className="pointer-events-none absolute bottom-0 h-px w-[80%] bg-black/10 max-sm:hidden" />
-                <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-6 max-sm:pr-6">
-                  {[
-                    { key: 'all', label: 'Tất cả' },
-                    { key: 'landscape', label: 'Tiện ích cảnh quan' },
-                    { key: 'service', label: 'Tiện ích dịch vụ' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.key}
-                      onClick={() => handleCatChange(tab.key)}
-                      className={`relative cursor-pointer whitespace-nowrap pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${carouselCat === tab.key
-                        ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
-                        : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
-                        }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </section>
 
         {/* Products */}
-        <section id="products" className="relative pt-0 md:pt-16">
+        <section id="products" className="relative pt-0">
           <img
             src="/gradient-from-t.png"
             alt=""
-            className="hidden md:block pointer-events-none absolute top-20 left-0 w-screen object-cover z-10"
+            className="hidden md:block pointer-events-none absolute -top-5 left-0 w-screen object-cover z-10"
           />
           <div className="relative">
             <img
               src="/leaf.png"
               alt=""
-              className="pointer-events-none absolute -top-30 -right-70 hidden w-auto object-contain sm:block z-20"
+              className="pointer-events-none absolute -top-5 -right-70 hidden w-auto object-contain sm:block z-20"
             />
 
             <div className="absolute top-18 z-20 flex w-screen flex-col items-center font-light text-secondary">
               <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-2 md:gap-5">
-                <span className="font-sagire text-7xl sm:text-3xl md:text-7xl">
+                <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
                   An nhàn
                 </span>
-                <span className="font-alishanty text-6xl sm:text-4xl md:text-8xl">khai thác</span>
+                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">khai thác</span>
               </div>
               <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-2 md:gap-5 mt-2 md:mt-0">
-                <span className="font-sagire text-7xl sm:text-3xl md:text-7xl">
+                <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
                   An tâm
                 </span>
-                <span className="font-alishanty text-6xl sm:text-4xl md:text-8xl">sinh lời</span>
+                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">sinh lời</span>
               </div>
             </div>
             <img
               src="/exterior.jpg"
               alt=""
-              className="hidden md:block mt-10 w-full object-contain sm:mt-14 md:mt-20 rounded-b-3xl"
+              className="hidden md:block mt-10 w-full object-contain md:mt-0 rounded-b-3xl"
             />
             <img
               src="/exterior-mobile.png"
@@ -833,14 +882,14 @@ function App() {
                   <button
                     onClick={extPrev}
                     aria-label="Previous"
-                    className="btn-inverted-corners absolute -left-6 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex"
+                    className="rounded-xl absolute -left-6 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button
                     onClick={extNext}
                     aria-label="Next"
-                    className="btn-inverted-corners absolute right-8 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex md:right-30"
+                    className="rounded-xl absolute right-8 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex md:right-30"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
@@ -891,7 +940,7 @@ function App() {
                     <button
                       onClick={prodPrev}
                       aria-label="Previous product"
-                      className="btn-inverted-corners flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer"
+                      className="rounded-xl flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
@@ -904,7 +953,7 @@ function App() {
                     <button
                       onClick={prodNext}
                       aria-label="Next product"
-                      className="btn-inverted-corners flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer"
+                      className="rounded-xl flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
@@ -937,22 +986,22 @@ function App() {
                     <button
                       onClick={prodPrev}
                       aria-label="Previous product"
-                      className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                      className="rounded-xl flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
                     >
                       <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
                     <button
                       onClick={prodNext}
                       aria-label="Next product"
-                      className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                      className="rounded-xl flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
                     >
                       <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
-                    <button className="btn-inverted-corners ml-auto bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:py-4">
+                    <button className="rounded-xl ml-auto bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:py-4">
                       Tải tài liệu dự án
                     </button>
                   </div>
-                  <button className="btn-inverted-corners mx-auto mt-8 w-full max-w-sm bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer md:hidden sm:py-4">
+                  <button className="rounded-xl mx-auto mt-8 w-full max-w-sm bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer md:hidden sm:py-4">
                     Tải tài liệu dự án
                   </button>
                 </div>
@@ -1030,12 +1079,12 @@ function App() {
             <div className="pointer-events-none absolute top-10 md:top-20 justify-self-center md:right-[3%] flex md:pr-6 mx-6 md:mx-0">
               <div className="text-center md:text-right lg:max-w-lg">
                 <h2 className="text-secondary">
-                  <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-7xl">An toàn</span>
-                  <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}tích sản</span>
+                  <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">An toàn</span>
+                  <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}tích sản</span>
                 </h2>
                 <h2 className="mt-2 text-secondary sm:-mt-3">
-                  <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-7xl">An giữ</span>
-                  <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}truyền đời</span>
+                  <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">An giữ</span>
+                  <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}truyền đời</span>
                 </h2>
                 <p className="mt-4 md:pl-5 text-sm font-medium text-center md:text-end justify-end text-black sm:mt-10 sm:text-base">
                   Dự án hiếm hoi tại Hội An sở hữu pháp lý và sổ đỏ lâu dài cho 100% sản phẩm. Quỹ đất sinh thái cuối cùng ở vùng lõi phát triển Đà Nẵng – Hội An.
@@ -1129,7 +1178,7 @@ function App() {
               <div className="mt-8 flex justify-center">
                 <a
                   href="#"
-                  className="btn-inverted-corners bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+                  className="rounded-xl bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
                 >
                   Tải tài liệu dự án
                 </a>
@@ -1147,125 +1196,224 @@ function App() {
 
       {/* Footer */}
       <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
-        <img
-          src="/bg-footer.png"
-          alt=""
-          className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover mt-20"
-        />
-
-        <div className="relative mx-auto max-w-6xl px-6 py-14 sm:px-10 sm:py-20 lg:px-20">
-          <div className="flex flex-col-reverse gap-12 md:flex-row md:gap-16">
-            {/* Left column — logo, info, socials */}
-            <div className="md:w-[38%] md:shrink-0">
-              <div className="items-center justify-center flex">
-                <img
-                  src="/logo-footer.png"
-                  alt="Casamia Balanca Hoi An"
-                  className="w-44 object-contain sm:w-52"
-                />
-              </div>
-
-              <div className="mt-8 space-y-6 text-sm text-white/90 sm:text-base">
-                <div>
-                  <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hà Nội</h3>
-                  <p className="mt-2 flex items-start gap-2">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span>Tầng 15, tòa nhà Handico Tower, Đường Phạm Hùng, Phường Từ Liêm, TP. Hà Nội</span>
-                  </p>
-                  <p className="mt-1 flex items-center gap-2">
-                    <Phone className="h-4 w-4 shrink-0" />
-                    <span>1800 6918</span>
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hội An</h3>
-                  <p className="mt-2 flex items-start gap-2">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span>Số nhà LK3.17, KĐT Casamia Phường Hội An Đông, Đà Nẵng</span>
-                  </p>
-                  <p className="mt-1 flex items-center gap-2">
-                    <Phone className="h-4 w-4 shrink-0" />
-                    <span>1800 6918</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <p className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">Cập nhật thông tin tại</p>
-                <div className="mt-3 flex gap-3">
-                  <a href="#" className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" /></svg>
-                  </a>
-                  <a href="#" className="btn-inverted-corners flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-                  </a>
-                </div>
-              </div>
-
-              <p className="mt-6 text-xs text-white/50">
-                &copy;Bản quyền thuộc về Casamia Balanca Hội An
-              </p>
-            </div>
-
-            {/* Right column — subscribe form */}
-            <div className="flex-1">
-              <div className="rounded-2xl bg-white px-8 py-8 sm:px-10 sm:py-10">
-                <h3 className="font-sagire text-center text-2xl text-secondary sm:text-3xl md:text-4xl">
-                  Đăng ký nhận tư vấn
-                </h3>
-                <p className="mt-2 text-center text-xs text-black/70 sm:text-sm">
-                  Vui lòng để lại thông tin.<br />
-                  Tư vấn viên sẽ liên hệ quý khách trong thời gian sớm nhất.
-                </p>
-
-                <form className="mt-8 space-y-5" onSubmit={(e) => e.preventDefault()}>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-black/70 sm:text-sm">Họ tên</label>
-                    <input
-                      type="text"
-                      placeholder="Điền thông tin của bạn"
-                      className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-                    <div className="flex flex-1 flex-col gap-1">
-                      <label className="text-xs font-semibold text-black/70 sm:text-sm">Số điện thoại</label>
-                      <input
-                        type="tel"
-                        placeholder="Tối thiểu 10 chữ số"
-                        className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col gap-1">
-                      <label className="text-xs font-semibold text-black/70 sm:text-sm">Email</label>
-                      <input
-                        type="email"
-                        placeholder="vidu@mail.com"
-                        className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold text-black/70 sm:text-sm">Yêu cầu tư vấn</label>
-                    <input
-                      type="text"
-                      placeholder="Hãy để lại lời nhắn để tư vấn viên có thể hỗ trợ Quý khách"
-                      className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                    />
-                  </div>
-
-                  <div className="flex justify-center pt-2">
-                    <button
-                      type="submit"
-                      className="btn-inverted-corners bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+        <section
+          className="relative overflow-hidden"
+          style={{
+            backgroundImage: "url('/footer-pattern.png')",
+            backgroundPosition: 'center',
+            backgroundRepeat: 'repeat',
+            backgroundSize: 'auto',
+          }}
+        >
+          <div className="absolute inset-0 bg-secondary" />
+          <div className="relative mx-auto max-w-7xl px-6 py-14 sm:px-10 sm:py-16 lg:px-20">
+            <div className="grid gap-12 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
+              <div>
+                <h3 className="font-sagire text-4xl text-white sm:text-5xl">Tin tức</h3>
+                <div className="mt-8 space-y-5">
+                  {FOOTER_NEWS.map((item) => (
+                    <a
+                      key={item.title}
+                      href="#"
+                      className="group flex items-start gap-4 text-white/90 transition-opacity hover:opacity-90"
                     >
-                      Đăng ký tư vấn
-                    </button>
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="h-20 w-28 shrink-0 rounded-2xl object-cover sm:h-24 sm:w-36"
+                      />
+                      <div className="min-w-0">
+                        <p className="line-clamp-2 text-sm font-medium leading-6 sm:text-base">
+                          {item.title}
+                        </p>
+                        <p className="mt-3 text-xs tracking-[0.2em] text-white/35">{item.date}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                <a
+                  href="#"
+                  className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
+                >
+                  Xem thêm
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </div>
+
+              <div>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <h3 className="font-sagire text-4xl text-white sm:text-5xl">Thư viện</h3>
+                  <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                    <span className="text-white">Hình ảnh</span>
+                    <span>|</span>
+                    <span>Video</span>
+                    <span>|</span>
+                    <span>Tài liệu</span>
                   </div>
-                </form>
+                </div>
+
+                <div className="mt-8 flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-secondary shadow-lg transition-opacity hover:opacity-90 md:inline-flex"
+                    aria-label="Previous gallery item"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <div className="grid flex-1 gap-4 md:grid-cols-[minmax(0,1fr)_170px]">
+                    <img
+                      src="/carousel-1.png"
+                      alt="Thư viện Casamia Balanca"
+                      className="h-[250px] w-full rounded-4xl object-cover sm:h-[340px]"
+                    />
+                    <img
+                      src="/carousel-5.png"
+                      alt="Xem trước thư viện"
+                      className="hidden h-[340px] w-full rounded-4xl object-cover md:block"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-secondary shadow-lg transition-opacity hover:opacity-90 md:inline-flex"
+                    aria-label="Next gallery item"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <a
+                  href="#"
+                  className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
+                >
+                  Xem thêm
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="relative overflow-hidden">
+          <img
+            src="/bg-footer.png"
+            alt=""
+            className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover mt-20"
+          />
+
+          <div className="relative mx-auto max-w-6xl px-6 py-14 sm:px-10 sm:py-20 lg:px-20">
+            <div className="flex flex-col-reverse gap-12 md:flex-row md:gap-16">
+              {/* Left column — logo, info, socials */}
+              <div className="md:w-[38%] md:shrink-0">
+                <div className="items-center justify-center flex">
+                  <img
+                    src="/logo-footer.png"
+                    alt="Casamia Balanca Hoi An"
+                    className="w-44 object-contain sm:w-52"
+                  />
+                </div>
+
+                <div className="mt-8 space-y-6 text-sm text-white/90 sm:text-base">
+                  <div>
+                    <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hà Nội</h3>
+                    <p className="mt-2 flex items-start gap-2">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>Tầng 15, tòa nhà Handico Tower, Đường Phạm Hùng, Phường Từ Liêm, TP. Hà Nội</span>
+                    </p>
+                    <p className="mt-1 flex items-center gap-2">
+                      <Phone className="h-4 w-4 shrink-0" />
+                      <span>1800 6918</span>
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hội An</h3>
+                    <p className="mt-2 flex items-start gap-2">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>Số nhà LK3.17, KĐT Casamia Phường Hội An Đông, Đà Nẵng</span>
+                    </p>
+                    <p className="mt-1 flex items-center gap-2">
+                      <Phone className="h-4 w-4 shrink-0" />
+                      <span>1800 6918</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <p className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">Cập nhật thông tin tại</p>
+                  <div className="mt-3 flex gap-3">
+                    <a href="#" className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" /></svg>
+                    </a>
+                    <a href="#" className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <p className="mt-6 text-xs text-white/50">
+                  &copy;Bản quyền thuộc về Casamia Balanca Hội An
+                </p>
+              </div>
+
+              {/* Right column — subscribe form */}
+              <div className="flex-1">
+                <div className="rounded-2xl bg-white px-8 py-8 sm:px-10 sm:py-10">
+                  <h3 className="font-sagire text-center text-2xl text-secondary sm:text-3xl md:text-4xl">
+                    Đăng ký nhận tư vấn
+                  </h3>
+                  <p className="mt-2 text-center text-xs text-black/70 sm:text-sm">
+                    Vui lòng để lại thông tin.<br />
+                    Tư vấn viên sẽ liên hệ quý khách trong thời gian sớm nhất.
+                  </p>
+
+                  <form className="mt-8 space-y-5" onSubmit={(e) => e.preventDefault()}>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-black/70 sm:text-sm">Họ tên</label>
+                      <input
+                        type="text"
+                        placeholder="Điền thông tin của bạn"
+                        className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
+                      <div className="flex flex-1 flex-col gap-1">
+                        <label className="text-xs font-semibold text-black/70 sm:text-sm">Số điện thoại</label>
+                        <input
+                          type="tel"
+                          placeholder="Tối thiểu 10 chữ số"
+                          className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col gap-1">
+                        <label className="text-xs font-semibold text-black/70 sm:text-sm">Email</label>
+                        <input
+                          type="email"
+                          placeholder="vidu@mail.com"
+                          className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-black/70 sm:text-sm">Yêu cầu tư vấn</label>
+                      <input
+                        type="text"
+                        placeholder="Hãy để lại lời nhắn để tư vấn viên có thể hỗ trợ Quý khách"
+                        className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
+                      />
+                    </div>
+
+                    <div className="flex justify-center pt-2">
+                      <button
+                        type="submit"
+                        className="rounded-xl bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+                      >
+                        Đăng ký tư vấn
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
