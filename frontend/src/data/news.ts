@@ -1,10 +1,19 @@
+export type NewsCategory = 'du-an' | 'su-kien'
+
 export interface NewsArticle {
   slug: string
   title: string
   date: string
   image: string
+  category: NewsCategory
   content: string[]
 }
+
+export const NEWS_CATEGORIES = [
+  { value: 'all', label: 'Tất cả' },
+  { value: 'du-an', label: 'Thông tin dự án' },
+  { value: 'su-kien', label: 'Sự kiện' },
+] as const
 
 export const NEWS_ARTICLES: NewsArticle[] = [
   {
@@ -12,6 +21,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     title: 'Bỏ ra 8 tỷ mua Villa Casamia Hội An: Liệu có đáng?',
     date: '20.10',
     image: '/carousel-1.png',
+    category: 'du-an',
     content: [
       'Villa Casamia Hội An đã và đang thu hút sự chú ý lớn trong giới đầu tư bất động sản nghỉ dưỡng. Với mức giá khoảng 8 tỷ đồng cho một căn villa, nhiều người đặt câu hỏi: "Liệu có đáng để đầu tư?" Hãy cùng phân tích chi tiết để trả lời câu hỏi này.',
       'ĐẦU TƯ 8 TỶ VÀO VILLA CASAMIA HỘI AN: LIỆU CÓ ĐÁNG KHÔNG?',
@@ -27,6 +37,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     title: 'Casamia Balanca Hội An: "Mỏ Vàng" Hay "Vũng Lầy" Rủi Ro?',
     date: '20.10',
     image: '/carousel-2.jpg',
+    category: 'du-an',
     content: [
       'Casamia Balanca Hội An đang là tâm điểm bàn luận trong giới đầu tư bất động sản. Với vị trí đắc địa bên bờ sông Thu Bồn và thiết kế kiến trúc Đông Dương độc đáo, dự án hứa hẹn mang đến cơ hội đầu tư hấp dẫn.',
       'CASAMIA BALANCA: CƠ HỘI HAY RỦI RO?',
@@ -42,6 +53,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     title: 'Đừng Mua Casamia Hội An Nếu Chưa Đọc Điều Này: Lợi Nhuận Thật Sự?',
     date: '20.10',
     image: '/carousel-3.jpg',
+    category: 'du-an',
     content: [
       'Trước khi quyết định đầu tư vào Casamia Hội An, có những thông tin quan trọng mà bạn cần nắm rõ. Bài viết này sẽ phân tích chi tiết về lợi nhuận thực tế mà dự án có thể mang lại.',
       'LỢI NHUẬN TỪ CHO THUÊ VILLA',
@@ -50,6 +62,84 @@ export const NEWS_ARTICLES: NewsArticle[] = [
       'NHỮNG ĐIỀU CẦN LƯU Ý',
       'Chi phí vận hành và bảo trì villa là yếu tố cần tính toán kỹ. Bao gồm phí quản lý, bảo trì, thuế, và các chi phí phát sinh khác. Nhà đầu tư nên làm việc với đơn vị quản lý chuyên nghiệp để tối ưu hóa lợi nhuận.',
       'Tóm lại, Casamia Hội An là một kênh đầu tư tiềm năng với lợi nhuận hấp dẫn, nhưng cần được phân tích kỹ lưỡng dựa trên tình hình tài chính cá nhân và mục tiêu đầu tư dài hạn.',
+    ],
+  },
+  {
+    slug: 'casamia-balanca-to-chuc-le-dong-tho',
+    title: 'Casamia Balanca Hội An: Tổ Chức Lễ Động Thổ Giai Đoạn 2',
+    date: '15.09',
+    image: '/carousel-5.png',
+    category: 'su-kien',
+    content: [
+      'Ngày 15/09, Casamia Balanca Hội An chính thức tổ chức lễ động thổ giai đoạn 2, đánh dấu bước phát triển mới của dự án khu đô thị sinh thái ven sông Thu Bồn.',
+      'LỄ ĐỘNG THỔ GIAI ĐOẠN 2',
+      'Sự kiện thu hút sự tham gia của hơn 500 khách mời, bao gồm đại diện chính quyền địa phương, đối tác chiến lược, và các nhà đầu tư quan tâm đến dự án.',
+      'Giai đoạn 2 của dự án sẽ phát triển thêm 120 căn biệt thự với thiết kế đa dạng, đáp ứng nhu cầu của nhiều phân khúc khách hàng khác nhau.',
+    ],
+  },
+  {
+    slug: 'bo-ra-8-ty-mua-villa-casamia-hoi-an-phan-2',
+    title: 'Bỏ ra 8 tỷ mua Villa Casamia Hội An: Liệu có đáng? (Phần 2)',
+    date: '18.10',
+    image: '/exterior.jpg',
+    category: 'du-an',
+    content: [
+      'Tiếp nối phần 1, bài viết này sẽ đi sâu phân tích các yếu tố pháp lý và tài chính khi đầu tư vào Villa Casamia Hội An.',
+      'PHÁP LÝ MINH BẠCH',
+      'Dự án Casamia Balanca được cấp giấy chứng nhận quyền sử dụng đất lâu dài, đảm bảo quyền lợi cho nhà đầu tư. Hồ sơ pháp lý đầy đủ và minh bạch, được thẩm định bởi các đơn vị tư vấn uy tín.',
+      'Nhà đầu tư hoàn toàn yên tâm về tính pháp lý khi sở hữu biệt thự tại Casamia Balanca Hội An.',
+    ],
+  },
+  {
+    slug: 'casamia-balanca-mo-vang-hay-vung-lay-phan-2',
+    title: 'Casamia Balanca Hội An: "Mỏ Vàng" Hay "Vũng Lầy" Rủi Ro? (Phần 2)',
+    date: '22.10',
+    image: '/carousel-1.png',
+    category: 'du-an',
+    content: [
+      'Phần 2 của loạt bài phân tích chuyên sâu về tiềm năng đầu tư tại Casamia Balanca Hội An.',
+      'PHÂN TÍCH THỊ TRƯỜNG',
+      'Thị trường bất động sản nghỉ dưỡng miền Trung đang trải qua giai đoạn tăng trưởng mạnh mẽ nhờ sự phát triển của hạ tầng giao thông và du lịch.',
+      'Casamia Balanca với lợi thế vị trí và thiết kế độc đáo đang dần khẳng định vị thế trên thị trường.',
+    ],
+  },
+  {
+    slug: 'su-kien-mo-ban-giai-doan-moi',
+    title: 'Sự Kiện Mở Bán Giai Đoạn Mới Casamia Balanca',
+    date: '05.11',
+    image: '/carousel-2.jpg',
+    category: 'su-kien',
+    content: [
+      'Casamia Balanca Hội An chính thức mở bán giai đoạn mới với nhiều ưu đãi hấp dẫn dành cho nhà đầu tư.',
+      'ƯU ĐÃI ĐẶC BIỆT',
+      'Khách hàng đặt mua trong giai đoạn này sẽ được hưởng chiết khấu lên đến 5% giá trị căn hộ, cùng nhiều phần quà giá trị.',
+      'Sự kiện diễn ra từ ngày 05/11 đến 30/11 tại văn phòng bán hàng dự án.',
+    ],
+  },
+  {
+    slug: 'dung-mua-casamia-hoi-an-phan-2',
+    title: 'Đừng Mua Casamia Hội An Nếu Chưa Đọc Điều Này (Phần 2)',
+    date: '25.10',
+    image: '/carousel-3.jpg',
+    category: 'du-an',
+    content: [
+      'Tiếp nối phần 1, bài viết phân tích thêm về các yếu tố cần cân nhắc trước khi đầu tư.',
+      'CHI PHÍ ẨN CẦN BIẾT',
+      'Ngoài giá mua villa, nhà đầu tư cần tính toán thêm các chi phí như thuế chuyển nhượng, phí bảo trì, và chi phí vận hành hàng tháng.',
+      'Tuy nhiên, với mức lợi nhuận cho thuê hấp dẫn, các chi phí này hoàn toàn có thể được bù đắp trong thời gian ngắn.',
+    ],
+  },
+  {
+    slug: 'trien-lam-kien-truc-xanh-casamia',
+    title: 'Triển Lãm Kiến Trúc Xanh Casamia Balanca Tại Hà Nội',
+    date: '10.11',
+    image: '/carousel-5.png',
+    category: 'su-kien',
+    content: [
+      'Triển lãm kiến trúc xanh Casamia Balanca được tổ chức tại Hà Nội, giới thiệu mô hình kiến trúc bền vững của dự án.',
+      'KIẾN TRÚC XANH BỀN VỮNG',
+      'Triển lãm trưng bày các mô hình thu nhỏ của biệt thự Casamia Balanca, thể hiện sự kết hợp hài hòa giữa kiến trúc truyền thống Hội An và công nghệ xanh hiện đại.',
+      'Sự kiện thu hút hơn 1000 khách tham quan trong 3 ngày diễn ra.',
     ],
   },
 ]
