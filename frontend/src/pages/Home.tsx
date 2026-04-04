@@ -741,7 +741,7 @@ function Home() {
                         />
                         {/* Overlay: title + description + award | carousel */}
                         <div className="relative z-10 flex items-center md:absolute md:inset-0">
-                            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:pl-6 pr-0 md:flex-row md:items-stretch md:gap-15 lg:pl-20">
+                            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:py-0 md:pt-20 md:pl-6 pr-0 md:flex-row md:items-stretch md:gap-15 lg:pl-20">
                                 {/* Left column */}
                                 <div className="flex flex-col justify-center md:w-[340px] md:shrink-0">
                                     <h2 className="md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-left">
@@ -840,7 +840,11 @@ function Home() {
                         <div className="relative z-10 flex items-center pb-6 sm:py-10 md:absolute md:inset-0">
                             <div className="flex h-full min-h-0 w-full flex-col justify-center gap-8 md:flex-row md:items-stretch md:justify-start md:gap-0 lg:pr-10">
                                 {/* Left — image carousel */}
-                                <div className="relative flex min-w-0 w-full items-center justify-center md:w-[65%] md:shrink-0">
+                                <div className="relative flex min-w-0 w-full flex-col justify-start md:w-[65%] md:shrink-0">
+                                    <h2 className="px-6 mb-2 uppercase text-center md:text-left font-sagire text-3xl text-secondary sm:text-4xl md:pl-10 lg:pl-20">
+                                        Lựa chọn "may đo" không gian
+                                    </h2>
+                                    <p className="px-6 mb-4 uppercase text-center md:text-left text-base md:text-3xl text-secondary sm:text-base md:pl-10 lg:pl-20 font-medium">03 phương án hoàn thiện nội thất linh hoạt</p>
                                     <div className="w-full overflow-hidden max-md:rounded-none md:aspect-3/2 md:rounded-r-3xl md:max-h-[360px] lg:max-h-[1000px]">
                                         <div
                                             className="flex md:h-full min-h-0 shrink-0 transition-transform duration-600 ease-in-out"
@@ -852,7 +856,7 @@ function Home() {
                                             {productSlides.map((slide, i) => (
                                                 <div
                                                     key={`prod-${i}`}
-                                                    className="box-border md:h-full min-h-0 shrink-0 overflow-hidden"
+                                                    className="box-border md:h-full min-h-0 shrink-0 overflow-hidden md:inverted-corners-lg-r"
                                                     style={{ flex: `0 0 ${100 / productSlides.length}%` }}
                                                 >
                                                     <div className="md:h-full min-h-0 overflow-hidden max-md:[-webkit-mask:none] max-md:[mask:none] md:inverted-corners-lg-r">
@@ -1145,7 +1149,7 @@ function Home() {
                             <div>
                                 <h3 className="font-sagire text-4xl text-white sm:text-5xl">Tin tức</h3>
                                 <div className="mt-8 space-y-5">
-                                    {NEWS_ARTICLES.map((item) => (
+                                    {NEWS_ARTICLES.slice(0, 3).map((item) => (
                                         <Link
                                             key={item.slug}
                                             to={`/tin-tuc/${item.slug}`}
@@ -1165,13 +1169,13 @@ function Home() {
                                         </Link>
                                     ))}
                                 </div>
-                                <a
-                                    href="#"
+                                <Link
+                                    to="/tin-tuc"
                                     className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
                                 >
                                     Xem thêm
                                     <ChevronRight className="h-4 w-4" />
-                                </a>
+                                </Link>
                             </div>
 
                             <div className="min-w-0">
@@ -1239,14 +1243,14 @@ function Home() {
                     </div>
                 </section>
 
-                <div className="relative overflow-hidden">
+                <div className="relative mt-20">
                     <img
                         src="/bg-footer.png"
                         alt=""
-                        className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover mt-20"
+                        className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover 2xl:scale-100"
                     />
 
-                    <div className="relative mx-auto max-w-6xl px-6 py-14 sm:px-10 sm:py-20 lg:px-20">
+                    <div className="relative mx-auto max-w-9xl px-6 py-14 sm:px-10 sm:py-20 lg:px-20">
                         <div className="flex flex-col-reverse gap-12 md:flex-row md:gap-16">
                             {/* Left column — logo, info, socials */}
                             <div className="md:w-[38%] md:shrink-0">
@@ -1254,7 +1258,7 @@ function Home() {
                                     <img
                                         src="/logo-footer.png"
                                         alt="Casamia Balanca Hoi An"
-                                        className="w-44 object-contain sm:w-52"
+                                        className="w-44 object-contain sm:w-52 2xl:w-64"
                                     />
                                 </div>
 
