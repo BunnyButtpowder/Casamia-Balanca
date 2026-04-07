@@ -6,10 +6,10 @@ import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 
 const FOOTER_GALLERY = [
-    '/carousel-1.png',
+    '/center-square.png',
     '/carousel-5.png',
-    '/carousel-2.jpg',
-    '/carousel-3.jpg',
+    '/infi-pool.jpg',
+    '/bar.jpg',
     '/exterior.jpg',
 ]
 
@@ -72,38 +72,68 @@ function Home() {
 
     const allSlides = [
         {
-            src: '/carousel-1.png',
+            src: '/center-square.png',
             title: 'Quảng trường trung tâm',
             desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp  tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.',
-            cat: 'landscape',
+            cat: 'health-care',
         },
         {
             src: '/wellness-park.jpg',
             title: 'Công viên Wellness',
             desc: 'Hồ bơi tràn viền hướng biển, mang đến trải nghiệm nghỉ dưỡng đẳng cấp quốc tế.',
-            cat: 'service',
+            cat: 'health-care',
         },
         {
             src: '/pickleball.jpg',
             title: 'Hệ thống sân Pickle Ball',
             desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
+            cat: 'health-care',
         },
         {
             src: '/gym-and-fitness.jpg',
             title: 'Gym & Fitness',
             desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
+            cat: 'health-care',
         },
         {
             src: '/pool.jpg',
             title: 'Bể bơi tiêu chuẩn Olympic',
             desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
+            cat: 'health-care',
         },
         {
             src: '/school.jpg',
             title: 'Trường mầm non quốc tế',
+            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
+            cat: 'health-care',
+        },
+        {
+            src: '/hotel.jpg',
+            title: 'Khách sạn 5 sao',
+            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
+            cat: 'service',
+        },
+        {
+            src: '/mall.jpg',
+            title: 'Trung tâm thương mại',
+            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
+            cat: 'service',
+        },
+        {
+            src: '/school.jpg',
+            title: 'Co-working Space',
+            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
+            cat: 'service',
+        },
+        {
+            src: '/coffee-shop.jpg',
+            title: 'Coffee & Bistro',
+            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
+            cat: 'service',
+        },
+        {
+            src: '/bar.jpg',
+            title: 'Sky bar',
             desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
             cat: 'service',
         },
@@ -116,9 +146,9 @@ function Home() {
 
     // Exterior carousel
     const exteriorImages = [
-        '/carousel-1.png',
-        '/carousel-2.jpg',
-        '/carousel-3.jpg',
+        '/center-square.png',
+        '/infi-pool.jpg',
+        '/bar.jpg',
     ]
     const [extIdx, setExtIdx] = useState(0)
     const extMax = exteriorImages.length - 1
@@ -169,59 +199,88 @@ function Home() {
         extDragRef.current = null
     }
 
-    const productSlides = [
-        {
-            src: '/carousel-5.png',
-            title: 'Biệt thự đơn lập',
-            specs: [
-                { label: 'QUY MÔ', value: '270 căn' },
-                { label: 'LOẠI HÌNH', value: 'Biệt thự đơn lập' },
-                { label: 'DIỆN TÍCH', value: '80 m²' },
-                { label: 'QUY MÔ', value: '270 căn' },
-                { label: 'LOẠI HÌNH', value: 'Biệt thự đơn lập' },
-                { label: 'DIỆN TÍCH', value: '80 m²' },
-            ],
-        },
-        {
-            src: '/carousel-1.png',
-            title: 'Biệt thự song lập',
-            specs: [
-                { label: 'QUY MÔ', value: '180 căn' },
-                { label: 'LOẠI HÌNH', value: 'Biệt thự song lập' },
-                { label: 'DIỆN TÍCH', value: '150–250 m²' },
-                { label: 'QUY MÔ', value: '180 căn' },
-                { label: 'LOẠI HÌNH', value: 'Biệt thự song lập' },
-                { label: 'DIỆN TÍCH', value: '150–250 m²' },
-            ],
-        },
-        {
-            src: '/carousel-2.jpg',
-            title: 'Nhà phố thương mại',
-            specs: [
-                { label: 'QUY MÔ', value: '320 căn' },
-                { label: 'LOẠI HÌNH', value: 'Nhà phố thương mại' },
-                { label: 'DIỆN TÍCH', value: '80–120 m²' },
-                { label: 'QUY MÔ', value: '320 căn' },
-                { label: 'LOẠI HÌNH', value: 'Nhà phố thương mại' },
-                { label: 'DIỆN TÍCH', value: '80–120 m²' },
-            ],
-        },
-        {
-            src: '/carousel-3.jpg',
-            title: 'Căn hộ nghỉ dưỡng',
-            specs: [
-                { label: 'QUY MÔ', value: '450 căn' },
-                { label: 'LOẠI HÌNH', value: 'Căn hộ nghỉ dưỡng' },
-                { label: 'DIỆN TÍCH', value: '45–90 m²' },
-                { label: 'QUY MÔ', value: '450 căn' },
-                { label: 'LOẠI HÌNH', value: 'Căn hộ nghỉ dưỡng' },
-                { label: 'DIỆN TÍCH', value: '45–90 m²' },
-            ],
-        },
+    // Village / operations carousel — same behaviour as exterior carousel
+    const villageImages = [
+        { src: '/carousel-1.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
+        { src: '/carousel-2.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
+        { src: '/carousel-3.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
+        { src: '/carousel-6.jpg', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
     ]
-    const [prodIdx, setProdIdx] = useState(0)
-    const prodPrev = () => setProdIdx((i) => (i === 0 ? productSlides.length - 1 : i - 1))
-    const prodNext = () => setProdIdx((i) => (i === productSlides.length - 1 ? 0 : i + 1))
+    const [vilIdx, setVilIdx] = useState(0)
+    const vilMax = villageImages.length - 1
+    const vilPrev = () => setVilIdx((i) => Math.max(0, i - 1))
+    const vilNext = () => setVilIdx((i) => Math.min(vilMax, i + 1))
+    const [vilDragOffset, setVilDragOffset] = useState(0)
+    const vilDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
+    const vilTrackRef = useRef<HTMLDivElement>(null)
+    const vilIsFirst = vilIdx === 0
+    const vilIsLast = vilIdx === vilMax
+
+    const handleVilTouchStart = (e: React.TouchEvent) => {
+        vilDragRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, locked: null, startTime: Date.now() }
+    }
+    const handleVilTouchMove = (e: React.TouchEvent) => {
+        if (!vilDragRef.current) return
+        const dx = e.touches[0].clientX - vilDragRef.current.startX
+        const dy = e.touches[0].clientY - vilDragRef.current.startY
+        if (vilDragRef.current.locked === null) {
+            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+                vilDragRef.current.locked = Math.abs(dx) > Math.abs(dy)
+            }
+            return
+        }
+        if (!vilDragRef.current.locked) return
+        e.preventDefault()
+        const atEdge = (vilIsFirst && dx > 0) || (vilIsLast && dx < 0)
+        setVilDragOffset(atEdge ? dx * 0.2 : dx)
+    }
+    const handleVilTouchEnd = (e: React.TouchEvent) => {
+        if (!vilDragRef.current || !vilDragRef.current.locked) {
+            vilDragRef.current = null
+            setVilDragOffset(0)
+            return
+        }
+        const dx = e.changedTouches[0].clientX - vilDragRef.current.startX
+        const elapsed = Date.now() - vilDragRef.current.startTime
+        const velocity = Math.abs(dx) / elapsed
+        const containerW = vilTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const threshold = containerW * 0.2
+        setVilDragOffset(0)
+        if (!vilIsLast && (dx < -threshold || (velocity > 0.3 && dx < 0))) {
+            vilNext()
+        } else if (!vilIsFirst && (dx > threshold || (velocity > 0.3 && dx > 0))) {
+            vilPrev()
+        }
+        vilDragRef.current = null
+    }
+
+    /** Park Home — one product; arrows only change images per filter (Mặt ngoài / Nội thất). */
+    const parkHomeProduct = {
+        title: 'Mẫu hoàn thiện 3 tầng Park Home',
+        exteriorImages: ['/ParkHome/exterior/livingroom.jpg', '/ParkHome/exterior/kitchen.jpg', '/ParkHome/exterior/bathroom.jpg', '/ParkHome/exterior/bedroom.jpg', '/ParkHome/exterior/bedroom-2.jpg', '/ParkHome/exterior/bedroom-3.jpg', '/ParkHome/exterior/reading-room.jpg'],
+        interiorImages: ['/ParkHome/interior/livingroom.jpg', '/ParkHome/interior/kitchen.jpg', '/ParkHome/interior/readingroom.jpg', '/ParkHome/interior/washingroom.jpg', '/ParkHome/interior/bathroom.jpg', '/ParkHome/interior/garden.jpg'],
+    } as const
+    type ProductFilter = 'exterior' | 'interior'
+    const [productFilter, setProductFilter] = useState<ProductFilter>('exterior')
+    const [prodSlideIdx, setProdSlideIdx] = useState(0)
+    const productGalleryImages =
+        productFilter === 'exterior' ? parkHomeProduct.exteriorImages : parkHomeProduct.interiorImages
+    const prodGalleryLen = productGalleryImages.length
+
+    useEffect(() => {
+        setProdSlideIdx(0)
+    }, [productFilter])
+
+    const prodPrev = () =>
+        setProdSlideIdx((i) => {
+            const len = productFilter === 'exterior' ? parkHomeProduct.exteriorImages.length : parkHomeProduct.interiorImages.length
+            return i === 0 ? len - 1 : i - 1
+        })
+    const prodNext = () =>
+        setProdSlideIdx((i) => {
+            const len = productFilter === 'exterior' ? parkHomeProduct.exteriorImages.length : parkHomeProduct.interiorImages.length
+            return i === len - 1 ? 0 : i + 1
+        })
 
     const handleCatChange = (cat: string) => {
         setCarouselCat(cat)
@@ -465,7 +524,7 @@ function Home() {
                         <div className="absolute top-35 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
                             <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
                                 <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
-                                    An tâm
+                                    An cư
                                 </span>
                                 <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">giữa thiên nhiên</span>
                             </div>
@@ -488,24 +547,20 @@ function Home() {
                         />
                         {/* Stats card */}
                         <div className="absolute bottom-0 mb-20 md:bottom-0 left-1/2 md:mb-10 w-[calc(100%-2rem)] max-w-6xl -translate-x-1/2 rounded-2xl bg-[#FFFFFFCC] px-6 py-8 backdrop-blur-xs sm:w-full sm:px-0 sm:py-5 sm:pr-7">
-                            <p className="mx-auto max-w-3xl text-center text-sm font-medium leading-relaxed text-black sm:text-base">
-                                Địa thế đắc địa hiếm có, Casamia Balanca là nơi mỗi ngày cư dân sống an,
+                            <p className="mx-auto max-w-xl text-center text-sm font-medium leading-relaxed text-black sm:text-base">
+                                Địa thế đắc địa hiếm có, Casamia Balanca Hoi An là nơi mỗi ngày cư dân sống an, sống khỏe cùng hệ sinh thái sông - rừng dừa - vịnh biển.
                             </p>
-                            <p className=" mx-auto max-w-3xl text-center text-sm font-medium leading-relaxed text-black sm:text-base">
-                                sống khỏe cùng hệ sinh thái sống - rừng dừa - biển duy nhất tại Hội An.
-                            </p>
-                            <div className="mt-5 grid grid-cols-2 gap-x-0 gap-y-8 sm:mt-5 sm:grid-cols-3 sm:gap-6 md:grid-cols-6 md:gap-0">
+                            <div className="mt-5 grid grid-cols-2 gap-x-0 gap-y-8 sm:mt-5 sm:grid-cols-3 sm:gap-6 md:grid-cols-5 md:gap-0">
                                 {[
                                     { label: 'Tổng\nquy mô', value: '31,1 ha' },
                                     { label: 'Rừng dừa nước\ntự nhiên', value: '3,6 ha' },
-                                    { label: 'Diện tích mặt nước\ntự nhiên', value: '80%' },
-                                    { label: 'Mật độ\nxây dựng', value: '23,1%' },
-                                    { label: 'Diện tích dành cho\ncây xanh & mặt nước', value: '1/3' },
-                                    { label: 'Diện tích đất\nthương mại, dịch vụ', value: '9%' },
+                                    { label: 'Diện tích cây xanh,\n mặt nước', value: '8 ha' },
+                                    { label: 'Mật độ\nxây dựng', value: '38%' },
+                                    { label: 'Cận hải - Cận giang \n- Cận lâm - Cận lộ', value: '04 cận' },
                                 ].map((stat, i) => (
                                     <div
                                         key={stat.value}
-                                        className={`text-center px-1${i % 2 !== 0 ? ' border-l border-black/20' : ''
+                                        className={`text-center px-1${i === 4 ? ' col-span-2 flex flex-col items-center' : ''}${i % 2 !== 0 ? ' border-l border-black/20' : ''
                                             }${i > 0 && i % 2 === 0 ? ' md:border-l md:border-black/20' : ''}`}
                                     >
                                         <p className="whitespace-pre-line text-base leading-snug font-medium text-secondary mb-5">
@@ -548,22 +603,19 @@ function Home() {
                                 <div className="w-full md:w-auto md:pl-[23%] xl:pl-[40%]">
                                     <div className="flex flex-col items-center text-center md:items-end md:text-right">
                                         <h1 className="font-sagire leading-[1.3] text-5xl sm:leading-[1.05] sm:text-3xl md:text-5xl text-secondary px-5 md:px-0">
-                                            Đô thị sinh thái hiếm hoi
+                                            Khu đô thị sinh thái
                                         </h1>
                                         <span className="mt-2 font-inter font-medium uppercase text-lg sm:text-lg md:text-xl text-secondary">
-                                            Nằm trong lõi di sản hội an
+                                            Liền kề lõi di sản hội an
                                         </span>
-                                        <div className="mt-10 text-base md:text-lg font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm - Hội An, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
+                                        <div className="mt-10 text-base md:text-lg font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
                                         <div className="pointer-events-auto mt-6 w-full max-w-md overflow-y-auto max-h-60 location-scrollbar" data-lenis-prevent>
                                             {[
                                                 { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
-                                                { name: 'Biển Cửa Đại / Cầu Cửa Đại', time: '5 phút' },
+                                                { name: 'Biển Cửa Đại', time: '5 phút' },
                                                 { name: 'Bãi biển An Bàng', time: '5 - 7 phút' },
                                                 { name: 'Phố cổ Hội An', time: '5 - 10 phút' },
-                                                { name: 'Sân bay quốc tế', time: '30 - 40 phút' },
-                                                { name: 'Bãi biển An Bàng', time: '5 - 7 phút' },
-                                                { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
-                                                { name: 'Phố cổ Hội An', time: '5 - 10 phút' },
+                                                { name: 'Sân bay quốc tế Đà Nẵng', time: '30 - 40 phút' },
                                             ].map((item, i, arr) => (
                                                 <div
                                                     key={`${item.name}-${i}`}
@@ -591,9 +643,17 @@ function Home() {
                     className="relative z-10 rounded-t-3xl bg-white py-8 md:mb-10"
                 >
                     <div className="mx-auto">
-                        <div className="mx-auto max-w-7xl 2xl:max-w-max flex flex-col gap-8 rounded-2xl pb-10 sm:px-10 sm:py-12 md:flex-row md:items-center md:gap-12 lg:px-14">
-                            <p className="max-w-sm text-base text-justify leading-relaxed text-black font-medium md:shrink-0 md:text-base px-6 md:px-0">
-                                Hệ thống cây xanh, mặt nước được kết nối, xếp lớp&nbsp;&nbsp;tạo nên la phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị, đồng thời xây dựng di sản sống xanh cho thế hệ tương lai.
+                        <div className="mx-auto max-w-7xl flex flex-col gap-1 px-6 sm:px-10 lg:px-14 mb-6 md:mb-0">
+                            <h1 className="font-sagire px-6 md:px-0 text-5xl text-secondary leading-[1.3] text-center md:text-left">
+                                Sống theo nhịp Hội An
+                            </h1>
+                            <span className="font-inter font-medium uppercase text-lg sm:text-lg md:text-xl text-secondary text-center md:text-left">
+                                Giữa dòng chảy quốc tế
+                            </span>
+                        </div>
+                        <div className="mx-auto max-w-7xl 2xl:max-w-max flex flex-col gap-8 rounded-2xl pb-10 px-6 sm:px-10 sm:py-12 md:flex-row md:items-center md:gap-12 lg:px-14">
+                            <p className="max-w-sm text-base text-justify leading-relaxed text-black font-medium md:shrink-0 md:text-base">
+                                Sống an lành giữa thiên nhiên và văn hóa bản địa, đồng thời kết nối linh hoạt với cộng đồng quốc tế. Tại đây, mỗi tiện ích được thiết kế để dung hòa hai nhịp: tận hưởng "vibe Hội An" tĩnh tại và trải nghiệm nhịp sống toàn cầu năng động.
                             </p>
                             <div className="grid flex-1 grid-cols-2 gap-x-0 gap-y-8 sm:grid-cols-5 sm:gap-6 md:gap-0">
                                 {[
@@ -625,7 +685,7 @@ function Home() {
                                 <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-6 max-sm:pr-6">
                                     {[
                                         { key: 'all', label: 'Tất cả' },
-                                        { key: 'landscape', label: 'Tiện ích cảnh quan' },
+                                        { key: 'health-care', label: 'Tiện ích sức khoẻ' },
                                         { key: 'service', label: 'Tiện ích dịch vụ' },
                                     ].map((tab) => (
                                         <button
@@ -728,8 +788,8 @@ function Home() {
                             className="block md:hidden w-full object-contain rounded-b-3xl"
                         />
                         <div className="absolute bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 py-8 sm:py-5 px-6 md:px-0">
-                            <p className="mx-auto max-w-xl text-center text-sm font-medium leading-relaxed text-white sm:text-base 2xl:text-lg">
-                                Kiến trúc của dự án là sự tiếp nối tinh tế của di sản kiến trúc Hội An với nếp nhà của những mái ngói nâu xếp lớp, vật liệu đá sa thạch từ Thánh địa Mỹ Sơn. 100% biệt thự thiết kế mở, thông tầng và hệ cửa kính lớn để đón trọn ánh sáng tự nhiên và gió trời.
+                            <p className="mx-auto max-w-2xl text-center text-sm font-medium leading-relaxed text-white sm:text-base 2xl:text-lg">
+                                Lối kiến trúc giao thoa giữa di sản và tư duy xanh không chỉ tạo nên vẻ đẹp bền vững theo thời gian, mà còn được tính toán để tối ưu công năng lưu trú và trải nghiệm. Không gian vừa tinh tế, giàu bản sắc, vừa phù hợp với nhu cầu vận hành thực tế, giúp chủ sở hữu dễ dàng khai thác, tối ưu hiệu suất cho thuê, tạo dòng tiền ổn định.
                             </p>
                         </div>
                     </div>
@@ -744,22 +804,22 @@ function Home() {
                             <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:py-0 md:pt-20 md:pl-6 pr-0 md:flex-row md:items-stretch md:gap-15 lg:pl-20">
                                 {/* Left column */}
                                 <div className="flex flex-col justify-center md:w-[340px] md:shrink-0">
-                                    <h2 className="md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-left">
-                                        Kiệt tác xanh
+                                    <h2 className="px-6 md:px-0 md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-left">
+                                        Kiệt tác xanh được thổi hồn bởi KTS
                                     </h2>
-                                    <div className="flex justify-center md:justify-start items-center">
+                                    {/* <div className="flex justify-center md:justify-start items-center">
                                         <p className="mt-2 text-center md:text-left font-sagire text-5xl leading-none text-secondary sm:text-5xl md:mt-2 md:text-4xl">
                                             “<span className="text-5xl sm:text-6xl md:text-4xl">3</span> trong <span className="text-5xl sm:text-6xl md:text-4xl">1</span>”
                                         </p>
                                         <p className="mt-2 ms-3 text-secondary font-medium">
                                             Thiết kết <br /> bởi KTS
                                         </p>
-                                    </div>
+                                    </div> */}
                                     <span className="mt-5 font-alishanty text-center font-medium text-secondary text-6xl md:mt-2">
                                         Võ Trọng Nghĩa
                                     </span>
                                     <p className="px-6 md:px-0 mt-7 md:mt-5 max-w-sm text-base leading-relaxed text-center md:text-justify text-black">
-                                        Mỗi nếp nhà là một sắc xanh, toàn khu đô thị là một khu vườn xanh mang nét đẹp hoài cổ và bình tâm của phố Hội. Lối kiến trúc giao thoa giữa bảo tồn di sản và tư duy xanh hiện đại mang đến dòng sản phẩm biệt thự đẹp bất biến với thời gian, công năng linh hoạt, vừa phù hợp với hoạt động nghỉ dưỡng, vừa phù hợp với nhu cầu cho thuê, khai thác, vận hành du lịch.
+                                        Kiến trúc dự án kế thừa tinh thần Hội An với mái ngói nâu xếp lớp, đá sa thạch Mỹ Sơn và được phát triển bởi KTS Võ Trọng Nghĩa theo định hướng xanh bền vững. Biệt thự thiết kế mở, thông tầng, hệ cửa kính lớn giúp tối ưu ánh sáng và thông gió, tạo không gian thoáng mát, gần gũi thiên nhiên.
                                     </p>
                                     <div className="mt-6 flex flex-col gap-5 px-6 md:px-0">
                                         <div className="flex flex-col md:flex-row items-center md:items-end gap-4 min-w-0">
@@ -823,7 +883,7 @@ function Home() {
                                     <button
                                         onClick={extNext}
                                         aria-label="Next"
-                                        className="rounded-xl absolute right-8 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex md:right-25"
+                                        className="rounded-xl absolute right-8 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex md:right-5"
                                     >
                                         <ChevronRight className="h-6 w-6" />
                                     </button>
@@ -837,32 +897,42 @@ function Home() {
                             alt=""
                             className="pointer-events-none justify-self-end hidden md:block"
                         />
-                        <div className="relative z-10 flex items-center pb-6 sm:py-10 md:absolute md:inset-0">
+                        <div className="relative z-10 flex items-center pb-6 sm:py-5 md:absolute md:inset-0 md:mt-10">
                             <div className="flex h-full min-h-0 w-full flex-col justify-center gap-8 md:flex-row md:items-stretch md:justify-start md:gap-0 lg:pr-10">
                                 {/* Left — image carousel */}
                                 <div className="relative flex min-w-0 w-full flex-col justify-start md:w-[65%] md:shrink-0">
-                                    <h2 className="px-6 mb-2 uppercase text-center md:text-left font-sagire text-3xl text-secondary sm:text-4xl md:pl-10 lg:pl-20">
-                                        Lựa chọn "may đo" không gian
-                                    </h2>
-                                    <p className="px-6 mb-4 uppercase text-center md:text-left text-base md:text-3xl text-secondary sm:text-base md:pl-10 lg:pl-20 font-medium">03 phương án hoàn thiện nội thất linh hoạt</p>
+                                    <div className="flex flex-col md:flex-row items-center mb-10">
+                                        <h2 className="px-6 text-center md:text-left font-alishanty text-6xl text-secondary md:pl-10 lg:pl-20">
+                                            Park Home
+                                        </h2>
+                                        <div className="flex flex-col gap-2 text-center md:text-start mt-5 md:mt-0">
+                                            <span className="font-sagire text-3xl md:text-4xl text-secondary">
+                                                Đón khách quốc tế,
+                                            </span>
+                                            <span className="font-sagire text-3xl md:text-4xl text-secondary">
+                                                kích hoạt dòng tiền ngay lập tức
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     <div className="w-full overflow-hidden max-md:rounded-none md:aspect-3/2 md:rounded-r-3xl md:max-h-[360px] lg:max-h-[1000px]">
                                         <div
                                             className="flex md:h-full min-h-0 shrink-0 transition-transform duration-600 ease-in-out"
                                             style={{
-                                                width: `${productSlides.length * 100}%`,
-                                                transform: `translateX(-${(prodIdx * 100) / productSlides.length}%)`,
+                                                width: `${prodGalleryLen * 100}%`,
+                                                transform: `translateX(-${(prodSlideIdx * 100) / prodGalleryLen}%)`,
                                             }}
                                         >
-                                            {productSlides.map((slide, i) => (
+                                            {productGalleryImages.map((src, i) => (
                                                 <div
-                                                    key={`prod-${i}`}
-                                                    className="box-border md:h-full min-h-0 shrink-0 overflow-hidden md:inverted-corners-lg-r"
-                                                    style={{ flex: `0 0 ${100 / productSlides.length}%` }}
+                                                    key={`${productFilter}-${src}-${i}`}
+                                                    className="box-border md:h-full min-h-0 shrink-0 overflow-hidden inverted-corners-lg-r"
+                                                    style={{ flex: `0 0 ${100 / prodGalleryLen}%` }}
                                                 >
                                                     <div className="md:h-full min-h-0 overflow-hidden max-md:[-webkit-mask:none] max-md:[mask:none] md:inverted-corners-lg-r">
                                                         <img
-                                                            src={slide.src}
-                                                            alt={slide.title}
+                                                            src={src}
+                                                            alt=""
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:max-h-full md:max-w-full"
                                                         />
                                                     </div>
@@ -873,75 +943,65 @@ function Home() {
                                 </div>
 
                                 {/* Right — info panel */}
-                                <div className="flex w-full flex-1 flex-col justify-center px-6 sm:px-10 md:px-12 lg:px-16">
-                                    <div className="flex items-center justify-between gap-3 md:hidden">
-                                        <button
-                                            onClick={prodPrev}
-                                            aria-label="Previous product"
-                                            className="rounded-xl flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer"
-                                        >
-                                            <ChevronLeft className="h-5 w-5" />
-                                        </button>
-                                        <p className="font-snell-bold text-center text-8xl md:text-4xl italic text-secondary">
-                                            <span>{String(prodIdx + 1).padStart(2, '0')}</span>
-                                            <span className="ml-1 align-bottom text-4xl font-normal text-secondary/40 not-italic md:text-base">
-                                                / {String(productSlides.length).padStart(2, '0')}
-                                            </span>
-                                        </p>
-                                        <button
-                                            onClick={prodNext}
-                                            aria-label="Next product"
-                                            className="rounded-xl flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer"
-                                        >
-                                            <ChevronRight className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                    <p className="hidden font-snell-bold text-4xl text-secondary sm:text-5xl md:block md:text-8xl">
-                                        <span>{String(prodIdx + 1).padStart(2, '0')}</span>
-                                        <span className="ml-1 align-bottom text-lg font-normal text-secondary/40 sm:text-xl md:text-3xl">
-                                            /{String(productSlides.length).padStart(2, '0')}
-                                        </span>
-                                    </p>
-                                    <h3 className="mt-4 text-center font-sagire text-2xl text-secondary md:text-start sm:text-3xl md:text-3xl">
-                                        {productSlides[prodIdx].title}
+                                <div className="flex w-full flex-1 flex-col justify-center px-6 sm:px-10 md:px-12 md:max-w-lg 2xl:max-w-max md:mt-20">
+                                    <h3 className="text-center font-sagire max-w-xs text-2xl text-secondary md:text-start sm:text-3xl md:text-4xl">
+                                        {parkHomeProduct.title}
                                     </h3>
-                                    <div className="mt-6 w-full max-w-md border-t border-black/15 max-md:max-w-none">
-                                        {productSlides[prodIdx].specs.map((row, i) => (
-                                            <div
-                                                key={i}
-                                                className="grid grid-cols-2 border-b border-black/15 py-3 text-start"
-                                            >
-                                                <span className="min-w-0 text-xs font-bold uppercase tracking-wide text-black sm:text-sm">
-                                                    {row.label}
-                                                </span>
-                                                <span className="min-w-0 text-sm font-normal text-black sm:text-base">
-                                                    {row.value}
-                                                </span>
-                                            </div>
-                                        ))}
+
+                                    <div className="relative mt-6 flex max-sm:justify-start sm:justify-start max-sm:overflow-x-auto max-sm:scrollbar-none">
+                                        <div className="pointer-events-none absolute bottom-0 h-px w-full bg-black/10 max-sm:hidden" />
+                                        <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-0 max-sm:pr-0">
+                                            {(
+                                                [
+                                                    { key: 'exterior' as const, label: 'Mặt ngoài' },
+                                                    { key: 'interior' as const, label: 'Nội thất' },
+                                                ] as const
+                                            ).map((tab) => (
+                                                <button
+                                                    key={tab.key}
+                                                    type="button"
+                                                    onClick={() => setProductFilter(tab.key)}
+                                                    className={`relative cursor-pointer whitespace-nowrap pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${productFilter === tab.key
+                                                        ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
+                                                        : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                                                        }`}
+                                                >
+                                                    {tab.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div className="mt-8 hidden items-center gap-4 md:flex">
+
+                                    <div className="mt-6 w-full max-md:max-w-none">
+                                        <p className="text-base leading-relaxed text-black font-medium">
+                                            Park Home là dòng biệt thự lưu trú tại phân khu sôi động nhất Casamia Balanca Hội An, được thiết kế đa chức năng linh hoạt, tối ưu vận hành. Sản phẩm phù hợp đón đầu nhu cầu lưu trú dài hạn của khách quốc tế tại Hội An – Đà Nẵng, đồng thời là cơ hội đầu tư khan hiếm, tạo dòng tiền ngay.
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-8 flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-2 sm:gap-4">
+                                            <button
+                                                onClick={prodPrev}
+                                                aria-label="Ảnh trước"
+                                                className="rounded-xl flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                                            >
+                                                <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                                            </button>
+                                            <button
+                                                onClick={prodNext}
+                                                aria-label="Ảnh sau"
+                                                className="rounded-xl flex h-10 w-10 shrink-0 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                                            >
+                                                <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                                            </button>
+                                        </div>
                                         <button
-                                            onClick={prodPrev}
-                                            aria-label="Previous product"
-                                            className="rounded-xl flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
+                                            type="button"
+                                            className="rounded-xl shrink-0 bg-[#0F4672] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
                                         >
-                                            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-                                        </button>
-                                        <button
-                                            onClick={prodNext}
-                                            aria-label="Next product"
-                                            className="rounded-xl flex h-10 w-10 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/80 cursor-pointer sm:h-12 sm:w-12"
-                                        >
-                                            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-                                        </button>
-                                        <button className="rounded-xl ml-auto bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:py-4">
                                             Tải tài liệu dự án
                                         </button>
                                     </div>
-                                    <button className="rounded-xl mx-auto mt-8 w-full max-w-sm bg-[#0F4672] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer md:hidden sm:py-4">
-                                        Tải tài liệu dự án
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -952,46 +1012,88 @@ function Home() {
                             alt=""
                             className="pointer-events-none object-cover hidden md:block"
                         />
-                        <div className="relative z-10 flex items-center px-6 py-10 sm:px-10 sm:py-14 md:absolute md:inset-0 lg:px-20 lg:py-16">
-                            {/* Village image + title + white card */}
-                            <div className="relative min-h-[90vh] w-full overflow-hidden rounded-2xl max-md:[-webkit-mask:none] max-md:[mask:none] md:min-h-0 md:rounded-none md:h-full inverted-corners-lg">
-                                <img
-                                    src="/village.png"
-                                    alt=""
-                                    className="absolute inset-0 h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-                                />
-                                {/* Title + white card column */}
-                                <div className="pointer-events-none relative flex min-h-[90vh] flex-col items-center px-6 py-5 text-center md:min-h-0 md:absolute md:inset-y-8 md:left-10 md:w-[320px] md:items-start md:text-left md:px-0 md:py-0 lg:left-15 lg:inset-y-18 lg:w-[50%]">
-                                    {/* Title */}
-                                    <div>
-                                        <h2 className="font-sagire text-secondary">
-                                            <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">Vận hành <br className="block md:hidden" /></span>
-                                            <span className="inline-block px-3 md:translate-y-[0.35em] font-alishanty text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{' '}& </span>
-                                            <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl"><br className="block md:hidden" />Sinh lời ngay</span>
-                                        </h2>
-                                        <p className="mt-2 md:mt-7 text-sm font-medium uppercase tracking-[0.15em] text-secondary sm:text-base">
+                        <div className="relative z-10 flex items-stretch px-6 py-10 sm:px-10 sm:py-14 md:absolute md:inset-0 md:pr-0 md:pb-16 md:pt-0 2xl:pt-16 lg:pl-20">
+                            <div className="flex w-full flex-col gap-10 md:flex-row md:items-stretch md:gap-20 2xl:gap-0">
+                                {/* Left column — 1/3 — title + logo + paragraph */}
+                                <div className="flex flex-col justify-center items-center md:items-start md:w-1/3 md:shrink-0">
+                                    <div className="font-sagire text-secondary flex flex-col gap-2 text-center">
+                                        <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">Hợp tác vận hành</span>
+                                        <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">& Sinh lời ngay</span>
+                                    </div>
+                                    <div className="flex flex-col items-center">
+                                        <p className="mt-3 md:mt-5 text-sm font-medium text-center uppercase tracking-[0.15em] text-secondary sm:text-base">
                                             Cùng đơn vị chuyên nghiệp
                                         </p>
-                                    </div>
-                                    {/* White card — fills from mt-10 below title to bottom */}
-                                    <div className="mt-auto flex min-h-0 flex-col items-center justify-center rounded-3xl bg-white/80 px-6 py-6 backdrop-blur-xs w-full sm:px-8 sm:py-8 md:mt-10 md:flex-1 md:w-[80%]">
                                         <img
                                             src="/logo-village.png"
                                             alt="M Village"
-                                            className="mb-5 h-20 object-contain sm:h-24 lg:h-28"
+                                            className="mt-8 h-24 self-center object-contain sm:h-28 lg:h-32"
                                         />
-                                        <p className="px-2 mt-5 text-center text-sm leading-relaxed text-black sm:px-5 sm:text-base">
-                                            Mỗi nếp nhà là một sắc xanh, toàn khu đô thị là một khu vườn xanh mang nét đẹp hoài cổ và bình lặng của phố Hội. Lối kiến trúc giao thoa giữa bảo tồn di sản và tư duy xanh hiện đại mang đến dòng sản phẩm biệt thự đẹp bất biến với thời gian, công năng linh hoạt, vừa phù hợp với hoạt động nghỉ dưỡng, vừa phù hợp với nhu cầu cho thuê, khai thác, vận hành du lịch.
+                                        <p className="mt-6 max-w-md text-sm text-center leading-relaxed text-black sm:text-base">
+                                            Casamia Balanca thiết lập mô hình vận hành toàn diện, nói chủ đầu tư Đạt Phương kiến tạo nền tảng, M Village trực tiếp vận hành, và chủ nhà an tâm thụ hưởng đồng thời. Sự kết hợp giữa hệ sinh thái bài bản và đơn vị vận hành giàu kinh nghiệm, am hiểu khách quốc tế giúp tối ưu hiệu suất khai thác, đồng thời giải phóng hoàn toàn áp lực quản lý cho chủ nhà đầu tư ở xa.
                                         </p>
                                     </div>
+
+                                </div>
+
+                                {/* Right column — 2/3 — vertical-style image carousel */}
+                                <div className={`relative flex-1 [--vil-sw:88%] [--vil-so:6%] [--vil-gap:0px] md:[--vil-sw:55%] md:[--vil-so:0%] md:[--vil-gap:12px] md:pr-0 md:min-h-0`}>
+                                    <div className="overflow-hidden rounded-l-3xl touch-pan-y md:h-full" onTouchStart={handleVilTouchStart} onTouchMove={handleVilTouchMove} onTouchEnd={handleVilTouchEnd}>
+                                        <div
+                                            ref={vilTrackRef}
+                                            className="flex transition-transform duration-500 ease-in-out md:h-full"
+                                            style={{
+                                                transform: vilIdx === vilMax
+                                                    ? `translateX(calc(100% - ${villageImages.length} * var(--vil-sw) - ${villageImages.length - 1} * var(--vil-gap) + ${vilDragOffset}px))`
+                                                    : `translateX(calc(var(--vil-so) - ${vilIdx} * var(--vil-sw) - ${vilIdx} * var(--vil-gap) + ${vilDragOffset}px))`,
+                                            }}
+                                        >
+                                            {villageImages.map((slide) => (
+                                                <div
+                                                    key={slide.src}
+                                                    className="w-(--vil-sw) shrink-0 px-1.5"
+                                                >
+                                                    <div className="inverted-corners-lg relative overflow-hidden md:h-full">
+                                                        <img
+                                                            src={slide.src}
+                                                            alt={slide.title}
+                                                            className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:w-full"
+                                                        />
+                                                        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 via-black/30 to-transparent px-6 pb-6 sm:px-8 sm:pb-8">
+                                                            <h3 className="font-sagire text-xl text-white sm:text-2xl md:text-3xl">
+                                                                {slide.title}
+                                                            </h3>
+                                                            <p className="mt-2 text-xs text-white/85 sm:text-sm">
+                                                                {slide.desc}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={vilPrev}
+                                        aria-label="Previous"
+                                        className="rounded-xl absolute -left-6 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex"
+                                    >
+                                        <ChevronLeft className="h-6 w-6" />
+                                    </button>
+                                    <button
+                                        onClick={vilNext}
+                                        aria-label="Next"
+                                        className="rounded-xl absolute right-8 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-secondary text-white transition-colors duration-300 hover:bg-secondary/90 hover:text-white cursor-pointer md:flex md:right-5"
+                                    >
+                                        <ChevronRight className="h-6 w-6" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <img
+                        {/* <img
                             src="/bg-emblem.png"
                             alt=""
                             className="pointer-events-none hidden object-cover sm:block absolute -bottom-120 right-0"
-                        />
+                        /> */}
                     </div>
                 </section>
 
@@ -1025,7 +1127,10 @@ function Home() {
                                     <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}truyền đời</span>
                                 </h2>
                                 <p className="mt-4 md:pl-5 text-sm font-medium text-center md:text-end justify-end text-black sm:mt-10 sm:text-base">
-                                    Dự án hiếm hoi tại Hội An sở hữu pháp lý và sổ đỏ lâu dài cho 100% sản phẩm. Quỹ đất sinh thái cuối cùng ở vùng lõi phát triển Đà Nẵng – Hội An.
+                                    100% biệt thự Casamia Balanca sở hữu lâu dài. Tọa lạc trên quỹ đất hiếm trong vùng sinh thái được quy hoạch bảo tồn nghiêm ngặt của Hội An.
+                                </p>
+                                <p className="mt-4 md:pl-5 text-sm font-medium text-center md:text-end justify-end text-black sm:text-base">
+                                    Tính pháp lý vững chắc đi cùng sự khan hiếm không thể mở rộng tạo nên giá trị bền vững theo thời gian, vừa là tài sản tích lũy an toàn, vừa có thể trao truyền cho nhiều thế hệ.
                                 </p>
                             </div>
                         </div>
@@ -1045,27 +1150,37 @@ function Home() {
                                 Top 10 thương hiệu phát triển bền vững
                             </p>
                             <p className="mt-5 text-base text-center md:text-justify leading-relaxed text-black">
-                                Giá trị của dự án được bảo chứng bởi tiềm lực tài chính mạnh mẽ và hơn 20 năm kinh nghiệm trong lĩnh vực xây dựng, bất động sản của Chủ đầu tư Đạt Phương, đơn vị thi công các công trình hạ tầng trọng điểm quốc gia: Cầu Cửa Đại, cầu Đế Võng.
+                                Kiên định với triết lý phát triển bền vững, lấy con người làm trung tâm. Đạt Phương gắn bó sâu sắc với Hội An qua các công trình hạ tầng trọng điểm như cầu Đế Võng, Cửa Đại, tuyến ven biển Võ Chí Công…, tích lũy nền tảng về địa chất, thủy văn và cấu trúc đặc thù, từ đó kiến tạo những sản phẩm có giá trị thực, bền vững theo thời gian.
                             </p>
                             {/* Awards */}
                             <div className="mt-10 md:mt-15 flex flex-col gap-5">
-                                <div className="relative">
+                                <div className="relative px-4 md:px-16">
                                     <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
                                     <div className="relative flex items-center justify-center gap-7 py-4">
                                         <img src="/award-top-10.png" alt="Top 10" className="h-28 w-28 shrink-0 object-contain -mt-8 sm:-mt-12" />
                                         <div>
                                             <span className="font-bold text-secondary text-base">TOP 10</span>
-                                            <p className="text-black text-base">thương hiệu phát triển<br />bền vững (2025)</p>
+                                            <p className="text-black text-base">thương hiệu phát triển bền vững (2025)</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="relative">
+                                <div className="relative px-4 py-2 md:px-16">
+                                    <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
+                                    <div className="relative flex items-center justify-center gap-7">
+                                        <img src="/award-top-10(2).png" alt="Top 10" className="h-30 w-30 shrink-0 object-contain" />
+                                        <div className="">
+                                            <span className="font-bold text-secondary text-base">TOP 10</span>
+                                            <p className="text-black text-base">nhà thầu xây dựng hạ tầng - công nghiệp uy tín năm 2026</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="relative px-4 md:px-16">
                                     <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
                                     <div className="relative flex items-center justify-center gap-7">
                                         <img src="/award-top-500.png" alt="Top 500" className="h-30 w-30 shrink-0 object-contain" />
                                         <div>
                                             <span className="font-bold text-secondary text-base">TOP 500</span>
-                                            <p className="text-black text-base">doanh nghiệp tư nhân<br />lớn nhất Việt Nam</p>
+                                            <p className="text-black text-base">doanh nghiệp tư nhân lớn nhất Việt Nam</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1098,21 +1213,18 @@ function Home() {
                         </div>
                         {/* Right — text + button */}
                         <div className="px-6 md:px-0 flex flex-col justify-center md:w-[42%] md:shrink-0 md:pl-10 lg:pl-16 max-w-lg">
-                            <h2 className="font-sagire text-4xl leading-tight text-secondary sm:text-4xl md:text-5xl">
-                                100% pháp lý
+                            <h2 className="font-sagire text-4xl leading-tight text-secondary text-center md:text-start sm:text-4xl md:text-5xl">
+                                03 lựa chọn "may đo" không gian
                             </h2>
-                            <p className="font-alishanty text-6xl text-center leading-none text-secondary sm:text-4xl md:-mt-2 md:text-6xl">
-                                sổ đỏ Lâu dài
+                            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-secondary text-center md:text-start sm:text-sm">
+                                Phương án bàn giao linh hoạt,<br /> tối ưu cho khách hàng
                             </p>
-                            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-secondary text-end sm:text-sm">
-                                Quy hoạch bền vững,<br />được bảo tồn bởi UNESCO
-                            </p>
-                            <p className="mt-5 text-center md:text-justify leading-relaxed text-black text-base">
-                                Nương theo địa thế hiếm có của vùng đất Cẩm Thanh – top 20 ngôi làng đẹp nhất thế giới, Casamia Balanca được quy hoạch hài hòa với tự nhiên. Dự án nằm trong quỹ đất được bảo tồn với quy định nghiêm ngặt.
-                            </p>
-                            <p className="mt-4 text-center md:text-justify leading-relaxed text-black text-base">
-                                Sự khan hiếm ấy trở thành nền tảng giá trị độc tôn của Casamia Balanca. Nơi nếp sống vì sức khỏe được thiên nhiên nâng niu và giá trị sinh lời của tài sản được thời gian nâng giữ.
-                            </p>
+                            <ul className="mt-5 list-disc space-y-1 pl-7 text-justify leading-relaxed text-black text-base">
+                                <li>Hoàn thiện full nội thất</li>
+                                <li>Tham gia chương trình ủy thác cho thuê</li>
+                                <li>Hoàn thiện nội thất cơ bản</li>
+                                <li>Xây thô hoàn thiện mặt ngoài</li>
+                            </ul>
                             <div className="mt-8 flex justify-center">
                                 <a
                                     href="#"
