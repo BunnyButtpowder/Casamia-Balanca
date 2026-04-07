@@ -20,7 +20,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'bo-ra-8-ty-mua-villa-casamia-hoi-an',
     title: 'Bỏ ra 8 tỷ mua Villa Casamia Hội An: Liệu có đáng?',
     date: '20.10',
-    image: '/carousel-1.png',
+    image: '/center-square.png',
     category: 'du-an',
     content: [
       'Villa Casamia Hội An đã và đang thu hút sự chú ý lớn trong giới đầu tư bất động sản nghỉ dưỡng. Với mức giá khoảng 8 tỷ đồng cho một căn villa, nhiều người đặt câu hỏi: "Liệu có đáng để đầu tư?" Hãy cùng phân tích chi tiết để trả lời câu hỏi này.',
@@ -36,7 +36,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'casamia-balanca-mo-vang-hay-vung-lay',
     title: 'Casamia Balanca Hội An: "Mỏ Vàng" Hay "Vũng Lầy" Rủi Ro?',
     date: '20.10',
-    image: '/carousel-2.jpg',
+    image: '/infi-pool.jpg',
     category: 'du-an',
     content: [
       'Casamia Balanca Hội An đang là tâm điểm bàn luận trong giới đầu tư bất động sản. Với vị trí đắc địa bên bờ sông Thu Bồn và thiết kế kiến trúc Đông Dương độc đáo, dự án hứa hẹn mang đến cơ hội đầu tư hấp dẫn.',
@@ -52,7 +52,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'dung-mua-casamia-hoi-an-neu-chua-doc',
     title: 'Đừng Mua Casamia Hội An Nếu Chưa Đọc Điều Này: Lợi Nhuận Thật Sự?',
     date: '20.10',
-    image: '/carousel-3.jpg',
+    image: '/bar.jpg',
     category: 'du-an',
     content: [
       'Trước khi quyết định đầu tư vào Casamia Hội An, có những thông tin quan trọng mà bạn cần nắm rõ. Bài viết này sẽ phân tích chi tiết về lợi nhuận thực tế mà dự án có thể mang lại.',
@@ -94,7 +94,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'casamia-balanca-mo-vang-hay-vung-lay-phan-2',
     title: 'Casamia Balanca Hội An: "Mỏ Vàng" Hay "Vũng Lầy" Rủi Ro? (Phần 2)',
     date: '22.10',
-    image: '/carousel-1.png',
+    image: '/center-square.png',
     category: 'du-an',
     content: [
       'Phần 2 của loạt bài phân tích chuyên sâu về tiềm năng đầu tư tại Casamia Balanca Hội An.',
@@ -107,7 +107,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'su-kien-mo-ban-giai-doan-moi',
     title: 'Sự Kiện Mở Bán Giai Đoạn Mới Casamia Balanca',
     date: '05.11',
-    image: '/carousel-2.jpg',
+    image: '/infi-pool.jpg',
     category: 'su-kien',
     content: [
       'Casamia Balanca Hội An chính thức mở bán giai đoạn mới với nhiều ưu đãi hấp dẫn dành cho nhà đầu tư.',
@@ -120,7 +120,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'dung-mua-casamia-hoi-an-phan-2',
     title: 'Đừng Mua Casamia Hội An Nếu Chưa Đọc Điều Này (Phần 2)',
     date: '25.10',
-    image: '/carousel-3.jpg',
+    image: '/bar.jpg',
     category: 'du-an',
     content: [
       'Tiếp nối phần 1, bài viết phân tích thêm về các yếu tố cần cân nhắc trước khi đầu tư.',
