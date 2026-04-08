@@ -17,16 +17,58 @@ function Home() {
     const lenisRef = useLenis()
     const [pageLoaded, setPageLoaded] = useState(false)
     useEffect(() => {
-        if (document.readyState === 'complete') {
-            setPageLoaded(true)
-            return
+        let cancelled = false
+        const FALLBACK_MS = 20000
+        const fallback = setTimeout(() => { if (!cancelled) setPageLoaded(true) }, FALLBACK_MS)
+
+        const waitForImage = (img: HTMLImageElement) =>
+            new Promise<void>((resolve) => {
+                if (img.complete && img.naturalWidth > 0) return resolve()
+                const done = () => {
+                    img.removeEventListener('load', done)
+                    img.removeEventListener('error', done)
+                    resolve()
+                }
+                img.addEventListener('load', done)
+                img.addEventListener('error', done)
+            })
+
+        const waitForVideo = (video: HTMLVideoElement) =>
+            new Promise<void>((resolve) => {
+                if (video.readyState >= 3) return resolve()
+                const done = () => {
+                    video.removeEventListener('canplaythrough', done)
+                    video.removeEventListener('loadeddata', done)
+                    video.removeEventListener('error', done)
+                    resolve()
+                }
+                video.addEventListener('canplaythrough', done)
+                video.addEventListener('loadeddata', done)
+                video.addEventListener('error', done)
+            })
+
+        const waitForAll = async () => {
+            // Wait one frame so React has mounted the DOM.
+            await new Promise((r) => requestAnimationFrame(() => r(null)))
+            const imgs = Array.from(document.images) as HTMLImageElement[]
+            const vids = Array.from(document.querySelectorAll('video')) as HTMLVideoElement[]
+            await Promise.all([
+                ...imgs.map(waitForImage),
+                ...vids.map(waitForVideo),
+            ])
+            if (!cancelled) setPageLoaded(true)
         }
-        const onLoad = () => setPageLoaded(true)
-        window.addEventListener('load', onLoad)
-        const fallback = setTimeout(() => setPageLoaded(true), 8000)
+
+        if (document.readyState === 'complete') {
+            waitForAll()
+        } else {
+            window.addEventListener('load', waitForAll, { once: true })
+        }
+
         return () => {
-            window.removeEventListener('load', onLoad)
+            cancelled = true
             clearTimeout(fallback)
+            window.removeEventListener('load', waitForAll)
         }
     }, [])
     useEffect(() => {
@@ -294,7 +336,7 @@ function Home() {
 
     /** Park Home — one product; arrows only change images per filter (Mặt ngoài / Nội thất). */
     const parkHomeProduct = {
-        title: 'Concept đương đại – Tối ưu lưu trú, đón khách toàn cầu',
+        title: 'Tối ưu lưu trú, đón khách toàn cầu',
         exteriorImages: ['/ParkHome/exterior/livingroom.jpg', '/ParkHome/exterior/kitchen.jpg', '/ParkHome/exterior/bathroom.jpg', '/ParkHome/exterior/bedroom.jpg', '/ParkHome/exterior/bedroom-2.jpg', '/ParkHome/exterior/bedroom-3.jpg', '/ParkHome/exterior/reading-room.jpg'],
         interiorImages: ['/ParkHome/interior/livingroom.jpg', '/ParkHome/interior/kitchen.jpg', '/ParkHome/interior/readingroom.jpg', '/ParkHome/interior/washingroom.jpg', '/ParkHome/interior/bathroom.jpg', '/ParkHome/interior/garden.jpg'],
     } as const
@@ -497,7 +539,7 @@ function Home() {
         <div className="min-h-screen overflow-x-clip">
             <div
                 aria-hidden={pageLoaded}
-                className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
             >
                 <img src="/logo.png" alt="Casamia Balanca" className="w-40 object-contain sm:w-52 animate-pulse" />
                 <div className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-secondary/15">
@@ -516,6 +558,9 @@ function Home() {
                         loop
                         muted
                         playsInline
+                        preload="auto"
+                        width={1920}
+                        height={1080}
                         className="absolute inset-0 h-full w-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/10" />
@@ -555,7 +600,7 @@ function Home() {
                             alt=""
                             className="h-full w-full object-cover"
                         />
-                        <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-sm md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24">
+                        <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-sm md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
                             <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
                                 <span className="block text-4xl sm:inline sm:text-3xl md:text-5xl">
                                     Là mỗi ngày
@@ -578,7 +623,7 @@ function Home() {
                         <img
                             src="/leaf.png"
                             alt=""
-                            className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 sm:-right-40 md:-right-110 md:w-auto"
+                            className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 2xl:bottom-30 sm:-right-40 md:-right-110 md:w-auto"
                         />
                     </div>
 
@@ -609,7 +654,7 @@ function Home() {
                             alt=""
                             className="pointer-events-none absolute top-30 md:top-0 md:left-0 w-screen object-cover"
                         />
-                        <div className="absolute top-35 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
+                        <div className="absolute top-35 md:top-25 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
                             <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
                                 <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
                                     An cư
@@ -624,7 +669,7 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/3.png"
+                            src="/3.jpg"
                             alt=""
                             className="mt-10 w-full object-contain hidden md:block sm:mt-0 rounded-b-3xl"
                         />
@@ -682,12 +727,12 @@ function Home() {
                                 onLoad={(e) => {
                                     const c = mobileMapScrollRef.current
                                     if (!c) return
-                                    c.scrollLeft = (e.currentTarget.scrollWidth - c.clientWidth) / 1.47
+                                    c.scrollLeft = (e.currentTarget.scrollWidth - c.clientWidth) / 1.55
                                 }}
                                 className="h-full w-auto max-w-none"
                             />
                         </div>
-                        <div className="group/pin hidden md:block absolute left-[39.8%] top-[59%] w-[8%] -translate-x-1/2 -translate-y-1/2">
+                        <div className="group/pin hidden md:block absolute left-[33.9%] top-[49.9%] w-[8%] -translate-x-1/2 -translate-y-1/2">
                             <img
                                 src="/balanca-sign.png"
                                 alt=""
@@ -707,7 +752,7 @@ function Home() {
                                         <span className="mt-2 font-inter font-medium uppercase text-lg sm:text-lg md:text-xl text-secondary">
                                             Liền kề khu dự trữ sinh quyển thế giới
                                         </span>
-                                        <div className="mt-10 text-base font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
+                                        <div className="mt-2 md:mt-10 text-base font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
                                         <div className="pointer-events-auto mt-6 w-full max-w-md overflow-y-auto max-h-60 location-scrollbar" data-lenis-prevent>
                                             {[
                                                 { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
@@ -881,12 +926,12 @@ function Home() {
                             className="hidden md:block mt-10 w-full object-contain md:mt-0 rounded-b-3xl"
                         />
                         <img
-                            src="/exterior-mobile.png"
+                            src="/product-mobile.png"
                             alt=""
                             className="block md:hidden w-full object-contain rounded-b-3xl"
                         />
-                        <div className="absolute bottom-0 left-1/2 mb-10 w-full max-w-6xl -translate-x-1/2 py-8 sm:py-5 px-6 md:px-0">
-                            <p className="mx-auto max-w-2xl text-center text-sm font-medium leading-relaxed text-white sm:text-base 2xl:text-lg">
+                        <div className="absolute bottom-0 left-1/2 md:mb-10 w-full max-w-6xl -translate-x-1/2 py-8 sm:py-5 px-6 md:px-0">
+                            <p className="mx-auto max-w-2xl text-center text-sm font-medium leading-relaxed text-black md:text-white sm:text-base 2xl:text-lg">
                                 Lối kiến trúc giao thoa giữa di sản và tư duy xanh không chỉ tạo nên vẻ đẹp bền vững theo thời gian, mà còn được tính toán để tối ưu công năng lưu trú và trải nghiệm. Không gian vừa tinh tế, giàu bản sắc, vừa phù hợp với nhu cầu vận hành thực tế, giúp chủ sở hữu dễ dàng khai thác, tối ưu hiệu suất cho thuê, tạo dòng tiền ổn định.
                             </p>
                         </div>
@@ -899,7 +944,7 @@ function Home() {
                         />
                         {/* Overlay: title + description + award | carousel */}
                         <div className="relative z-10 flex items-center md:absolute md:inset-0">
-                            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:py-0 md:pt-20 pr-0 md:flex-row md:items-stretch md:gap-20 2xl:gap-0 lg:pl-20">
+                            <div className="mx-auto flex w-full h-full flex-col gap-8 pb-20 md:py-0 md:pt-20 pr-0 md:flex-row md:items-stretch md:gap-20 2xl:gap-0 lg:pl-20">
                                 {/* Left column */}
                                 <div className="flex flex-col justify-center md:w-1/3 md:shrink-0 ">
                                     <h2 className="px-6 md:px-0 md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-center max-w-md">
@@ -920,7 +965,7 @@ function Home() {
                                         Kiến trúc dự án kế thừa tinh thần Hội An với mái ngói nâu xếp lớp, đá sa thạch Mỹ Sơn và được phát triển bởi KTS Võ Trọng Nghĩa theo định hướng xanh bền vững. Biệt thự thiết kế mở, thông tầng, hệ cửa kính lớn giúp tối ưu ánh sáng và thông gió, tạo không gian thoáng mát, gần gũi thiên nhiên.
                                     </p>
                                     <div className="mt-6 flex flex-col gap-5 px-6 md:px-0 max-w-md">
-                                        <div className="flex flex-col md:flex-row items-center md:items-end gap-4 min-w-0">
+                                        <div className="flex flex-col md:flex-row items-center md:items-center gap-4 min-w-0">
                                             <img
                                                 src="/award.png"
                                                 alt="Asia Property Awards 2021"
@@ -930,11 +975,11 @@ function Home() {
                                                 Thiết kế kiến trúc cảnh quan đẹp nhất Việt Nam
                                             </p>
                                         </div>
-                                        <div className="flex flex-col md:flex-row items-center md:items-end gap-4 min-w-0">
+                                        <div className="flex flex-col md:flex-row items-center md:items-center gap-4 min-w-0">
                                             <img
-                                                src="/award-2026.png"
-                                                alt="Dự án Đáng sống 2026"
-                                                className="w-60 shrink-0 object-contain sm:w-50"
+                                                src="/award-2025.png"
+                                                alt="Dự án Đáng sống 2025"
+                                                className="w-60 shrink-0 object-contain sm:w-50 inverted-corners-lg"
                                             />
                                             <p className="min-w-0 text-base text-center md:text-left px-11 md:px-0 leading-relaxed text-black">
                                                 <span className="font-semibold">"Dự án Đáng sống 2025"</span> do VCCI và Tạp chí Diễn đàn Doanh nghiệp tổ chức.
@@ -1047,24 +1092,24 @@ function Home() {
 
                                 {/* Right — info panel */}
                                 <div className="flex w-full flex-1 flex-col justify-center px-6 sm:px-10 md:px-12 md:max-w-lg 2xl:max-w-max md:mt-20">
-                                    <h3 className="text-center font-sagire md:max-w-lg text-2xl text-secondary md:text-start sm:text-3xl md:text-4xl">
+                                    <h3 className="text-center font-sagire md:max-w-lg text-3xl text-secondary md:text-start md:text-4xl">
                                         {parkHomeProduct.title}
                                     </h3>
 
-                                    <div className="relative mt-6 flex max-sm:justify-start sm:justify-start max-sm:overflow-x-auto max-sm:scrollbar-none">
+                                    <div className="relative mt-6 flex justify-center sm:justify-start max-sm:overflow-x-auto max-sm:scrollbar-none">
                                         <div className="pointer-events-none absolute bottom-0 h-px w-full bg-black/10 max-sm:hidden" />
                                         <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-0 max-sm:pr-0">
                                             {(
                                                 [
-                                                    { key: 'exterior' as const, label: 'Mẫu xây thô hoàn thiện mặt ngoài' },
-                                                    { key: 'interior' as const, label: 'Mẫu hoàn thiện nội thất' },
+                                                    { key: 'exterior' as const, label: 'Mẫu 1' },
+                                                    { key: 'interior' as const, label: 'Mẫu 2' },
                                                 ] as const
                                             ).map((tab) => (
                                                 <button
                                                     key={tab.key}
                                                     type="button"
                                                     onClick={() => setProductFilter(tab.key)}
-                                                    className={`relative cursor-pointer whitespace-nowrap pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${productFilter === tab.key
+                                                    className={`relative cursor-pointer whitespace-nowrap pb-1 text-base font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${productFilter === tab.key
                                                         ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
                                                         : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
                                                         }`}
@@ -1075,8 +1120,11 @@ function Home() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-6 w-full max-md:max-w-none">
-                                        <p className="text-base leading-relaxed text-black font-medium">
+                                    <div className="mt-4 w-full max-md:max-w-none">
+                                        <p className="text-base leading-relaxed text-black font-semibold mb-2">
+                                            {productFilter === 'exterior' ? 'Mẫu xây thô hoàn thiện mặt ngoài' : 'Mẫu hoàn thiện nội thất'}
+                                        </p>
+                                        <p className="text-base text-justify leading-relaxed text-black ">
                                             Park Home là dòng biệt thự lưu trú tại phân khu sôi động nhất Casamia Balanca Hội An, được thiết kế đa chức năng linh hoạt, tối ưu vận hành. Sản phẩm phù hợp đón đầu nhu cầu lưu trú dài hạn của khách quốc tế tại Hội An – Đà Nẵng, đồng thời là cơ hội đầu tư khan hiếm, tạo dòng tiền ngay.
                                         </p>
                                     </div>
