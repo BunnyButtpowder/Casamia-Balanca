@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
-import { MapPin, ChevronLeft, ChevronRight, Phone } from 'lucide-react'
+import { MapPin, ChevronLeft, ChevronRight, Phone, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 
@@ -15,6 +15,15 @@ const FOOTER_GALLERY = [
 
 function Home() {
     const lenisRef = useLenis()
+    const [downloadOpen, setDownloadOpen] = useState(false)
+    const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
+    const DOWNLOAD_URL = 'https://drive.google.com/drive/folders/1hK-gZr3IgHwoXaurZJbYyOnfV8XxGgxM?usp=drive_link'
+    const handleDownloadSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        window.open(DOWNLOAD_URL, '_blank', 'noopener,noreferrer')
+        setDownloadOpen(false)
+        setDownloadForm({ name: '', phone: '', city: '', email: '' })
+    }
     const [galleryIdx, setGalleryIdx] = useState(1)
     const [galleryAnimate, setGalleryAnimate] = useState(true)
     const [galleryDragOffset, setGalleryDragOffset] = useState(0)
@@ -120,7 +129,7 @@ function Home() {
             cat: 'service',
         },
         {
-            src: '/school.jpg',
+            src: '/co-working.jpg',
             title: 'Co-working Space',
             desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
             cat: 'service',
@@ -146,14 +155,19 @@ function Home() {
 
     // Exterior carousel
     const exteriorImages = [
-        '/center-square.png',
-        '/infi-pool.jpg',
-        '/bar.jpg',
+        '/carousel-5.png',
+        '/river.jpg',
+        '/pool-view.jpg',
     ]
     const [extIdx, setExtIdx] = useState(0)
     const extMax = exteriorImages.length - 1
     const extPrev = () => setExtIdx((i) => Math.max(0, i - 1))
     const extNext = () => setExtIdx((i) => Math.min(extMax, i + 1))
+
+    useEffect(() => {
+        const id = setInterval(() => setExtIdx((i) => (i >= extMax ? 0 : i + 1)), 5000)
+        return () => clearInterval(id)
+    }, [extMax])
 
     const [extDragOffset, setExtDragOffset] = useState(0)
     const extDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -210,6 +224,11 @@ function Home() {
     const vilMax = villageImages.length - 1
     const vilPrev = () => setVilIdx((i) => Math.max(0, i - 1))
     const vilNext = () => setVilIdx((i) => Math.min(vilMax, i + 1))
+
+    useEffect(() => {
+        const id = setInterval(() => setVilIdx((i) => (i >= vilMax ? 0 : i + 1)), 5000)
+        return () => clearInterval(id)
+    }, [vilMax])
     const [vilDragOffset, setVilDragOffset] = useState(0)
     const vilDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
     const vilTrackRef = useRef<HTMLDivElement>(null)
@@ -256,7 +275,7 @@ function Home() {
 
     /** Park Home — one product; arrows only change images per filter (Mặt ngoài / Nội thất). */
     const parkHomeProduct = {
-        title: 'Mẫu hoàn thiện 3 tầng Park Home',
+        title: 'Concept đương đại – Tối ưu lưu trú, đón khách toàn cầu',
         exteriorImages: ['/ParkHome/exterior/livingroom.jpg', '/ParkHome/exterior/kitchen.jpg', '/ParkHome/exterior/bathroom.jpg', '/ParkHome/exterior/bedroom.jpg', '/ParkHome/exterior/bedroom-2.jpg', '/ParkHome/exterior/bedroom-3.jpg', '/ParkHome/exterior/reading-room.jpg'],
         interiorImages: ['/ParkHome/interior/livingroom.jpg', '/ParkHome/interior/kitchen.jpg', '/ParkHome/interior/readingroom.jpg', '/ParkHome/interior/washingroom.jpg', '/ParkHome/interior/bathroom.jpg', '/ParkHome/interior/garden.jpg'],
     } as const
@@ -282,6 +301,30 @@ function Home() {
             return i === len - 1 ? 0 : i + 1
         })
 
+    const prodTouchStartX = useRef<number | null>(null)
+    const prodTouchDeltaX = useRef(0)
+    const onProdTouchStart = (e: React.TouchEvent) => {
+        prodTouchStartX.current = e.touches[0].clientX
+        prodTouchDeltaX.current = 0
+    }
+    const onProdTouchMove = (e: React.TouchEvent) => {
+        if (prodTouchStartX.current === null) return
+        prodTouchDeltaX.current = e.touches[0].clientX - prodTouchStartX.current
+    }
+    const onProdTouchEnd = () => {
+        const dx = prodTouchDeltaX.current
+        prodTouchStartX.current = null
+        prodTouchDeltaX.current = 0
+        if (Math.abs(dx) < 40) return
+        if (dx < 0) prodNext()
+        else prodPrev()
+    }
+
+    useEffect(() => {
+        const id = setInterval(() => prodNext(), 5000)
+        return () => clearInterval(id)
+    }, [productFilter])
+
     const handleCatChange = (cat: string) => {
         setCarouselCat(cat)
         setAnimate(false)
@@ -296,6 +339,11 @@ function Home() {
 
     const prevSlide = () => { setAnimate(true); setSlideIdx((i) => i - 1) }
     const nextSlide = () => { setAnimate(true); setSlideIdx((i) => i + 1) }
+
+    useEffect(() => {
+        const id = setInterval(() => nextSlide(), 5000)
+        return () => clearInterval(id)
+    }, [carouselCat])
 
     const [dragOffset, setDragOffset] = useState(0)
     const dragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -365,6 +413,11 @@ function Home() {
 
     const prevGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i - 1) }
     const nextGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i + 1) }
+
+    useEffect(() => {
+        const id = setInterval(() => nextGallery(), 5000)
+        return () => clearInterval(id)
+    }, [])
 
     const handleGalleryTouchStart = (e: React.TouchEvent) => {
         setGalleryAnimate(false)
@@ -560,7 +613,7 @@ function Home() {
                                 ].map((stat, i) => (
                                     <div
                                         key={stat.value}
-                                        className={`text-center px-1${i === 4 ? ' col-span-2 flex flex-col items-center' : ''}${i % 2 !== 0 ? ' border-l border-black/20' : ''
+                                        className={`text-center px-1${i === 4 ? ' max-sm:col-span-2 max-sm:flex max-sm:flex-col max-sm:items-center' : ''}${i % 2 !== 0 ? ' border-l border-black/20' : ''
                                             }${i > 0 && i % 2 === 0 ? ' md:border-l md:border-black/20' : ''}`}
                                     >
                                         <p className="whitespace-pre-line text-base leading-snug font-medium text-secondary mb-5">
@@ -606,9 +659,9 @@ function Home() {
                                             Khu đô thị sinh thái
                                         </h1>
                                         <span className="mt-2 font-inter font-medium uppercase text-lg sm:text-lg md:text-xl text-secondary">
-                                            Liền kề lõi di sản hội an
+                                            Liền kề khu dự trữ sinh quyển thế giới
                                         </span>
-                                        <div className="mt-10 text-base md:text-lg font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
+                                        <div className="mt-10 text-base font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
                                         <div className="pointer-events-auto mt-6 w-full max-w-md overflow-y-auto max-h-60 location-scrollbar" data-lenis-prevent>
                                             {[
                                                 { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
@@ -627,7 +680,7 @@ function Home() {
                                                 </div>
                                             ))}
                                         </div>
-                                        <button className="pointer-events-auto rounded-xl mt-4 bg-secondary px-5 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer">
+                                        <button onClick={() => setDownloadOpen(true)} className="pointer-events-auto rounded-xl mt-4 bg-secondary px-5 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer">
                                             Tải tài liệu dự án
                                         </button>
                                     </div>
@@ -660,7 +713,6 @@ function Home() {
                                     { value: '08', label: 'Ha\ncây xanh' },
                                     { value: '05', label: 'Công viên\nchủ đề' },
                                     { value: '19', label: 'Trụ hoa giấy\nkỷ lục' },
-                                    { value: '25 m', label: 'Hệ thống\nkênh nội khu' },
                                     { value: '70 m', label: 'Đường kính\nhồ trung tâm' },
                                 ].map((stat, i) => (
                                     <div
@@ -801,10 +853,10 @@ function Home() {
                         />
                         {/* Overlay: title + description + award | carousel */}
                         <div className="relative z-10 flex items-center md:absolute md:inset-0">
-                            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:py-0 md:pt-20 md:pl-6 pr-0 md:flex-row md:items-stretch md:gap-15 lg:pl-20">
+                            <div className="mx-auto flex w-full h-full flex-col gap-8 py-20 md:py-0 md:pt-20 pr-0 md:flex-row md:items-stretch md:gap-20 2xl:gap-0 lg:pl-20">
                                 {/* Left column */}
-                                <div className="flex flex-col justify-center md:w-[340px] md:shrink-0">
-                                    <h2 className="px-6 md:px-0 md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-left">
+                                <div className="flex flex-col justify-center md:w-1/3 md:shrink-0 ">
+                                    <h2 className="px-6 md:px-0 md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-center max-w-md">
                                         Kiệt tác xanh được thổi hồn bởi KTS
                                     </h2>
                                     {/* <div className="flex justify-center md:justify-start items-center">
@@ -815,13 +867,13 @@ function Home() {
                                             Thiết kết <br /> bởi KTS
                                         </p>
                                     </div> */}
-                                    <span className="mt-5 font-alishanty text-center font-medium text-secondary text-6xl md:mt-2">
+                                    <span className="mt-5 font-alishanty text-center font-medium text-secondary text-6xl md:mt-2 max-w-md">
                                         Võ Trọng Nghĩa
                                     </span>
-                                    <p className="px-6 md:px-0 mt-7 md:mt-5 max-w-sm text-base leading-relaxed text-center md:text-justify text-black">
+                                    <p className="px-6 md:px-0 mt-7 md:mt-5 text-base leading-relaxed text-center md:text-justify text-black max-w-md">
                                         Kiến trúc dự án kế thừa tinh thần Hội An với mái ngói nâu xếp lớp, đá sa thạch Mỹ Sơn và được phát triển bởi KTS Võ Trọng Nghĩa theo định hướng xanh bền vững. Biệt thự thiết kế mở, thông tầng, hệ cửa kính lớn giúp tối ưu ánh sáng và thông gió, tạo không gian thoáng mát, gần gũi thiên nhiên.
                                     </p>
-                                    <div className="mt-6 flex flex-col gap-5 px-6 md:px-0">
+                                    <div className="mt-6 flex flex-col gap-5 px-6 md:px-0 max-w-md">
                                         <div className="flex flex-col md:flex-row items-center md:items-end gap-4 min-w-0">
                                             <img
                                                 src="/award.png"
@@ -902,20 +954,25 @@ function Home() {
                                 {/* Left — image carousel */}
                                 <div className="relative flex min-w-0 w-full flex-col justify-start md:w-[65%] md:shrink-0">
                                     <div className="flex flex-col md:flex-row items-center mb-10">
-                                        <h2 className="px-6 text-center md:text-left font-alishanty text-6xl text-secondary md:pl-10 lg:pl-20">
+                                        <h2 className="whitespace-nowrap px-6 text-center md:text-left font-alishanty text-5xl sm:text-6xl text-secondary md:pl-10 lg:pl-20">
                                             Park Home
                                         </h2>
                                         <div className="flex flex-col gap-2 text-center md:text-start mt-5 md:mt-0">
                                             <span className="font-sagire text-3xl md:text-4xl text-secondary">
                                                 Đón khách quốc tế,
                                             </span>
-                                            <span className="font-sagire text-3xl md:text-4xl text-secondary">
+                                            <span className="sm:whitespace-nowrap font-sagire text-3xl md:text-4xl text-secondary">
                                                 kích hoạt dòng tiền ngay lập tức
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="w-full overflow-hidden max-md:rounded-none md:aspect-3/2 md:rounded-r-3xl md:max-h-[360px] lg:max-h-[1000px]">
+                                    <div
+                                        className="w-full overflow-hidden max-md:rounded-none md:aspect-3/2 md:rounded-r-3xl md:max-h-[360px] lg:max-h-[1000px] touch-pan-y"
+                                        onTouchStart={onProdTouchStart}
+                                        onTouchMove={onProdTouchMove}
+                                        onTouchEnd={onProdTouchEnd}
+                                    >
                                         <div
                                             className="flex md:h-full min-h-0 shrink-0 transition-transform duration-600 ease-in-out"
                                             style={{
@@ -926,7 +983,7 @@ function Home() {
                                             {productGalleryImages.map((src, i) => (
                                                 <div
                                                     key={`${productFilter}-${src}-${i}`}
-                                                    className="box-border md:h-full min-h-0 shrink-0 overflow-hidden inverted-corners-lg-r"
+                                                    className="box-border md:h-full min-h-0 shrink-0 overflow-hidden md:inverted-corners-lg-r"
                                                     style={{ flex: `0 0 ${100 / prodGalleryLen}%` }}
                                                 >
                                                     <div className="md:h-full min-h-0 overflow-hidden max-md:[-webkit-mask:none] max-md:[mask:none] md:inverted-corners-lg-r">
@@ -944,7 +1001,7 @@ function Home() {
 
                                 {/* Right — info panel */}
                                 <div className="flex w-full flex-1 flex-col justify-center px-6 sm:px-10 md:px-12 md:max-w-lg 2xl:max-w-max md:mt-20">
-                                    <h3 className="text-center font-sagire max-w-xs text-2xl text-secondary md:text-start sm:text-3xl md:text-4xl">
+                                    <h3 className="text-center font-sagire md:max-w-lg text-2xl text-secondary md:text-start sm:text-3xl md:text-4xl">
                                         {parkHomeProduct.title}
                                     </h3>
 
@@ -997,6 +1054,7 @@ function Home() {
                                         </div>
                                         <button
                                             type="button"
+                                            onClick={() => setDownloadOpen(true)}
                                             className="rounded-xl shrink-0 bg-[#0F4672] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
                                         >
                                             Tải tài liệu dự án
@@ -1029,7 +1087,7 @@ function Home() {
                                             alt="M Village"
                                             className="mt-8 h-24 self-center object-contain sm:h-28 lg:h-32"
                                         />
-                                        <p className="mt-6 max-w-md text-sm text-center leading-relaxed text-black sm:text-base">
+                                        <p className="mt-6 max-w-md text-base text-center text-pretty leading-relaxed text-black">
                                             Casamia Balanca thiết lập mô hình vận hành toàn diện, nói chủ đầu tư Đạt Phương kiến tạo nền tảng, M Village trực tiếp vận hành, và chủ nhà an tâm thụ hưởng đồng thời. Sự kết hợp giữa hệ sinh thái bài bản và đơn vị vận hành giàu kinh nghiệm, am hiểu khách quốc tế giúp tối ưu hiệu suất khai thác, đồng thời giải phóng hoàn toàn áp lực quản lý cho chủ nhà đầu tư ở xa.
                                         </p>
                                     </div>
@@ -1059,14 +1117,14 @@ function Home() {
                                                             alt={slide.title}
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:w-full"
                                                         />
-                                                        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 via-black/30 to-transparent px-6 pb-6 sm:px-8 sm:pb-8">
+                                                        {/* <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 via-black/30 to-transparent px-6 pb-6 sm:px-8 sm:pb-8">
                                                             <h3 className="font-sagire text-xl text-white sm:text-2xl md:text-3xl">
                                                                 {slide.title}
                                                             </h3>
                                                             <p className="mt-2 text-xs text-white/85 sm:text-sm">
                                                                 {slide.desc}
                                                             </p>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             ))}
@@ -1126,10 +1184,10 @@ function Home() {
                                     <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">An giữ</span>
                                     <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}truyền đời</span>
                                 </h2>
-                                <p className="mt-4 md:pl-5 text-sm font-medium text-center md:text-end justify-end text-black sm:mt-10 sm:text-base">
+                                <p className="mt-4 md:pl-5 text-base font-medium text-center text-pretty md:text-end justify-end text-black sm:mt-10">
                                     100% biệt thự Casamia Balanca sở hữu lâu dài. Tọa lạc trên quỹ đất hiếm trong vùng sinh thái được quy hoạch bảo tồn nghiêm ngặt của Hội An.
                                 </p>
-                                <p className="mt-4 md:pl-5 text-sm font-medium text-center md:text-end justify-end text-black sm:text-base">
+                                <p className="mt-4 md:pl-5 text-base font-medium text-center text-pretty md:text-end justify-end text-black">
                                     Tính pháp lý vững chắc đi cùng sự khan hiếm không thể mở rộng tạo nên giá trị bền vững theo thời gian, vừa là tài sản tích lũy an toàn, vừa có thể trao truyền cho nhiều thế hệ.
                                 </p>
                             </div>
@@ -1188,11 +1246,16 @@ function Home() {
                         </div>
                         {/* Right — aerial image */}
                         <div className="relative min-h-[300px] flex-1 sm:min-h-[400px] pl-6 md:pl-0 mt-6 md:mt-0">
-                            <div className="h-full w-full overflow-hidden inverted-corners-lg-l">
+                            <div className="relative h-full w-full overflow-hidden inverted-corners-lg-l">
                                 <img
                                     src="/exterior-2.png"
                                     alt="Casamia Balance aerial view"
                                     className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+                                />
+                                <img
+                                    src="/logo-datphuong.png"
+                                    alt="Dat Phuong logo"
+                                    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2"
                                 />
                             </div>
                             <img
@@ -1219,19 +1282,19 @@ function Home() {
                             <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-secondary text-center md:text-start sm:text-sm">
                                 Phương án bàn giao linh hoạt,<br /> tối ưu cho khách hàng
                             </p>
-                            <ul className="mt-5 list-disc space-y-1 pl-7 text-justify leading-relaxed text-black text-base">
-                                <li>Hoàn thiện full nội thất</li>
-                                <li>Tham gia chương trình ủy thác cho thuê</li>
+                            <ul className="mt-5 list-disc space-y-1 pl-7 leading-relaxed text-black text-base md:max-w-sm">
+                                <li>Hoàn thiện full nội thất - Tham gia chương trình ủy thác cho thuê</li>
                                 <li>Hoàn thiện nội thất cơ bản</li>
                                 <li>Xây thô hoàn thiện mặt ngoài</li>
                             </ul>
-                            <div className="mt-8 flex justify-center">
-                                <a
-                                    href="#"
-                                    className="rounded-xl bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+                            <div className="mt-8 flex justify-center md:max-w-sm">
+                                <button
+                                    type="button"
+                                    onClick={() => setDownloadOpen(true)}
+                                    className="rounded-xl bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:text-base"
                                 >
                                     Tải tài liệu dự án
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1259,7 +1322,7 @@ function Home() {
                     <div className="relative py-14 sm:py-16 px-6 sm:px-10 lg:pl-20 lg:pr-0">
                         <div className="grid gap-12 xl:grid-cols-[minmax(0,480px)_minmax(0,1fr)] xl:items-start">
                             <div>
-                                <h3 className="font-sagire text-4xl text-white sm:text-5xl">Tin tức</h3>
+                                <h3 className="font-sagire text-4xl text-white sm:text-5xl text-center md:text-left">Tin tức</h3>
                                 <div className="mt-8 space-y-5">
                                     {NEWS_ARTICLES.slice(0, 3).map((item) => (
                                         <Link
@@ -1291,9 +1354,9 @@ function Home() {
                             </div>
 
                             <div className="min-w-0">
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between lg:pr-20 xl:pr-10">
-                                    <h3 className="font-sagire text-4xl text-white sm:text-5xl">Thư viện</h3>
-                                    <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                                <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:justify-between lg:pr-20 xl:pr-10">
+                                    <h3 className="font-sagire text-4xl text-white text-center sm:text-left sm:text-5xl">Thư viện</h3>
+                                    <div className="flex items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
                                         <span className="text-white">Hình ảnh</span>
                                         <span>|</span>
                                         <span>Video</span>
@@ -1302,18 +1365,18 @@ function Home() {
                                     </div>
                                 </div>
 
-                                <div className="relative mt-8">
+                                <div className="relative mt-8 [--gal-step:90%] md:[--gal-step:76%]">
                                     <div className="overflow-hidden touch-pan-y rounded-l-3xl" onTouchStart={handleGalleryTouchStart} onTouchMove={handleGalleryTouchMove} onTouchEnd={handleGalleryTouchEnd}>
                                         <div
                                             ref={galleryTrackRef}
                                             className={`flex ${galleryAnimate ? 'transition-transform duration-700 ease-in-out' : ''}`}
-                                            style={{ transform: `translateX(calc(-${galleryIdx} * 76% - ${galleryIdx} * 16px + ${galleryDragOffset}px))` }}
+                                            style={{ transform: `translateX(calc(-${galleryIdx} * var(--gal-step) - ${galleryIdx} * 16px + ${galleryDragOffset}px))` }}
                                             onTransitionEnd={handleGalleryTransitionEnd}
                                         >
                                             {extendedGallery.map((src, i) => (
                                                 <div
                                                     key={`${src}-${i}`}
-                                                    className="w-[78%] shrink-0 pr-4"
+                                                    className="w-[calc(var(--gal-step)+2%)] shrink-0 pr-4"
                                                 >
                                                     <img
                                                         src={src}
@@ -1326,7 +1389,7 @@ function Home() {
                                     </div>
                                     <button
                                         type="button"
-                                        className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 hidden h-11 w-11 items-center justify-center rounded-xl bg-white text-secondary transition-opacity hover:opacity-90 md:inline-flex"
+                                        className="absolute cursor-pointer -left-2 md:-left-6 top-1/2 -translate-y-1/2 z-10 inline-flex h-9 w-9 md:h-11 md:w-11 items-center justify-center rounded-xl bg-white text-secondary transition-opacity hover:opacity-90"
                                         aria-label="Previous gallery item"
                                         onClick={prevGallery}
                                     >
@@ -1334,8 +1397,7 @@ function Home() {
                                     </button>
                                     <button
                                         type="button"
-                                        className="absolute top-1/2 -translate-y-1/2 z-10 hidden h-11 w-11 items-center justify-center rounded-xl bg-white text-secondary transition-opacity hover:opacity-90 md:inline-flex"
-                                        style={{ right: 'calc(22%)' }}
+                                        className="absolute cursor-pointer top-1/2 -translate-y-1/2 z-10 inline-flex h-9 w-9 md:h-11 md:w-11 items-center justify-center rounded-xl bg-white text-secondary transition-opacity hover:opacity-90 right-2 md:right-[22%]"
                                         aria-label="Next gallery item"
                                         onClick={nextGallery}
                                     >
@@ -1355,14 +1417,14 @@ function Home() {
                     </div>
                 </section>
 
-                <div className="relative mt-20">
+                <div className="relative overflow-hidden">
                     <img
                         src="/bg-footer.png"
                         alt=""
                         className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover 2xl:scale-100"
                     />
 
-                    <div className="relative mx-auto max-w-9xl px-6 py-14 sm:px-10 sm:py-20 lg:px-20">
+                    <div className="relative mx-auto max-w-9xl px-6 pb-14 sm:px-10 sm:py-20 lg:px-20">
                         <div className="flex flex-col-reverse gap-12 md:flex-row md:gap-16">
                             {/* Left column — logo, info, socials */}
                             <div className="md:w-[38%] md:shrink-0">
@@ -1376,26 +1438,14 @@ function Home() {
 
                                 <div className="mt-8 space-y-6 text-sm text-white/90 sm:text-base">
                                     <div>
-                                        <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hà Nội</h3>
+                                        <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng bán hàng</h3>
                                         <p className="mt-2 flex items-start gap-2">
                                             <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                                            <span>Tầng 15, tòa nhà Handico Tower, Đường Phạm Hùng, Phường Từ Liêm, TP. Hà Nội</span>
+                                            <span>Khu đô thị Casamia Balanca Hoi An, Phường Hội An Đông, Thành phố Đà Nẵng</span>
                                         </p>
                                         <p className="mt-1 flex items-center gap-2">
                                             <Phone className="h-4 w-4 shrink-0" />
-                                            <span>1800 6918</span>
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng Hội An</h3>
-                                        <p className="mt-2 flex items-start gap-2">
-                                            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                                            <span>Số nhà LK3.17, KĐT Casamia Phường Hội An Đông, Đà Nẵng</span>
-                                        </p>
-                                        <p className="mt-1 flex items-center gap-2">
-                                            <Phone className="h-4 w-4 shrink-0" />
-                                            <span>1800 6918</span>
+                                            <span>(+84)90 136 22 88</span>
                                         </p>
                                     </div>
                                 </div>
@@ -1481,6 +1531,93 @@ function Home() {
                     </div>
                 </div>
             </footer>
+
+            {downloadOpen && (
+                <div
+                    className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 px-4"
+                    onClick={() => setDownloadOpen(false)}
+                >
+                    <div
+                        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            aria-label="Close"
+                            onClick={() => setDownloadOpen(false)}
+                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:bg-black/5 hover:text-black cursor-pointer"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                        <h3 className="font-sagire text-2xl text-secondary sm:text-3xl">
+                            Tải tài liệu dự án
+                        </h3>
+                        <form onSubmit={handleDownloadSubmit} className="mt-5 flex flex-col gap-3">
+                            <input
+                                type="text"
+                                required
+                                minLength={2}
+                                maxLength={60}
+                                pattern="[\p{L}\s'\-\.]+"
+                                title="Chỉ được nhập chữ cái và khoảng trắng"
+                                placeholder="Họ và tên"
+                                value={downloadForm.name}
+                                onChange={(e) => {
+                                    const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
+                                    setDownloadForm((f) => ({ ...f, name: v }))
+                                }}
+                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
+                            />
+                            <input
+                                type="tel"
+                                required
+                                inputMode="numeric"
+                                pattern="[0-9]{9,11}"
+                                maxLength={11}
+                                title="Số điện thoại phải gồm 9-11 chữ số"
+                                placeholder="Số điện thoại"
+                                value={downloadForm.phone}
+                                onChange={(e) => {
+                                    const v = e.target.value.replace(/\D/g, '').slice(0, 11)
+                                    setDownloadForm((f) => ({ ...f, phone: v }))
+                                }}
+                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
+                            />
+                            <input
+                                type="text"
+                                required
+                                minLength={2}
+                                maxLength={60}
+                                pattern="[\p{L}\s'\-\.]+"
+                                title="Chỉ được nhập chữ cái và khoảng trắng"
+                                placeholder="Nơi ở (Tỉnh/Thành)"
+                                value={downloadForm.city}
+                                onChange={(e) => {
+                                    const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
+                                    setDownloadForm((f) => ({ ...f, city: v }))
+                                }}
+                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
+                            />
+                            <input
+                                type="email"
+                                required
+                                pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                                title="Vui lòng nhập email hợp lệ"
+                                placeholder="Email"
+                                value={downloadForm.email}
+                                onChange={(e) => setDownloadForm((f) => ({ ...f, email: e.target.value.trim() }))}
+                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
+                            />
+                            <button
+                                type="submit"
+                                className="mt-2 rounded-xl bg-secondary px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer"
+                            >
+                                Tải tài liệu dự án
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
