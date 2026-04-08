@@ -20,7 +20,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'bo-ra-8-ty-mua-villa-casamia-hoi-an',
     title: 'Bỏ ra 8 tỷ mua Villa Casamia Hội An: Liệu có đáng?',
     date: '20.10',
-    image: '/center-square.png',
+    image: '/center-square.jpg',
     category: 'du-an',
     content: [
       'Villa Casamia Hội An đã và đang thu hút sự chú ý lớn trong giới đầu tư bất động sản nghỉ dưỡng. Với mức giá khoảng 8 tỷ đồng cho một căn villa, nhiều người đặt câu hỏi: "Liệu có đáng để đầu tư?" Hãy cùng phân tích chi tiết để trả lời câu hỏi này.',
@@ -94,7 +94,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'casamia-balanca-mo-vang-hay-vung-lay-phan-2',
     title: 'Casamia Balanca Hội An: "Mỏ Vàng" Hay "Vũng Lầy" Rủi Ro? (Phần 2)',
     date: '22.10',
-    image: '/center-square.png',
+    image: '/center-square.jpg',
     category: 'du-an',
     content: [
       'Phần 2 của loạt bài phân tích chuyên sâu về tiềm năng đầu tư tại Casamia Balanca Hội An.',

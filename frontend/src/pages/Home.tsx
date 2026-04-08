@@ -6,7 +6,7 @@ import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 
 const FOOTER_GALLERY = [
-    '/center-square.png',
+    '/center-square.jpg',
     '/carousel-5.png',
     '/infi-pool.jpg',
     '/bar.jpg',
@@ -15,6 +15,24 @@ const FOOTER_GALLERY = [
 
 function Home() {
     const lenisRef = useLenis()
+    const [pageLoaded, setPageLoaded] = useState(false)
+    useEffect(() => {
+        if (document.readyState === 'complete') {
+            setPageLoaded(true)
+            return
+        }
+        const onLoad = () => setPageLoaded(true)
+        window.addEventListener('load', onLoad)
+        const fallback = setTimeout(() => setPageLoaded(true), 8000)
+        return () => {
+            window.removeEventListener('load', onLoad)
+            clearTimeout(fallback)
+        }
+    }, [])
+    useEffect(() => {
+        document.body.style.overflow = pageLoaded ? '' : 'hidden'
+        return () => { document.body.style.overflow = '' }
+    }, [pageLoaded])
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
@@ -82,7 +100,7 @@ function Home() {
 
     const allSlides = [
         {
-            src: '/center-square.png',
+            src: '/center-square.jpg',
             title: 'Quảng trường trung tâm',
             desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp  tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.',
             cat: 'health-care',
@@ -216,7 +234,7 @@ function Home() {
 
     // Village / operations carousel — same behaviour as exterior carousel
     const villageImages = [
-        { src: '/carousel-1.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
+        { src: '/carousel-1.jpg', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
         { src: '/carousel-2.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
         { src: '/carousel-3.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
         { src: '/carousel-6.jpg', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
@@ -477,6 +495,16 @@ function Home() {
 
     return (
         <div className="min-h-screen overflow-x-clip">
+            <div
+                aria-hidden={pageLoaded}
+                className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+            >
+                <img src="/logo.png" alt="Casamia Balanca" className="w-40 object-contain sm:w-52 animate-pulse" />
+                <div className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-secondary/15">
+                    <div className="h-full w-1/2 animate-[loader_1.2s_ease-in-out_infinite] bg-secondary" />
+                </div>
+                <style>{`@keyframes loader { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }`}</style>
+            </div>
             <div ref={contentRef} className="sticky">
                 <Header lenisRef={lenisRef} />
 
@@ -1266,7 +1294,7 @@ function Home() {
                         <div className="relative min-h-[300px] flex-1 sm:min-h-[400px] pl-6 md:pl-0 mt-6 md:mt-0">
                             <div className="relative h-full w-full overflow-hidden inverted-corners-lg-l">
                                 <img
-                                    src="/exterior-2.png"
+                                    src="/exterior-2.jpg"
                                     alt="Casamia Balance aerial view"
                                     className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                                 />
@@ -1282,7 +1310,7 @@ function Home() {
                         {/* Left — scenery image */}
                         <div className="min-h-[300px] flex-1 overflow-hidden sm:min-h-[400px] inverted-corners-lg-r mr-6 md:mr-0">
                             <img
-                                src="/scenery.png"
+                                src="/scenery.jpg"
                                 alt="Casamia Balance scenery"
                                 className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                             />
