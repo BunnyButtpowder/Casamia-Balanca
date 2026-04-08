@@ -15,6 +15,7 @@ const FOOTER_GALLERY = [
 
 function Home() {
     const lenisRef = useLenis()
+    const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const DOWNLOAD_URL = 'https://drive.google.com/drive/folders/1hK-gZr3IgHwoXaurZJbYyOnfV8XxGgxM?usp=drive_link'
@@ -341,9 +342,12 @@ function Home() {
     const nextSlide = () => { setAnimate(true); setSlideIdx((i) => i + 1) }
 
     useEffect(() => {
-        const id = setInterval(() => nextSlide(), 5000)
+        const id = setInterval(() => {
+            setAnimate(true)
+            setSlideIdx((i) => (i >= carouselSlides.length ? 1 : i + 1))
+        }, 5000)
         return () => clearInterval(id)
-    }, [carouselCat])
+    }, [carouselCat, carouselSlides.length])
 
     const [dragOffset, setDragOffset] = useState(0)
     const dragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -415,7 +419,10 @@ function Home() {
     const nextGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i + 1) }
 
     useEffect(() => {
-        const id = setInterval(() => nextGallery(), 5000)
+        const id = setInterval(() => {
+            setGalleryAnimate(true)
+            setGalleryIdx((i) => (i >= FOOTER_GALLERY.length ? 1 : i + 1))
+        }, 5000)
         return () => clearInterval(id)
     }, [])
 
@@ -636,11 +643,22 @@ function Home() {
                             alt=""
                             className="w-full h-full hidden md:block object-cover rounded-3xl"
                         />
-                        <img
-                            src="/map-mobile.svg"
-                            alt=""
-                            className="w-full md:hidden h-full object-cover rounded-3xl"
-                        />
+                        <div
+                            ref={mobileMapScrollRef}
+                            className="md:hidden overflow-x-auto overflow-y-hidden rounded-3xl"
+                            style={{ height: 'calc(100vw * 1228 / 375)' }}
+                        >
+                            <img
+                                src="/map-mobile-full.svg"
+                                alt=""
+                                onLoad={(e) => {
+                                    const c = mobileMapScrollRef.current
+                                    if (!c) return
+                                    c.scrollLeft = (e.currentTarget.scrollWidth - c.clientWidth) / 1.47
+                                }}
+                                className="h-full w-auto max-w-none"
+                            />
+                        </div>
                         <div className="group/pin hidden md:block absolute left-[39.8%] top-[59%] w-[8%] -translate-x-1/2 -translate-y-1/2">
                             <img
                                 src="/balanca-sign.png"
@@ -891,7 +909,7 @@ function Home() {
                                                 className="w-60 shrink-0 object-contain sm:w-50"
                                             />
                                             <p className="min-w-0 text-base text-center md:text-left px-11 md:px-0 leading-relaxed text-black">
-                                                <span className="font-semibold">"Dự án Đáng sống 2026"</span> do VCCI và Tạp chí Diễn đàn Doanh nghiệp tổ chức.
+                                                <span className="font-semibold">"Dự án Đáng sống 2025"</span> do VCCI và Tạp chí Diễn đàn Doanh nghiệp tổ chức.
                                             </p>
                                         </div>
                                     </div>
@@ -1010,8 +1028,8 @@ function Home() {
                                         <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-0 max-sm:pr-0">
                                             {(
                                                 [
-                                                    { key: 'exterior' as const, label: 'Mặt ngoài' },
-                                                    { key: 'interior' as const, label: 'Nội thất' },
+                                                    { key: 'exterior' as const, label: 'Mẫu xây thô hoàn thiện mặt ngoài' },
+                                                    { key: 'interior' as const, label: 'Mẫu hoàn thiện nội thất' },
                                                 ] as const
                                             ).map((tab) => (
                                                 <button
@@ -1251,11 +1269,6 @@ function Home() {
                                     src="/exterior-2.png"
                                     alt="Casamia Balance aerial view"
                                     className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-                                />
-                                <img
-                                    src="/logo-datphuong.png"
-                                    alt="Dat Phuong logo"
-                                    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2"
                                 />
                             </div>
                             <img
