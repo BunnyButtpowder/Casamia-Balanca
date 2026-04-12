@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import ScrollToTopButton from '../components/ScrollToTopButton'
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -95,6 +96,8 @@ export default function NewsDetail() {
           </div>
         </section>
       )}
+
+      <ScrollToTopButton />
 
       {/* Footer */}
       <Footer fixed={false} />

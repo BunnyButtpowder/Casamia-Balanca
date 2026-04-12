@@ -4,6 +4,7 @@ import { Share2 } from 'lucide-react'
 import { NEWS_ARTICLES, NEWS_CATEGORIES } from '../data/news'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import ScrollToTopButton from '../components/ScrollToTopButton'
 
 const ITEMS_PER_PAGE = 9
 
@@ -100,6 +101,7 @@ export default function News() {
         )}
       </main>
 
+      <ScrollToTopButton />
       <Footer fixed={false} />
     </div>
   )
