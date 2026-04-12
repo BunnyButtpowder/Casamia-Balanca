@@ -4,6 +4,7 @@ import { useLenis } from '../hooks/useLenis'
 import { MapPin, ChevronLeft, ChevronRight, Phone, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
+import ScrollToTopButton from '../components/ScrollToTopButton'
 
 const FOOTER_GALLERY = [
     '/center-square.jpg',
@@ -16,6 +17,7 @@ const FOOTER_GALLERY = [
 function Home() {
     const lenisRef = useLenis()
     const [pageLoaded, setPageLoaded] = useState(false)
+    const [tvcPlaying, setTvcPlaying] = useState(false)
     useEffect(() => {
         let cancelled = false
         const FALLBACK_MS = 20000
@@ -627,20 +629,40 @@ function Home() {
                         />
                     </div>
 
-                    {/* Video thumbnail */}
-                    <div className="group relative top-55 mx-auto max-w-6xl px-4 sm:-top-10 sm:px-6 lg:px-0">
-                        <div className="overflow-hidden inverted-corners-lg">
-                            <img
-                                src="/img.png"
-                                alt=""
-                                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                            />
-                        </div>
-                        <img
-                            src="/play-icon.png"
-                            alt="Play"
-                            className="pointer-events-none absolute top-1/2 left-1/2 z-20 h-12 w-12 -translate-x-1/2 -translate-y-1/2 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16"
-                        />
+                    {/* TVC */}
+                    <div className="relative top-55 mx-auto max-w-6xl px-4 sm:-top-10 sm:px-6 lg:px-0">
+                        {!tvcPlaying ? (
+                            <button
+                                type="button"
+                                onClick={() => setTvcPlaying(true)}
+                                className="group relative w-full cursor-pointer"
+                            >
+                                <div className="overflow-hidden inverted-corners-lg">
+                                    <img
+                                        src="/img.png"
+                                        alt="TVC"
+                                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                                    />
+                                </div>
+                                <img
+                                    src="/play-icon.png"
+                                    alt="Play"
+                                    className="pointer-events-none absolute top-1/2 left-1/2 z-20 h-12 w-12 -translate-x-1/2 -translate-y-1/2 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16"
+                                />
+                            </button>
+                        ) : (
+                            <div className="inverted-corners-lg overflow-hidden">
+                                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                    <iframe
+                                        className="absolute inset-0 h-full w-full"
+                                        src="https://www.youtube.com/embed/BS30TFRCrg4?autoplay=1&rel=0"
+                                        title="TVC"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="relative">
@@ -1707,6 +1729,8 @@ function Home() {
                     </div>
                 </div>
             )}
+
+            <ScrollToTopButton />
         </div>
     )
 }
