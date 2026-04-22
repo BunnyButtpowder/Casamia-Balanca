@@ -19,10 +19,10 @@ const navHref = (item: string) => {
 
 export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [showDesktopNav, setShowDesktopNav] = useState(true)
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/'
+  const isNews = location.pathname.startsWith('/tin-tuc')
 
   useEffect(() => {
     if (!menuOpen) return
@@ -32,31 +32,6 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
       document.body.style.overflow = prev
     }
   }, [menuOpen])
-
-  useEffect(() => {
-    let lastScrollY = window.scrollY
-
-    const updateHeaderState = () => {
-      const currentScrollY = window.scrollY
-
-      if (currentScrollY < 24) {
-        setShowDesktopNav(true)
-      } else if (currentScrollY < lastScrollY) {
-        setShowDesktopNav(true)
-      } else if (currentScrollY > lastScrollY) {
-        setShowDesktopNav(false)
-      }
-
-      lastScrollY = currentScrollY
-    }
-
-    updateHeaderState()
-    window.addEventListener('scroll', updateHeaderState, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', updateHeaderState)
-    }
-  }, [])
 
   const handleNavClick = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!href.startsWith('#') || href === '#') return
@@ -93,22 +68,22 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
     <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-xs">
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 md:justify-center">
         {/* Mobile: balances hamburger on the right so logo stays centered */}
-        <div className="w-10 shrink-0 md:hidden" aria-hidden />
+        {!isNews && <div className="w-10 shrink-0 md:hidden" aria-hidden />}
 
-        <div
-          className={`hidden items-center gap-8 transition-all duration-300 md:flex ${showDesktopNav ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-        >
-          {NAV_LEFT.map((item) => (
-            <a
-              key={item}
-              href={navHref(item)}
-              className={NAV_LINK_CLASS}
-              onClick={handleNavClick(navHref(item))}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
+        {!isNews && (
+          <div className="hidden items-center gap-8 md:flex">
+            {NAV_LEFT.map((item) => (
+              <a
+                key={item}
+                href={navHref(item)}
+                className={NAV_LINK_CLASS}
+                onClick={handleNavClick(navHref(item))}
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+        )}
 
         <a
           href={logoHref}
@@ -122,56 +97,63 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
           />
         </a>
 
+        {!isNews && (
+          <div className="hidden items-center gap-8 md:flex">
+            {NAV_RIGHT.map((item) => (
+              <a
+                key={item}
+                href={navHref(item)}
+                className={NAV_LINK_CLASS}
+                onClick={handleNavClick(navHref(item))}
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+        )}
+
+        {isNews
+          ? <div className="h-10 w-10 shrink-0 md:hidden" aria-hidden />
+          : (
+            <button
+              type="button"
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+              className="z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 md:hidden"
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              <span
+                className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? 'translate-y-2 rotate-45' : ''}`}
+              />
+              <span
+                className={`h-0.5 w-6 rounded bg-secondary transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+              />
+              <span
+                className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? '-translate-y-2 -rotate-45' : ''}`}
+              />
+            </button>
+          )
+        }
+      </nav>
+
+      {/* Mobile menu overlay */}
+      {!isNews && (
         <div
-          className={`hidden items-center gap-8 transition-all duration-300 md:flex ${showDesktopNav ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          className={`fixed inset-0 z-40 flex min-h-dvh flex-col items-center justify-center gap-6 overflow-y-auto bg-white/95 px-6 py-8 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+          aria-hidden={!menuOpen}
         >
-          {NAV_RIGHT.map((item) => (
+          {[...NAV_LEFT, ...NAV_RIGHT].map((item) => (
             <a
               key={item}
               href={navHref(item)}
-              className={NAV_LINK_CLASS}
+              className="shrink-0 text-center text-lg font-medium tracking-widest text-secondary"
               onClick={handleNavClick(navHref(item))}
             >
               {item}
             </a>
           ))}
         </div>
-
-        <button
-          type="button"
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-          className="z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 md:hidden"
-          onClick={() => setMenuOpen((v) => !v)}
-        >
-          <span
-            className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? 'translate-y-2 rotate-45' : ''}`}
-          />
-          <span
-            className={`h-0.5 w-6 rounded bg-secondary transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
-          />
-          <span
-            className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? '-translate-y-2 -rotate-45' : ''}`}
-          />
-        </button>
-      </nav>
-
-      {/* Mobile menu overlay */}
-      <div
-        className={`fixed inset-0 z-40 flex min-h-dvh flex-col items-center justify-center gap-6 overflow-y-auto bg-white/95 px-6 py-8 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] backdrop-blur-sm transition-opacity duration-300 md:hidden ${menuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
-        aria-hidden={!menuOpen}
-      >
-        {[...NAV_LEFT, ...NAV_RIGHT].map((item) => (
-          <a
-            key={item}
-            href={navHref(item)}
-            className="shrink-0 text-center text-lg font-medium tracking-widest text-secondary"
-            onClick={handleNavClick(navHref(item))}
-          >
-            {item}
-          </a>
-        ))}
-      </div>
+      )}
     </header>
   )
 }
