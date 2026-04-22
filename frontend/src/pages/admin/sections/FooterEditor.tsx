@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { FooterSection } from '../../../types/sections'
+import MediaUploader from '../components/MediaUploader'
 
 export default function FooterEditor() {
   const [form, setForm] = useState<FooterSection | null>(null)
@@ -47,12 +48,14 @@ export default function FooterEditor() {
       <div className="space-y-6">
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Thư viện hình ảnh ({form.galleryImages.length})</h2>
-          {form.galleryImages.map((img, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <input value={img} onChange={(e) => updateGalleryImage(i, e.target.value)} className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
-              <button onClick={() => setForm({ ...form, galleryImages: form.galleryImages.filter((_, idx) => idx !== i) })} className="text-red-500 hover:text-red-700 text-sm">Xoá</button>
-            </div>
-          ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {form.galleryImages.map((img, i) => (
+              <div key={i} className="relative">
+                <MediaUploader value={img} onChange={(url) => updateGalleryImage(i, url)} />
+                <button onClick={() => setForm({ ...form, galleryImages: form.galleryImages.filter((_, idx) => idx !== i) })} className="absolute -right-2 -top-2 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white hover:bg-red-600">Xoá</button>
+              </div>
+            ))}
+          </div>
           <button onClick={() => setForm({ ...form, galleryImages: [...form.galleryImages, ''] })} className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-gray-400">+ Thêm</button>
         </div>
 

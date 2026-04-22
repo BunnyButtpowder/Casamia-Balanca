@@ -15,6 +15,8 @@ export interface AboutSection {
   secondHeadingLine1Part2: string
   secondHeadingLine2Part1: string
   secondHeadingLine2Part2: string
+  bannerImage: string
+  bannerImageMobile: string
   statsParagraph: string
   stats: Array<{ label: string; value: string }>
 }
@@ -41,6 +43,8 @@ export interface ProductsSection {
   heading2Part1: string
   heading2Part2: string
   description: string
+  bannerImage: string
+  bannerImageMobile: string
   exteriorImages: string[]
   architectTitle: string
   architectName: string
@@ -54,6 +58,7 @@ export interface ProductsSection {
   parkHomeDescription: string
   parkHomeExteriorImages: string[]
   parkHomeInteriorImages: string[]
+  parkHomeHeading: string
   parkHomeSubheading1: string
   parkHomeSubheading2: string
   operationsTitle1: string
@@ -71,6 +76,10 @@ export interface ValueSection {
   heading2Part2: string
   paragraph1: string
   paragraph2: string
+  bannerImage: string
+  bannerImageMobile: string
+  aerialImage: string
+  sceneryImage: string
   developerTitle: string
   developerSubtitle: string
   developerDescription: string

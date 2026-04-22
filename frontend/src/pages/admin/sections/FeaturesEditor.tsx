@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { FeaturesSection } from '../../../types/sections'
+import MediaUploader from '../components/MediaUploader'
 
 export default function FeaturesEditor() {
   const [form, setForm] = useState<FeaturesSection | null>(null)
@@ -96,11 +97,8 @@ export default function FeaturesEditor() {
                 <span className="text-sm font-semibold text-gray-600">Slide #{i + 1}</span>
                 <button onClick={() => removeSlide(i)} className="text-red-500 hover:text-red-700 text-sm">Xoá</button>
               </div>
+              <MediaUploader value={slide.src} onChange={(url) => updateSlide(i, 'src', url)} label="Hình ảnh" />
               <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-600">Hình ảnh (URL)</label>
-                  <input value={slide.src} onChange={(e) => updateSlide(i, 'src', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
-                </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-gray-600">Tiêu đề</label>
                   <input value={slide.title} onChange={(e) => updateSlide(i, 'title', e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />

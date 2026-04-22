@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { HeroSection } from '../../../types/sections'
+import MediaUploader from '../components/MediaUploader'
 
 export default function HeroEditor() {
   const [form, setForm] = useState<HeroSection>({
@@ -44,8 +45,8 @@ export default function HeroEditor() {
       {status === 'error' && <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">Có lỗi xảy ra</div>}
       <div className="space-y-5 rounded-xl bg-white p-6 shadow-sm">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Video URL</label>
-          <input value={form.videoUrl} onChange={(e) => setForm({ ...form, videoUrl: e.target.value })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
+          <label className="mb-1 block text-sm font-medium text-gray-700">Video</label>
+          <MediaUploader value={form.videoUrl} onChange={(url) => setForm({ ...form, videoUrl: url })} accept="video" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

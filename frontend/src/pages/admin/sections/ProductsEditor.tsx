@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { ProductsSection } from '../../../types/sections'
+import MediaUploader from '../components/MediaUploader'
 
 export default function ProductsEditor() {
   const [form, setForm] = useState<ProductsSection | null>(null)
@@ -96,15 +97,32 @@ export default function ProductsEditor() {
           </div>
         </div>
 
+        {/* Banner images */}
+        <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-gray-800">Hình nền banner</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Desktop</label>
+              <MediaUploader value={form.bannerImage} onChange={(url) => setForm({ ...form, bannerImage: url })} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Mobile</label>
+              <MediaUploader value={form.bannerImageMobile} onChange={(url) => setForm({ ...form, bannerImageMobile: url })} />
+            </div>
+          </div>
+        </div>
+
         {/* Exterior carousel */}
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Hình ảnh ngoại thất ({form.exteriorImages.length})</h2>
-          {form.exteriorImages.map((img, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <input value={img} onChange={(e) => updateImageList('exteriorImages', i, e.target.value)} placeholder="URL hình ảnh" className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
-              <button onClick={() => removeImage('exteriorImages', i)} className="text-red-500 hover:text-red-700 text-sm">Xoá</button>
-            </div>
-          ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {form.exteriorImages.map((img, i) => (
+              <div key={i} className="relative">
+                <MediaUploader value={img} onChange={(url) => updateImageList('exteriorImages', i, url)} />
+                <button onClick={() => removeImage('exteriorImages', i)} className="absolute -right-2 -top-2 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white hover:bg-red-600">Xoá</button>
+              </div>
+            ))}
+          </div>
           <button onClick={() => addImage('exteriorImages')} className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-gray-400">+ Thêm</button>
         </div>
 
@@ -130,8 +148,8 @@ export default function ProductsEditor() {
           <h2 className="font-semibold text-gray-800">Giải thưởng KTS ({form.awards.length})</h2>
           {form.awards.map((award, i) => (
             <div key={i} className="rounded-lg border border-gray-200 p-4 space-y-3">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <input value={award.image} onChange={(e) => updateAward(i, 'image', e.target.value)} placeholder="URL hình" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
+              <MediaUploader value={award.image} onChange={(url) => updateAward(i, 'image', url)} label="Hình ảnh" />
+              <div className="grid gap-3 sm:grid-cols-2">
                 <input value={award.title} onChange={(e) => updateAward(i, 'title', e.target.value)} placeholder="Tiêu đề" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
                 <input value={award.description} onChange={(e) => updateAward(i, 'description', e.target.value)} placeholder="Mô tả" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
               </div>
@@ -143,7 +161,11 @@ export default function ProductsEditor() {
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Park Home</h2>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Tiêu đề</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Tiêu đề lớn (font Alishanty)</label>
+            <input value={form.parkHomeHeading} onChange={(e) => setForm({ ...form, parkHomeHeading: e.target.value })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Tiêu đề phụ</label>
             <input value={form.parkHomeTitle} onChange={(e) => setForm({ ...form, parkHomeTitle: e.target.value })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -183,24 +205,28 @@ export default function ProductsEditor() {
         {/* Park Home exterior images */}
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Park Home - Mẫu 1 ({form.parkHomeExteriorImages.length} ảnh)</h2>
-          {form.parkHomeExteriorImages.map((img, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <input value={img} onChange={(e) => updateImageList('parkHomeExteriorImages', i, e.target.value)} className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
-              <button onClick={() => removeImage('parkHomeExteriorImages', i)} className="text-red-500 hover:text-red-700 text-sm">Xoá</button>
-            </div>
-          ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {form.parkHomeExteriorImages.map((img, i) => (
+              <div key={i} className="relative">
+                <MediaUploader value={img} onChange={(url) => updateImageList('parkHomeExteriorImages', i, url)} />
+                <button onClick={() => removeImage('parkHomeExteriorImages', i)} className="absolute -right-2 -top-2 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white hover:bg-red-600">Xoá</button>
+              </div>
+            ))}
+          </div>
           <button onClick={() => addImage('parkHomeExteriorImages')} className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-gray-400">+ Thêm</button>
         </div>
 
         {/* Park Home interior images */}
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Park Home - Mẫu 2 ({form.parkHomeInteriorImages.length} ảnh)</h2>
-          {form.parkHomeInteriorImages.map((img, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <input value={img} onChange={(e) => updateImageList('parkHomeInteriorImages', i, e.target.value)} className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
-              <button onClick={() => removeImage('parkHomeInteriorImages', i)} className="text-red-500 hover:text-red-700 text-sm">Xoá</button>
-            </div>
-          ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {form.parkHomeInteriorImages.map((img, i) => (
+              <div key={i} className="relative">
+                <MediaUploader value={img} onChange={(url) => updateImageList('parkHomeInteriorImages', i, url)} />
+                <button onClick={() => removeImage('parkHomeInteriorImages', i)} className="absolute -right-2 -top-2 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white hover:bg-red-600">Xoá</button>
+              </div>
+            ))}
+          </div>
           <button onClick={() => addImage('parkHomeInteriorImages')} className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-gray-400">+ Thêm</button>
         </div>
 
@@ -222,8 +248,8 @@ export default function ProductsEditor() {
             <input value={form.operationsSubtitle} onChange={(e) => setForm({ ...form, operationsSubtitle: e.target.value })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Logo Village URL</label>
-            <input value={form.villageLogoUrl} onChange={(e) => setForm({ ...form, villageLogoUrl: e.target.value })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
+            <label className="mb-1 block text-sm font-medium text-gray-700">Logo Village</label>
+            <MediaUploader value={form.villageLogoUrl} onChange={(url) => setForm({ ...form, villageLogoUrl: url })} />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Mô tả vận hành</label>
@@ -236,8 +262,8 @@ export default function ProductsEditor() {
           <h2 className="font-semibold text-gray-800">Hình ảnh vận hành ({form.villageImages.length})</h2>
           {form.villageImages.map((img, i) => (
             <div key={i} className="rounded-lg border border-gray-200 p-4 space-y-3">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <input value={img.src} onChange={(e) => updateVillageImage(i, 'src', e.target.value)} placeholder="URL hình" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
+              <MediaUploader value={img.src} onChange={(url) => updateVillageImage(i, 'src', url)} label="Hình ảnh" />
+              <div className="grid gap-3 sm:grid-cols-2">
                 <input value={img.title} onChange={(e) => updateVillageImage(i, 'title', e.target.value)} placeholder="Tiêu đề" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
                 <input value={img.desc} onChange={(e) => updateVillageImage(i, 'desc', e.target.value)} placeholder="Mô tả" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
               </div>

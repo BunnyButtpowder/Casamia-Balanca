@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { AboutSection } from '../../../types/sections'
+import MediaUploader from '../components/MediaUploader'
 
 export default function AboutEditor() {
   const [form, setForm] = useState<AboutSection | null>(null)
@@ -85,6 +86,20 @@ export default function AboutEditor() {
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Dòng 2 - Phần 2 (font Alishanty)</label>
               <input value={form.secondHeadingLine2Part2} onChange={(e) => setForm({ ...form, secondHeadingLine2Part2: e.target.value })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-gray-800">Hình nền banner</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Desktop</label>
+              <MediaUploader value={form.bannerImage} onChange={(url) => setForm({ ...form, bannerImage: url })} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Mobile</label>
+              <MediaUploader value={form.bannerImageMobile} onChange={(url) => setForm({ ...form, bannerImageMobile: url })} />
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 import ScrollToTopButton from '../components/ScrollToTopButton'
 import { useHomeContent } from '../hooks/useHomeContent'
-import { api } from '../services/api'
+import { api, resolveUploadUrl } from '../services/api'
 
 function Home() {
     const lenisRef = useLenis()
@@ -138,7 +138,7 @@ function Home() {
         }
     }, [content])
 
-    const allSlides = content?.features.slides ?? []
+    const allSlides = (content?.features.slides ?? []).map((s) => ({ ...s, src: resolveUploadUrl(s.src) }))
 
     const carouselSlides = carouselCat === 'all' ? allSlides : allSlides.filter((s) => s.cat === carouselCat)
 
@@ -146,7 +146,7 @@ function Home() {
     const [animate, setAnimate] = useState(true)
 
     // Exterior carousel
-    const exteriorImages = content?.products.exteriorImages ?? []
+    const exteriorImages = (content?.products.exteriorImages ?? []).map(resolveUploadUrl)
     const [extIdx, setExtIdx] = useState(0)
     const extMax = exteriorImages.length - 1
     const extPrev = () => setExtIdx((i) => Math.max(0, i - 1))
@@ -202,7 +202,7 @@ function Home() {
     }
 
     // Village / operations carousel — same behaviour as exterior carousel
-    const villageImages = content?.products.villageImages ?? []
+    const villageImages = (content?.products.villageImages ?? []).map((v) => ({ ...v, src: resolveUploadUrl(v.src) }))
     const [vilIdx, setVilIdx] = useState(0)
     const vilMax = villageImages.length - 1
     const vilPrev = () => setVilIdx((i) => Math.max(0, i - 1))
@@ -259,8 +259,8 @@ function Home() {
     /** Park Home — one product; arrows only change images per filter (Mặt ngoài / Nội thất). */
     const parkHomeProduct = {
         title: content?.products.parkHomeTitle ?? '',
-        exteriorImages: content?.products.parkHomeExteriorImages ?? [],
-        interiorImages: content?.products.parkHomeInteriorImages ?? [],
+        exteriorImages: (content?.products.parkHomeExteriorImages ?? []).map(resolveUploadUrl),
+        interiorImages: (content?.products.parkHomeInteriorImages ?? []).map(resolveUploadUrl),
     }
     type ProductFilter = 'exterior' | 'interior'
     const [productFilter, setProductFilter] = useState<ProductFilter>('exterior')
@@ -388,7 +388,7 @@ function Home() {
     }
 
     // Footer gallery carousel
-    const footerGallery = content?.footer.galleryImages ?? []
+    const footerGallery = (content?.footer.galleryImages ?? []).map(resolveUploadUrl)
     const extendedGallery = footerGallery.length > 0 ? [
         footerGallery[footerGallery.length - 1],
         ...footerGallery,
@@ -477,7 +477,7 @@ function Home() {
                 {/* Hero */}
                 <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
                     <video
-                        src={content.hero.videoUrl}
+                        src={resolveUploadUrl(content.hero.videoUrl)}
                         autoPlay
                         loop
                         muted
@@ -580,12 +580,12 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/3.jpg"
+                            src={resolveUploadUrl(content.about.bannerImage)}
                             alt=""
                             className="mt-10 w-full object-contain hidden md:block sm:mt-0 rounded-b-3xl"
                         />
                         <img
-                            src="/3-mobile.png"
+                            src={resolveUploadUrl(content.about.bannerImageMobile)}
                             alt=""
                             className="mt-60 w-full object-contain md:hidden rounded-b-3xl"
                         />
@@ -815,12 +815,12 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/product.png"
+                            src={resolveUploadUrl(content.products.bannerImage)}
                             alt=""
                             className="hidden md:block mt-10 w-full object-contain md:mt-0 rounded-b-3xl"
                         />
                         <img
-                            src="/product-mobile.png"
+                            src={resolveUploadUrl(content.products.bannerImageMobile)}
                             alt=""
                             className="block md:hidden w-full object-contain rounded-b-3xl"
                         />
@@ -862,7 +862,7 @@ function Home() {
                                         {content.products.awards.map((award, i) => (
                                             <div key={i} className="flex flex-col md:flex-row items-center md:items-center gap-4 min-w-0">
                                                 <img
-                                                    src={award.image}
+                                                    src={resolveUploadUrl(award.image)}
                                                     alt={award.title}
                                                     className="w-60 shrink-0 object-contain sm:w-50 inverted-corners-lg"
                                                 />
@@ -932,7 +932,7 @@ function Home() {
                                 <div className="relative flex min-w-0 w-full flex-col justify-start md:w-[65%] md:shrink-0">
                                     <div className="flex flex-col md:flex-row items-center mb-10">
                                         <h2 className="whitespace-nowrap px-6 text-center md:text-left font-alishanty text-5xl sm:text-6xl text-secondary md:pl-10 lg:pl-20">
-                                            Park Home
+                                            {content.products.parkHomeHeading}
                                         </h2>
                                         <div className="flex flex-col gap-2 text-center md:text-start mt-5 md:mt-0">
                                             <span className="font-sagire text-3xl md:text-4xl text-secondary">
@@ -1063,7 +1063,7 @@ function Home() {
                                             {content.products.operationsSubtitle}
                                         </p>
                                         <img
-                                            src={content.products.villageLogoUrl}
+                                            src={resolveUploadUrl(content.products.villageLogoUrl)}
                                             alt="M Village"
                                             className="mt-8 h-24 self-center object-contain sm:h-28 lg:h-32"
                                         />
@@ -1139,12 +1139,12 @@ function Home() {
                 <section id="value" className="relative">
                     <div className="relative rounded-t-3xl overflow-hidden">
                         <img
-                            src="/safety.png"
+                            src={resolveUploadUrl(content.value.bannerImage)}
                             alt=""
                             className="w-full object-contain hidden md:block"
                         />
                         <img
-                            src="/safety-mobile.png"
+                            src={resolveUploadUrl(content.value.bannerImageMobile)}
                             alt=""
                             className="w-full object-contain block md:hidden"
                         />
@@ -1196,7 +1196,7 @@ function Home() {
                                     <div key={i} className="relative px-4 md:px-16">
                                         <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
                                         <div className="relative flex items-center justify-center gap-7 py-4">
-                                            <img src={award.image} alt={award.title} className="h-28 w-28 shrink-0 object-contain" />
+                                            <img src={resolveUploadUrl(award.image)} alt={award.title} className="h-28 w-28 shrink-0 object-contain" />
                                             <div>
                                                 <span className="font-bold text-secondary text-base">{award.title}</span>
                                                 <p className="text-black text-base">{award.description}</p>
@@ -1210,7 +1210,7 @@ function Home() {
                         <div className="relative min-h-[300px] flex-1 sm:min-h-[400px] pl-6 md:pl-0 mt-6 md:mt-0">
                             <div className="relative h-full w-full overflow-hidden inverted-corners-lg-l">
                                 <img
-                                    src="/exterior-2.jpg"
+                                    src={resolveUploadUrl(content.value.aerialImage)}
                                     alt="Casamia Balance aerial view"
                                     className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                                 />
@@ -1226,7 +1226,7 @@ function Home() {
                         {/* Left — scenery image */}
                         <div className="min-h-[300px] flex-1 overflow-hidden sm:min-h-[400px] inverted-corners-lg-r mr-6 md:mr-0">
                             <img
-                                src="/scenery.jpg"
+                                src={resolveUploadUrl(content.value.sceneryImage)}
                                 alt="Casamia Balance scenery"
                                 className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                             />
@@ -1493,7 +1493,7 @@ function Home() {
                                         <div className="flex justify-center pt-2">
                                             <button
                                                 type="submit"
-                                                className="rounded-xl bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
+                                                className="rounded-xl cursor-pointer bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
                                             >
                                                 Đăng ký tư vấn
                                             </button>

@@ -18,6 +18,7 @@ const ValueEditor = lazy(() => import('./pages/admin/sections/ValueEditor'))
 const FooterEditor = lazy(() => import('./pages/admin/sections/FooterEditor'))
 const ContactsList = lazy(() => import('./pages/admin/ContactsList'))
 const DownloadsList = lazy(() => import('./pages/admin/DownloadsList'))
+const ChangePassword = lazy(() => import('./pages/admin/ChangePassword'))
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="footer" element={<FooterEditor />} />
           <Route path="contacts" element={<ContactsList />} />
           <Route path="downloads" element={<DownloadsList />} />
+          <Route path="change-password" element={<ChangePassword />} />
         </Route>
       </Routes>
     </BrowserRouter>

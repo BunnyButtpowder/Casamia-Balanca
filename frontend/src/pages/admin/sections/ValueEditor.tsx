@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { ValueSection } from '../../../types/sections'
+import MediaUploader from '../components/MediaUploader'
 
 export default function ValueEditor() {
   const [form, setForm] = useState<ValueSection | null>(null)
@@ -53,6 +54,20 @@ export default function ValueEditor() {
 
       <div className="space-y-6">
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-gray-800">Hình nền banner</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Desktop</label>
+              <MediaUploader value={form.bannerImage} onChange={(url) => setForm({ ...form, bannerImage: url })} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Mobile</label>
+              <MediaUploader value={form.bannerImageMobile} onChange={(url) => setForm({ ...form, bannerImageMobile: url })} />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Tiêu đề chính</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -101,12 +116,28 @@ export default function ValueEditor() {
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Giải thưởng chủ đầu tư ({form.awards.length})</h2>
           {form.awards.map((award, i) => (
-            <div key={i} className="grid gap-3 sm:grid-cols-3 border-b border-gray-100 pb-4 last:border-0">
-              <input value={award.image} onChange={(e) => updateAward(i, 'image', e.target.value)} placeholder="URL hình" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
-              <input value={award.title} onChange={(e) => updateAward(i, 'title', e.target.value)} placeholder="Tiêu đề" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
-              <input value={award.description} onChange={(e) => updateAward(i, 'description', e.target.value)} placeholder="Mô tả" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
+            <div key={i} className="space-y-3 border-b border-gray-100 pb-4 last:border-0">
+              <MediaUploader value={award.image} onChange={(url) => updateAward(i, 'image', url)} label="Hình ảnh" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input value={award.title} onChange={(e) => updateAward(i, 'title', e.target.value)} placeholder="Tiêu đề" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
+                <input value={award.description} onChange={(e) => updateAward(i, 'description', e.target.value)} placeholder="Mô tả" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
+              </div>
             </div>
           ))}
+        </div>
+
+        <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-gray-800">Hình ảnh minh hoạ</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Hình phối cảnh</label>
+              <MediaUploader value={form.aerialImage} onChange={(url) => setForm({ ...form, aerialImage: url })} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Hình cảnh quan</label>
+              <MediaUploader value={form.sceneryImage} onChange={(url) => setForm({ ...form, sceneryImage: url })} />
+            </div>
+          </div>
         </div>
 
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
