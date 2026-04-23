@@ -10,7 +10,7 @@ import uploadRoutes from './routes/upload.routes.js'
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 3001
+const PORT = Number(process.env.PORT) || 3001
 
 app.use(cors())
 app.use(express.json())
@@ -21,7 +21,7 @@ app.get('/', (_req, res) => {
 })
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' })
+  res.status(200).json({ status: 'ok' })
 })
 
 app.use('/api/auth', authRoutes)
@@ -30,6 +30,6 @@ app.use('/api/contacts', contactsRoutes)
 app.use('/api/downloads', downloadsRoutes)
 app.use('/api/upload', uploadRoutes)
 
-app.listen(Number(PORT), '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`)
 })

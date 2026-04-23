@@ -16,7 +16,7 @@ export default function DownloadsList() {
 
   useEffect(() => {
     api.getDownloads().then((data) => {
-      setDownloads(data as Download[])
+      setDownloads(data as unknown as Download[])
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])

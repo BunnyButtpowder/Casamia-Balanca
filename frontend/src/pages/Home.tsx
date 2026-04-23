@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
-import { MapPin, ChevronLeft, ChevronRight, Phone, X } from 'lucide-react'
+import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 import FloatingButtons from '../components/FloatingButtons'
+import Footer from '../components/Footer'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
 
@@ -73,6 +74,7 @@ function Home() {
     }, [pageLoaded])
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
+    const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const handleDownloadSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -482,7 +484,8 @@ function Home() {
                         loop
                         muted
                         playsInline
-                        preload="auto"
+                        preload="metadata"
+                        poster="/hero-poster.jpg"
                         width={1920}
                         height={1080}
                         className="absolute inset-0 h-full w-full object-cover"
@@ -510,6 +513,8 @@ function Home() {
                         <img
                             src="/scroll-down.png"
                             alt="Scroll down"
+                            width={40}
+                            height={40}
                             className="my-2 h-8 w-8 object-contain sm:h-10 sm:w-10"
                         />
                         <div className="h-6 w-px bg-[#fff7e953]" />
@@ -535,6 +540,8 @@ function Home() {
                         <img
                             src="/leaf.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 2xl:bottom-30 sm:-right-40 md:-right-110 md:w-auto"
                         />
                     </div>
@@ -543,13 +550,30 @@ function Home() {
                     <div className="relative top-55 mx-auto max-w-6xl px-4 sm:-top-10 sm:px-6 lg:px-0">
                         <div className="inverted-corners-lg overflow-hidden">
                             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                <iframe
-                                    className="absolute inset-0 h-full w-full"
-                                    src={`https://www.youtube.com/embed/${content.about.tvcYoutubeId}?rel=0`}
-                                    title="TVC"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                />
+                                {tvcLoaded ? (
+                                    <iframe
+                                        className="absolute inset-0 h-full w-full"
+                                        src={`https://www.youtube.com/embed/${content.about.tvcYoutubeId}?rel=0&autoplay=1`}
+                                        title="TVC"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => setTvcLoaded(true)}
+                                        className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black"
+                                    >
+                                        <img
+                                            src={`https://img.youtube.com/vi/${content.about.tvcYoutubeId}/hqdefault.jpg`}
+                                            alt="TVC"
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="absolute inset-0 h-full w-full object-cover"
+                                        />
+                                        <svg className="relative z-10 h-16 w-16 text-white drop-shadow-lg" viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55C3.97 2.33 2.27 4.81 1.48 7.74.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="red"/><path d="M45 24L27 14v20" fill="white"/></svg>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -558,11 +582,15 @@ function Home() {
                         <img
                             src="/leaf.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute top-0 left-4 w-90 md:w-auto object-contain sm:-top-25 sm:-left-20 sm:block z-10"
                         />
                         <img
                             src="/gradient-from-t.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute  md:top-0 md:left-0 w-screen object-cover"
                         />
                         <div className="absolute top-35 md:top-25 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
@@ -582,11 +610,15 @@ function Home() {
                         <img
                             src={resolveUploadUrl(content.about.bannerImage)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="mt-10 w-full object-contain hidden md:block sm:mt-0 rounded-b-3xl"
                         />
                         <img
                             src={resolveUploadUrl(content.about.bannerImageMobile)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="mt-60 w-full object-contain md:hidden rounded-b-3xl"
                         />
                         {/* Stats card */}
@@ -619,6 +651,8 @@ function Home() {
                         <img
                             src="/map-balanca.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full hidden md:block object-cover rounded-3xl"
                         />
                         <div
@@ -629,6 +663,8 @@ function Home() {
                             <img
                                 src="/map-mobile-full.svg"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 onLoad={(e) => {
                                     const c = mobileMapScrollRef.current
                                     if (!c) return
@@ -641,6 +677,8 @@ function Home() {
                             <img
                                 src="/balanca-sign.png"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="peer/pin relative z-40 w-full object-contain hover:scale-120 transition-[scale] duration-500"
                             />
                             <span className="peer/inner absolute left-1/2 top-[150%] z-30 -translate-x-1/2 -translate-y-1/2 w-[380%] aspect-square rounded-full border border-dashed border-secondary transition-[scale] duration-600 hover:scale-105 peer-hover/pin:scale-105" />
@@ -756,6 +794,8 @@ function Home() {
                                                 <img
                                                     src={slide.src}
                                                     alt={slide.title}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     className="aspect-3/4 w-full object-cover hover:scale-105 transition-transform duration-500 sm:aspect-video"
                                                 />
                                                 <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/30 via-black/30 to-transparent backdrop-blur-[2px] px-6 pb-6 sm:px-10 sm:pb-8">
@@ -797,6 +837,8 @@ function Home() {
                         <img
                             src="/leaf.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute -top-10 -right-70 hidden w-auto object-contain sm:block z-20"
                         />
 
@@ -817,11 +859,15 @@ function Home() {
                         <img
                             src={resolveUploadUrl(content.products.bannerImage)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="hidden md:block mt-10 w-full object-contain md:mt-0 rounded-b-3xl"
                         />
                         <img
                             src={resolveUploadUrl(content.products.bannerImageMobile)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="block md:hidden w-full object-contain rounded-b-3xl"
                         />
                         <div className="absolute bottom-0 left-1/2 md:mb-10 w-full max-w-6xl -translate-x-1/2 py-8 sm:py-5 px-6 md:px-0">
@@ -834,6 +880,8 @@ function Home() {
                         <img
                             src="/bg-pattern.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none object-cover hidden md:block"
                         />
                         {/* Overlay: title + description + award | carousel */}
@@ -864,6 +912,8 @@ function Home() {
                                                 <img
                                                     src={resolveUploadUrl(award.image)}
                                                     alt={award.title}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     className="w-60 shrink-0 object-contain sm:w-50 inverted-corners-lg"
                                                 />
                                                 <p className="min-w-0 text-base text-center md:text-left px-11 md:px-0 leading-relaxed text-black font-semibold">
@@ -895,6 +945,8 @@ function Home() {
                                                         <img
                                                             src={src}
                                                             alt=""
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:w-full"
                                                         />
                                                     </div>
@@ -924,6 +976,8 @@ function Home() {
                         <img
                             src="/bg-pattern-2.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none justify-self-end hidden md:block"
                         />
                         <div className="relative z-10 flex items-center pb-6 sm:py-5 md:absolute md:inset-0 md:mt-10">
@@ -967,6 +1021,8 @@ function Home() {
                                                         <img
                                                             src={src}
                                                             alt=""
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:max-h-full md:max-w-full"
                                                         />
                                                     </div>
@@ -1048,6 +1104,8 @@ function Home() {
                         <img
                             src="/bg-pattern-3.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none object-cover hidden md:block"
                         />
                         <div className="relative z-10 flex items-stretch px-6 py-10 sm:px-10 sm:py-14 md:absolute md:inset-0 md:pr-0 md:pb-16 md:pt-0 2xl:pt-16 lg:pl-20">
@@ -1065,6 +1123,8 @@ function Home() {
                                         <img
                                             src={resolveUploadUrl(content.products.villageLogoUrl)}
                                             alt="M Village"
+                                            loading="lazy"
+                                            decoding="async"
                                             className="mt-8 h-24 self-center object-contain sm:h-28 lg:h-32"
                                         />
                                         <p className="mt-6 max-w-md text-base text-center text-pretty leading-relaxed text-black">
@@ -1095,6 +1155,8 @@ function Home() {
                                                         <img
                                                             src={slide.src}
                                                             alt={slide.title}
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:w-full"
                                                         />
                                                         {/* <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 via-black/30 to-transparent px-6 pb-6 sm:px-8 sm:pb-8">
@@ -1141,16 +1203,22 @@ function Home() {
                         <img
                             src={resolveUploadUrl(content.value.bannerImage)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full object-contain hidden md:block"
                         />
                         <img
                             src={resolveUploadUrl(content.value.bannerImageMobile)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full object-contain block md:hidden"
                         />
                         <img
                             src="/gradient-from-top-r.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none hidden object-cover sm:block absolute top-0 right-0"
                         />
                         {/* Title + description overlay */}
@@ -1175,6 +1243,8 @@ function Home() {
                         <img
                             src="/gradient-from-b.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none object-cover sm:block w-full absolute bottom-0 right-0"
                         />
                     </div>
@@ -1196,7 +1266,7 @@ function Home() {
                                     <div key={i} className="relative px-4 md:px-16">
                                         <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
                                         <div className="relative flex items-center justify-center gap-7 py-4">
-                                            <img src={resolveUploadUrl(award.image)} alt={award.title} className="h-28 w-28 shrink-0 object-contain" />
+                                            <img src={resolveUploadUrl(award.image)} alt={award.title} loading="lazy" decoding="async" className="h-28 w-28 shrink-0 object-contain" />
                                             <div>
                                                 <span className="font-bold text-secondary text-base">{award.title}</span>
                                                 <p className="text-black text-base">{award.description}</p>
@@ -1212,12 +1282,16 @@ function Home() {
                                 <img
                                     src={resolveUploadUrl(content.value.aerialImage)}
                                     alt="Casamia Balance aerial view"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
                             <img
                                 src="/cloud.png"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/4 translate-y-[60%] w-40 sm:w-100 object-contain z-20"
                             />
                         </div>
@@ -1228,6 +1302,8 @@ function Home() {
                             <img
                                 src={resolveUploadUrl(content.value.sceneryImage)}
                                 alt="Casamia Balance scenery"
+                                loading="lazy"
+                                decoding="async"
                                 className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                             />
                         </div>
@@ -1258,6 +1334,8 @@ function Home() {
                     <img
                         src="/leaf.png"
                         alt=""
+                        loading="lazy"
+                        decoding="async"
                         className="pointer-events-none object-cover sm:block absolute -bottom-10 md:-bottom-30 right-0"
                     />
                 </section>
@@ -1290,6 +1368,10 @@ function Home() {
                                             <img
                                                 src={item.image}
                                                 alt={item.title}
+                                                loading="lazy"
+                                                decoding="async"
+                                                width={144}
+                                                height={96}
                                                 className="h-20 w-28 shrink-0 rounded-2xl object-cover sm:h-24 sm:w-36"
                                             />
                                             <div className="min-w-0">
@@ -1338,6 +1420,8 @@ function Home() {
                                                     <img
                                                         src={src}
                                                         alt="Thư viện Casamia Balanca"
+                                                        loading="lazy"
+                                                        decoding="async"
                                                         className="h-[250px] w-full rounded-3xl object-cover sm:h-[340px]"
                                                     />
                                                 </div>
@@ -1374,159 +1458,7 @@ function Home() {
                     </div>
                 </section>
 
-                <div className="relative overflow-hidden">
-                    <img
-                        src="/bg-footer.png"
-                        alt=""
-                        className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover 2xl:scale-100"
-                    />
-
-                    <div className="relative mx-auto max-w-9xl px-6 pb-14 sm:px-10 sm:py-20 lg:px-20">
-                        <div className="flex flex-col-reverse gap-12 md:flex-row md:gap-16">
-                            {/* Left column — logo, info, socials */}
-                            <div className="md:w-[38%] md:shrink-0">
-                                <div className="items-center justify-center flex">
-                                    <img
-                                        src="/logo-footer.png"
-                                        alt="Casamia Balanca Hoi An"
-                                        className="w-44 object-contain sm:w-52 2xl:w-64"
-                                    />
-                                </div>
-
-                                <div className="mt-8 space-y-6 text-sm text-white/90 sm:text-base">
-                                    <div>
-                                        <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng bán hàng</h3>
-                                        <p className="mt-2 flex items-start gap-2">
-                                            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                                            <span>{content.footer.salesOfficeAddress}</span>
-                                        </p>
-                                        <p className="mt-1 flex items-center gap-2">
-                                            <Phone className="h-4 w-4 shrink-0" />
-                                            <span>{content.footer.phone}</span>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <p className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">Cập nhật thông tin tại</p>
-                                    <div className="mt-3 flex gap-3">
-                                        <a href={content.footer.socialLinks.tiktok} className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" /></svg>
-                                        </a>
-                                        <a href={content.footer.socialLinks.facebook} className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-                                        </a>
-                                        <a href={content.footer.socialLinks.zalo} className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                                            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor"><title>Zalo</title><path d="M12.49 10.2722v-.4496h1.3467v6.3218h-.7704a.576.576 0 01-.5763-.5729l-.0006.0005a3.273 3.273 0 01-1.9372.6321c-1.8138 0-3.2844-1.4697-3.2844-3.2823 0-1.8125 1.4706-3.2822 3.2844-3.2822a3.273 3.273 0 011.9372.6321l.0006.0005zM6.9188 7.7896v.205c0 .3823-.051.6944-.2995 1.0605l-.03.0343c-.0542.0615-.1815.206-.2421.2843L2.024 14.8h4.8948v.7682a.5764.5764 0 01-.5767.5761H0v-.3622c0-.4436.1102-.6414.2495-.8476L4.8582 9.23H.1922V7.7896h6.7266zm8.5513 8.3548a.4805.4805 0 01-.4803-.4798v-7.875h1.4416v8.3548H15.47zM20.6934 9.6C22.52 9.6 24 11.0807 24 12.9044c0 1.8252-1.4801 3.306-3.3066 3.306-1.8264 0-3.3066-1.4808-3.3066-3.306 0-1.8237 1.4802-3.3044 3.3066-3.3044zm-10.1412 5.253c1.0675 0 1.9324-.8645 1.9324-1.9312 0-1.065-.865-1.9295-1.9324-1.9295s-1.9324.8644-1.9324 1.9295c0 1.0667.865 1.9312 1.9324 1.9312zm10.1412-.0033c1.0737 0 1.945-.8707 1.945-1.9453 0-1.073-.8713-1.9436-1.945-1.9436-1.0753 0-1.945.8706-1.945 1.9436 0 1.0746.8697 1.9453 1.945 1.9453z" /></svg>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <p className="mt-6 text-xs text-white/50">
-                                    {content.footer.copyright}
-                                </p>
-                            </div>
-
-                            {/* Right column — subscribe form */}
-                            <div className="flex-1">
-                                <div className="rounded-2xl bg-white px-8 py-8 sm:px-10 sm:py-10">
-                                    <h3 className="font-sagire text-center text-2xl text-secondary sm:text-3xl md:text-4xl">
-                                        Đăng ký nhận tư vấn
-                                    </h3>
-                                    <p className="mt-2 text-center text-xs text-black/70 sm:text-sm">
-                                        Vui lòng để lại thông tin.<br />
-                                        Tư vấn viên sẽ liên hệ quý khách trong thời gian sớm nhất.
-                                    </p>
-
-                                    <form className="mt-8 space-y-5" onSubmit={async (e) => {
-                                        e.preventDefault()
-                                        const form = e.currentTarget
-                                        const formData = new FormData(form)
-                                        const phoneVal = (formData.get('phone') as string).replace(/\s/g, '')
-                                        const emailVal = (formData.get('email') as string).trim()
-
-                                        if (!/^(0|\+84)\d{9,10}$/.test(phoneVal)) {
-                                            const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]')
-                                            phoneInput?.setCustomValidity('Vui lòng nhập số điện thoại hợp lệ (VD: 0901234567)')
-                                            phoneInput?.reportValidity()
-                                            return
-                                        }
-                                        if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                                            const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]')
-                                            emailInput?.setCustomValidity('Vui lòng nhập email hợp lệ (VD: vidu@mail.com)')
-                                            emailInput?.reportValidity()
-                                            return
-                                        }
-
-                                        try {
-                                            await api.submitContact({
-                                                name: formData.get('name') as string,
-                                                phone: phoneVal,
-                                                email: emailVal || undefined,
-                                                message: formData.get('message') as string,
-                                            })
-                                            form.reset()
-                                        } catch { /* ignore */ }
-                                    }}>
-                                        <div className="flex flex-col gap-1">
-                                            <label className="text-xs font-semibold text-black/70 sm:text-sm">Họ tên</label>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                required
-                                                placeholder="Điền thông tin của bạn"
-                                                className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                            />
-                                        </div>
-
-                                        <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-                                            <div className="flex flex-1 flex-col gap-1">
-                                                <label className="text-xs font-semibold text-black/70 sm:text-sm">Số điện thoại</label>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    required
-                                                    placeholder="Tối thiểu 10 chữ số"
-                                                    onChange={(e) => e.target.setCustomValidity('')}
-                                                    className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                                />
-                                            </div>
-                                            <div className="flex flex-1 flex-col gap-1">
-                                                <label className="text-xs font-semibold text-black/70 sm:text-sm">Email</label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    placeholder="vidu@mail.com"
-                                                    onChange={(e) => e.target.setCustomValidity('')}
-                                                    className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-1">
-                                            <label className="text-xs font-semibold text-black/70 sm:text-sm">Yêu cầu tư vấn</label>
-                                            <input
-                                                type="text"
-                                                name="message"
-                                                placeholder="Hãy để lại lời nhắn để tư vấn viên có thể hỗ trợ Quý khách"
-                                                className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                            />
-                                        </div>
-
-                                        <div className="flex justify-center pt-2">
-                                            <button
-                                                type="submit"
-                                                className="rounded-xl cursor-pointer bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
-                                            >
-                                                Đăng ký tư vấn
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Footer data={content.footer} />
             </footer>
 
             {downloadOpen && (

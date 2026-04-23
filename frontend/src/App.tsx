@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
-import Home from './pages/Home'
+const Home = lazy(() => import('./pages/Home'))
 import ScrollToTop from './components/ScrollToTop'
 const News = lazy(() => import('./pages/News'))
 const NewsDetail = lazy(() => import('./pages/NewsDetail'))
@@ -25,7 +25,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Suspense fallback={null}><Home /></Suspense>} />
         <Route path="/tin-tuc" element={<Suspense fallback={null}><News /></Suspense>} />
         <Route path="/tin-tuc/:slug" element={<Suspense fallback={null}><NewsDetail /></Suspense>} />
 

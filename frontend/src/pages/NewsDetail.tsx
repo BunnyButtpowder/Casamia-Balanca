@@ -98,9 +98,7 @@ export default function NewsDetail() {
       )}
 
       <ScrollToTopButton />
-
-      {/* Footer */}
-      <Footer fixed={false} />
+      <Footer className="md:px-85"/>
     </div>
   )
 }
