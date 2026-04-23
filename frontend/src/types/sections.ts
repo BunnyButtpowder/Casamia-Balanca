@@ -93,7 +93,7 @@ export interface FooterSection {
   galleryImages: string[]
   salesOfficeAddress: string
   phone: string
-  socialLinks: { tiktok: string; facebook: string }
+  socialLinks: { tiktok: string; facebook: string; zalo: string }
   copyright: string
 }
 

@@ -73,7 +73,7 @@ export default function FooterEditor() {
 
         <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-800">Mạng xã hội</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">TikTok URL</label>
               <input value={form.socialLinks.tiktok} onChange={(e) => setForm({ ...form, socialLinks: { ...form.socialLinks, tiktok: e.target.value } })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
@@ -81,6 +81,10 @@ export default function FooterEditor() {
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Facebook URL</label>
               <input value={form.socialLinks.facebook} onChange={(e) => setForm({ ...form, socialLinks: { ...form.socialLinks, facebook: e.target.value } })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Zalo URL</label>
+              <input value={form.socialLinks.zalo} onChange={(e) => setForm({ ...form, socialLinks: { ...form.socialLinks, zalo: e.target.value } })} className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500" />
             </div>
           </div>
         </div>

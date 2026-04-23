@@ -16,7 +16,7 @@ export default function ContactsList() {
 
   useEffect(() => {
     api.getContacts().then((data) => {
-      setContacts(data as Contact[])
+      setContacts(data as unknown as Contact[])
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])

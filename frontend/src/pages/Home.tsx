@@ -4,7 +4,7 @@ import { useLenis } from '../hooks/useLenis'
 import { MapPin, ChevronLeft, ChevronRight, Phone, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
-import ScrollToTopButton from '../components/ScrollToTopButton'
+import FloatingButtons from '../components/FloatingButtons'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
 
@@ -524,11 +524,11 @@ function Home() {
                             alt=""
                             className="h-full w-full object-cover"
                         />
-                        <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-sm md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
-                            <div className="font-sagire font-light text-4xl md:text-5xl leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
+                        <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-xs md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
+                            <div className="font-sagire font-light text-4xl md:text-6xl leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
                                 {content.about.headingLine1}
                             </div>
-                            <div className="font-sagire font-light text-4xl md:text-5xl leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
+                            <div className="font-sagire font-light text-4xl md:text-6xl leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
                                 {content.about.headingLine2}
                             </div>
                         </div>
@@ -563,7 +563,7 @@ function Home() {
                         <img
                             src="/gradient-from-t.png"
                             alt=""
-                            className="pointer-events-none absolute top-30 md:top-0 md:left-0 w-screen object-cover"
+                            className="pointer-events-none absolute  md:top-0 md:left-0 w-screen object-cover"
                         />
                         <div className="absolute top-35 md:top-25 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
                             <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
@@ -1184,7 +1184,7 @@ function Home() {
                             <h2 className="font-sagire text-center md:text-left text-4xl text-secondary sm:text-4xl md:text-5xl">
                                 {content.value.developerTitle}
                             </h2>
-                            <p className="mt-2 text-center md:text-left text-sm font-semibold uppercase tracking-[0.15em] text-secondary">
+                            <p className="mt-2 text-center text-balance md:text-left text-sm font-semibold uppercase tracking-[0.15em] text-secondary">
                                 {content.value.developerSubtitle}
                             </p>
                             <p className="mt-5 text-base text-center md:text-justify leading-relaxed text-black">
@@ -1236,7 +1236,7 @@ function Home() {
                             <h2 className="font-sagire text-4xl leading-tight text-secondary text-center md:text-start sm:text-4xl md:text-5xl">
                                 {content.value.deliveryTitle}
                             </h2>
-                            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-secondary text-center md:text-start sm:text-sm">
+                            <p className="mt-1 text-sm text-balance font-semibold uppercase tracking-[0.15em] text-secondary text-center md:text-start sm:text-sm">
                                 {content.value.deliverySubtitle}
                             </p>
                             <ul className="mt-5 list-disc space-y-1 pl-7 leading-relaxed text-black text-base md:max-w-sm">
@@ -1416,6 +1416,9 @@ function Home() {
                                         <a href={content.footer.socialLinks.facebook} className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
                                             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                                         </a>
+                                        <a href={content.footer.socialLinks.zalo} className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
+                                            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor"><title>Zalo</title><path d="M12.49 10.2722v-.4496h1.3467v6.3218h-.7704a.576.576 0 01-.5763-.5729l-.0006.0005a3.273 3.273 0 01-1.9372.6321c-1.8138 0-3.2844-1.4697-3.2844-3.2823 0-1.8125 1.4706-3.2822 3.2844-3.2822a3.273 3.273 0 011.9372.6321l.0006.0005zM6.9188 7.7896v.205c0 .3823-.051.6944-.2995 1.0605l-.03.0343c-.0542.0615-.1815.206-.2421.2843L2.024 14.8h4.8948v.7682a.5764.5764 0 01-.5767.5761H0v-.3622c0-.4436.1102-.6414.2495-.8476L4.8582 9.23H.1922V7.7896h6.7266zm8.5513 8.3548a.4805.4805 0 01-.4803-.4798v-7.875h1.4416v8.3548H15.47zM20.6934 9.6C22.52 9.6 24 11.0807 24 12.9044c0 1.8252-1.4801 3.306-3.3066 3.306-1.8264 0-3.3066-1.4808-3.3066-3.306 0-1.8237 1.4802-3.3044 3.3066-3.3044zm-10.1412 5.253c1.0675 0 1.9324-.8645 1.9324-1.9312 0-1.065-.865-1.9295-1.9324-1.9295s-1.9324.8644-1.9324 1.9295c0 1.0667.865 1.9312 1.9324 1.9312zm10.1412-.0033c1.0737 0 1.945-.8707 1.945-1.9453 0-1.073-.8713-1.9436-1.945-1.9436-1.0753 0-1.945.8706-1.945 1.9436 0 1.0746.8697 1.9453 1.945 1.9453z" /></svg>
+                                        </a>
                                     </div>
                                 </div>
 
@@ -1439,11 +1442,27 @@ function Home() {
                                         e.preventDefault()
                                         const form = e.currentTarget
                                         const formData = new FormData(form)
+                                        const phoneVal = (formData.get('phone') as string).replace(/\s/g, '')
+                                        const emailVal = (formData.get('email') as string).trim()
+
+                                        if (!/^(0|\+84)\d{9,10}$/.test(phoneVal)) {
+                                            const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]')
+                                            phoneInput?.setCustomValidity('Vui lòng nhập số điện thoại hợp lệ (VD: 0901234567)')
+                                            phoneInput?.reportValidity()
+                                            return
+                                        }
+                                        if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                                            const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]')
+                                            emailInput?.setCustomValidity('Vui lòng nhập email hợp lệ (VD: vidu@mail.com)')
+                                            emailInput?.reportValidity()
+                                            return
+                                        }
+
                                         try {
                                             await api.submitContact({
                                                 name: formData.get('name') as string,
-                                                phone: formData.get('phone') as string,
-                                                email: formData.get('email') as string,
+                                                phone: phoneVal,
+                                                email: emailVal || undefined,
                                                 message: formData.get('message') as string,
                                             })
                                             form.reset()
@@ -1454,6 +1473,7 @@ function Home() {
                                             <input
                                                 type="text"
                                                 name="name"
+                                                required
                                                 placeholder="Điền thông tin của bạn"
                                                 className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
                                             />
@@ -1465,7 +1485,9 @@ function Home() {
                                                 <input
                                                     type="tel"
                                                     name="phone"
+                                                    required
                                                     placeholder="Tối thiểu 10 chữ số"
+                                                    onChange={(e) => e.target.setCustomValidity('')}
                                                     className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
                                                 />
                                             </div>
@@ -1475,6 +1497,7 @@ function Home() {
                                                     type="email"
                                                     name="email"
                                                     placeholder="vidu@mail.com"
+                                                    onChange={(e) => e.target.setCustomValidity('')}
                                                     className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
                                                 />
                                             </div>
@@ -1593,7 +1616,7 @@ function Home() {
                 </div>
             )}
 
-            <ScrollToTopButton />
+            <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
         </div>
     )
 }

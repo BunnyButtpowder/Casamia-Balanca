@@ -1,5 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 const BACKEND_BASE = API_BASE.replace(/\/api$/, '')
+import type { Contact } from '../types/contact'
 
 export function resolveUploadUrl(path: string): string {
   if (!path) return ''
@@ -52,7 +53,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  getContacts: () => apiFetch<Array<Record<string, unknown>>>('/contacts'),
+  getContacts: () => apiFetch<Array<Contact>>('/contacts'),
   getDownloads: () => apiFetch<Array<Record<string, unknown>>>('/downloads'),
   uploadFile: async (file: File, oldPath?: string): Promise<{ url: string }> => {
     const token = localStorage.getItem('admin_token')

@@ -22,7 +22,7 @@ async function seed() {
       username VARCHAR(50) UNIQUE NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `)
 
   await connection.query(`
@@ -33,7 +33,7 @@ async function seed() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       updated_by INT,
       FOREIGN KEY (updated_by) REFERENCES admin_users(id)
-    )
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `)
 
   await connection.query(`
@@ -44,7 +44,7 @@ async function seed() {
       email VARCHAR(100),
       message TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `)
 
   await connection.query(`
@@ -55,7 +55,7 @@ async function seed() {
       city VARCHAR(100),
       email VARCHAR(100),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `)
 
   console.log('Tables created')
@@ -221,7 +221,7 @@ async function seed() {
       galleryImages: ['/center-square.jpg', '/carousel-5.png', '/infi-pool.jpg', '/bar.jpg'],
       salesOfficeAddress: 'Khu đô thị Casamia Balanca Hoi An, Phường Hội An Đông, Thành phố Đà Nẵng',
       phone: '(+84)90 136 22 88',
-      socialLinks: { tiktok: '#', facebook: '#' },
+      socialLinks: { tiktok: '#', facebook: '#', zalo: '#' },
       copyright: 'Bản quyền thuộc về Casamia Balanca Hội An',
     },
   }
