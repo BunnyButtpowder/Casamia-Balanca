@@ -16,16 +16,20 @@ app.use(cors())
 app.use(express.json())
 app.use('/uploads', express.static('uploads'))
 
+app.get('/', (_req, res) => {
+  res.status(200).send('API is running')
+})
+
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok' })
+})
+
 app.use('/api/auth', authRoutes)
 app.use('/api/sections', sectionsRoutes)
 app.use('/api/contacts', contactsRoutes)
 app.use('/api/downloads', downloadsRoutes)
 app.use('/api/upload', uploadRoutes)
 
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' })
-})
-
-app.listen(PORT, () => {
+app.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`)
 })
