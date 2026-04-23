@@ -1,23 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
-import { MapPin, ChevronLeft, ChevronRight, Phone, X } from 'lucide-react'
+import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
-import ScrollToTopButton from '../components/ScrollToTopButton'
-
-const FOOTER_GALLERY = [
-    '/center-square.jpg',
-    '/carousel-5.png',
-    '/infi-pool.jpg',
-    '/bar.jpg',
-    '/exterior.jpg',
-]
+import FloatingButtons from '../components/FloatingButtons'
+import Footer from '../components/Footer'
+import { useHomeContent } from '../hooks/useHomeContent'
+import { api, resolveUploadUrl } from '../services/api'
 
 function Home() {
     const lenisRef = useLenis()
+    const { data: content, loading: contentLoading } = useHomeContent()
     const [pageLoaded, setPageLoaded] = useState(false)
-    const [tvcPlaying, setTvcPlaying] = useState(false)
     useEffect(() => {
         let cancelled = false
         const FALLBACK_MS = 20000
@@ -79,11 +74,14 @@ function Home() {
     }, [pageLoaded])
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
+    const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
-    const DOWNLOAD_URL = 'https://drive.google.com/drive/folders/1hK-gZr3IgHwoXaurZJbYyOnfV8XxGgxM?usp=drive_link'
-    const handleDownloadSubmit = (e: React.FormEvent) => {
+    const handleDownloadSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        window.open(DOWNLOAD_URL, '_blank', 'noopener,noreferrer')
+        try {
+            await api.submitDownload(downloadForm)
+        } catch { /* ignore */ }
+        window.open(content!.map.downloadUrl, '_blank', 'noopener,noreferrer')
         setDownloadOpen(false)
         setDownloadForm({ name: '', phone: '', city: '', email: '' })
     }
@@ -140,76 +138,9 @@ function Home() {
             window.removeEventListener('resize', updateLayout)
             ro.disconnect()
         }
-    }, [])
+    }, [content])
 
-    const allSlides = [
-        {
-            src: '/center-square.jpg',
-            title: 'Quảng trường trung tâm',
-            desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp  tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.',
-            cat: 'health-care',
-        },
-        {
-            src: '/wellness-park.jpg',
-            title: 'Công viên Wellness',
-            desc: 'Hồ bơi tràn viền hướng biển, mang đến trải nghiệm nghỉ dưỡng đẳng cấp quốc tế.',
-            cat: 'health-care',
-        },
-        {
-            src: '/pickleball.jpg',
-            title: 'Hệ thống sân Pickle Ball',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'health-care',
-        },
-        {
-            src: '/gym-and-fitness.jpg',
-            title: 'Gym & Fitness',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'health-care',
-        },
-        {
-            src: '/pool.jpg',
-            title: 'Bể bơi tiêu chuẩn Olympic',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'health-care',
-        },
-        {
-            src: '/school.jpg',
-            title: 'Trường mầm non quốc tế',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'health-care',
-        },
-        {
-            src: '/hotel.jpg',
-            title: 'Khách sạn 5 sao',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
-        },
-        {
-            src: '/mall.jpg',
-            title: 'Trung tâm thương mại',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
-        },
-        {
-            src: '/co-working.jpg',
-            title: 'Co-working Space',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
-        },
-        {
-            src: '/coffee-shop.jpg',
-            title: 'Coffee & Bistro',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
-        },
-        {
-            src: '/bar.jpg',
-            title: 'Sky bar',
-            desc: 'Không gian giải trí thượng lưu với tầm nhìn toàn cảnh sông nước và hoàng hôn.',
-            cat: 'service',
-        },
-    ]
+    const allSlides = (content?.features.slides ?? []).map((s) => ({ ...s, src: resolveUploadUrl(s.src) }))
 
     const carouselSlides = carouselCat === 'all' ? allSlides : allSlides.filter((s) => s.cat === carouselCat)
 
@@ -217,11 +148,7 @@ function Home() {
     const [animate, setAnimate] = useState(true)
 
     // Exterior carousel
-    const exteriorImages = [
-        '/carousel-5.png',
-        '/river.jpg',
-        '/pool-view.jpg',
-    ]
+    const exteriorImages = (content?.products.exteriorImages ?? []).map(resolveUploadUrl)
     const [extIdx, setExtIdx] = useState(0)
     const extMax = exteriorImages.length - 1
     const extPrev = () => setExtIdx((i) => Math.max(0, i - 1))
@@ -277,12 +204,7 @@ function Home() {
     }
 
     // Village / operations carousel — same behaviour as exterior carousel
-    const villageImages = [
-        { src: '/carousel-1.jpg', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
-        { src: '/carousel-2.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
-        { src: '/carousel-3.png', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
-        { src: '/carousel-6.jpg', title: 'Công viên chủ đề và các tuyến phố cây xanh', desc: 'Hệ thống cây xanh, mặt nước được kết nối, xếp lớp tạo nên lá phổi xanh, đảm bảo chất lượng không khí thuần khiết cho khu đô thị.' },
-    ]
+    const villageImages = (content?.products.villageImages ?? []).map((v) => ({ ...v, src: resolveUploadUrl(v.src) }))
     const [vilIdx, setVilIdx] = useState(0)
     const vilMax = villageImages.length - 1
     const vilPrev = () => setVilIdx((i) => Math.max(0, i - 1))
@@ -338,20 +260,17 @@ function Home() {
 
     /** Park Home — one product; arrows only change images per filter (Mặt ngoài / Nội thất). */
     const parkHomeProduct = {
-        title: 'Tối ưu lưu trú, đón khách toàn cầu',
-        exteriorImages: ['/ParkHome/exterior/livingroom.jpg', '/ParkHome/exterior/kitchen.jpg', '/ParkHome/exterior/bathroom.jpg', '/ParkHome/exterior/bedroom.jpg', '/ParkHome/exterior/bedroom-2.jpg', '/ParkHome/exterior/bedroom-3.jpg', '/ParkHome/exterior/reading-room.jpg'],
-        interiorImages: ['/ParkHome/interior/livingroom.jpg', '/ParkHome/interior/kitchen.jpg', '/ParkHome/interior/readingroom.jpg', '/ParkHome/interior/washingroom.jpg', '/ParkHome/interior/bathroom.jpg', '/ParkHome/interior/garden.jpg'],
-    } as const
+        title: content?.products.parkHomeTitle ?? '',
+        exteriorImages: (content?.products.parkHomeExteriorImages ?? []).map(resolveUploadUrl),
+        interiorImages: (content?.products.parkHomeInteriorImages ?? []).map(resolveUploadUrl),
+    }
     type ProductFilter = 'exterior' | 'interior'
     const [productFilter, setProductFilter] = useState<ProductFilter>('exterior')
     const [prodSlideIdx, setProdSlideIdx] = useState(0)
     const productGalleryImages =
         productFilter === 'exterior' ? parkHomeProduct.exteriorImages : parkHomeProduct.interiorImages
     const prodGalleryLen = productGalleryImages.length
-
-    useEffect(() => {
-        setProdSlideIdx(0)
-    }, [productFilter])
+    const safeProdSlideIdx = prodGalleryLen > 0 ? Math.min(prodSlideIdx, prodGalleryLen - 1) : 0
 
     const prodPrev = () =>
         setProdSlideIdx((i) => {
@@ -383,10 +302,12 @@ function Home() {
         else prodPrev()
     }
 
+    const prodNextRef = useRef(prodNext)
+    prodNextRef.current = prodNext
     useEffect(() => {
-        const id = setInterval(() => prodNext(), 5000)
+        const id = setInterval(() => prodNextRef.current(), 5000)
         return () => clearInterval(id)
-    }, [productFilter])
+    }, [])
 
     const handleCatChange = (cat: string) => {
         setCarouselCat(cat)
@@ -469,13 +390,14 @@ function Home() {
     }
 
     // Footer gallery carousel
-    const extendedGallery = [
-        FOOTER_GALLERY[FOOTER_GALLERY.length - 1],
-        ...FOOTER_GALLERY,
-        FOOTER_GALLERY[0],
-    ]
+    const footerGallery = (content?.footer.galleryImages ?? []).map(resolveUploadUrl)
+    const extendedGallery = footerGallery.length > 0 ? [
+        footerGallery[footerGallery.length - 1],
+        ...footerGallery,
+        footerGallery[0],
+    ] : []
     const galleryIsFirst = galleryIdx <= 1
-    const galleryIsLast = galleryIdx >= FOOTER_GALLERY.length
+    const galleryIsLast = galleryIdx >= footerGallery.length
 
     const prevGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i - 1) }
     const nextGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i + 1) }
@@ -483,7 +405,7 @@ function Home() {
     useEffect(() => {
         const id = setInterval(() => {
             setGalleryAnimate(true)
-            setGalleryIdx((i) => (i >= FOOTER_GALLERY.length ? 1 : i + 1))
+            setGalleryIdx((i) => (i >= footerGallery.length ? 1 : i + 1))
         }, 5000)
         return () => clearInterval(id)
     }, [])
@@ -530,18 +452,20 @@ function Home() {
     const handleGalleryTransitionEnd = () => {
         if (galleryIdx === 0) {
             setGalleryAnimate(false)
-            setGalleryIdx(FOOTER_GALLERY.length)
+            setGalleryIdx(footerGallery.length)
         } else if (galleryIdx === extendedGallery.length - 1) {
             setGalleryAnimate(false)
             setGalleryIdx(1)
         }
     }
 
+    if (!content) return null
+
     return (
         <div className="min-h-screen overflow-x-clip">
             <div
-                aria-hidden={pageLoaded}
-                className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                aria-hidden={pageLoaded && !contentLoading}
+                className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded && !contentLoading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
             >
                 <img src="/logo.png" alt="Casamia Balanca" className="w-40 object-contain sm:w-52 animate-pulse" />
                 <div className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-secondary/15">
@@ -555,12 +479,13 @@ function Home() {
                 {/* Hero */}
                 <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
                     <video
-                        src="/hero.mp4"
+                        src={resolveUploadUrl(content.hero.videoUrl)}
                         autoPlay
                         loop
                         muted
                         playsInline
-                        preload="auto"
+                        preload="metadata"
+                        poster="/hero-poster.jpg"
                         width={1920}
                         height={1080}
                         className="absolute inset-0 h-full w-full object-cover"
@@ -569,16 +494,16 @@ function Home() {
                     <div className="relative z-10 px-4 text-center sm:px-6">
                         <h1 className="leading-tight font-light text-white">
                             <span className="-ml-6 flex items-center justify-center gap-3 sm:-ml-10 md:-ml-27">
-                                <span className="text-7xl font-alishanty md:text-7xl">Sống</span>
-                                <span className="text-5xl font-sagire md:text-5xl">đủ sâu</span>
+                                <span className="text-7xl font-alishanty md:text-7xl">{content.hero.titleLine1Word1}</span>
+                                <span className="text-5xl font-sagire md:text-5xl">{content.hero.titleLine1Word2}</span>
                             </span>
                             <span className=" flex items-center justify-center gap-3 sm:ml-10 md:ml-29">
-                                <span className="text-7xl font-alishanty md:text-7xl">Giữ</span>
-                                <span className="text-5xl font-sagire md:text-5xl">đủ lâu</span>
+                                <span className="text-7xl font-alishanty md:text-7xl">{content.hero.titleLine2Word1}</span>
+                                <span className="text-5xl font-sagire md:text-5xl">{content.hero.titleLine2Word2}</span>
                             </span>
                         </h1>
                         <p className="mx-auto mt-4 max-w-xl text-xl text-white uppercase sm:mt-4 sm:text-base">
-                            Đâu là điều quý giá nhất <br className="block md:hidden" /> đời người?
+                            {content.hero.subtitle}
                         </p>
                     </div>
 
@@ -588,6 +513,8 @@ function Home() {
                         <img
                             src="/scroll-down.png"
                             alt="Scroll down"
+                            width={40}
+                            height={40}
                             className="my-2 h-8 w-8 object-contain sm:h-10 sm:w-10"
                         />
                         <div className="h-6 w-px bg-[#fff7e953]" />
@@ -602,117 +529,105 @@ function Home() {
                             alt=""
                             className="h-full w-full object-cover"
                         />
-                        <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-sm md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
-                            <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
-                                <span className="block text-4xl sm:inline sm:text-3xl md:text-5xl">
-                                    Là mỗi ngày
-                                </span>
-                                <span className="text-4xl sm:text-3xl md:text-5xl">
-                                    sống{' '}
-                                </span>
-                                <span className="text-[3rem] sm:text-4xl md:text-6xl">Khoẻ</span>
+                        <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-xs md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
+                            <div className="font-sagire font-light text-4xl md:text-6xl leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
+                                {content.about.headingLine1}
                             </div>
-                            <div className="font-sagire font-light leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
-                                <span className="block text-4xl sm:inline sm:text-3xl md:text-5xl">
-                                    Là nếp nhà
-                                </span>
-                                <span className="text-4xl sm:text-3xl md:text-5xl">
-                                    sống{' '}
-                                </span>
-                                <span className="text-[3rem] sm:text-4xl md:text-6xl">An</span>
+                            <div className="font-sagire font-light text-4xl md:text-6xl leading-snug text-secondary sm:flex sm:items-center sm:justify-center sm:gap-3">
+                                {content.about.headingLine2}
                             </div>
                         </div>
                         <img
                             src="/leaf.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 2xl:bottom-30 sm:-right-40 md:-right-110 md:w-auto"
                         />
                     </div>
 
                     {/* TVC */}
                     <div className="relative top-55 mx-auto max-w-6xl px-4 sm:-top-10 sm:px-6 lg:px-0">
-                        {!tvcPlaying ? (
-                            <button
-                                type="button"
-                                onClick={() => setTvcPlaying(true)}
-                                className="group relative w-full cursor-pointer"
-                            >
-                                <div className="overflow-hidden inverted-corners-lg">
-                                    <img
-                                        src="/img.png"
-                                        alt="TVC"
-                                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                                    />
-                                </div>
-                                <img
-                                    src="/play-icon.png"
-                                    alt="Play"
-                                    className="pointer-events-none absolute top-1/2 left-1/2 z-20 h-12 w-12 -translate-x-1/2 -translate-y-1/2 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16"
-                                />
-                            </button>
-                        ) : (
-                            <div className="inverted-corners-lg overflow-hidden">
-                                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                        <div className="inverted-corners-lg overflow-hidden">
+                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                {tvcLoaded ? (
                                     <iframe
                                         className="absolute inset-0 h-full w-full"
-                                        src="https://www.youtube.com/embed/BS30TFRCrg4?autoplay=1&rel=0"
+                                        src={`https://www.youtube.com/embed/${content.about.tvcYoutubeId}?rel=0&autoplay=1`}
                                         title="TVC"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
                                     />
-                                </div>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => setTvcLoaded(true)}
+                                        className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black"
+                                    >
+                                        <img
+                                            src={`https://img.youtube.com/vi/${content.about.tvcYoutubeId}/hqdefault.jpg`}
+                                            alt="TVC"
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="absolute inset-0 h-full w-full object-cover"
+                                        />
+                                        <svg className="relative z-10 h-16 w-16 text-white drop-shadow-lg" viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55C3.97 2.33 2.27 4.81 1.48 7.74.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="red"/><path d="M45 24L27 14v20" fill="white"/></svg>
+                                    </button>
+                                )}
                             </div>
-                        )}
+                        </div>
                     </div>
 
                     <div className="relative">
                         <img
                             src="/leaf.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute top-0 left-4 w-90 md:w-auto object-contain sm:-top-25 sm:-left-20 sm:block z-10"
                         />
                         <img
                             src="/gradient-from-t.png"
                             alt=""
-                            className="pointer-events-none absolute top-30 md:top-0 md:left-0 w-screen object-cover"
+                            loading="lazy"
+                            decoding="async"
+                            className="pointer-events-none absolute  md:top-0 md:left-0 w-screen object-cover"
                         />
                         <div className="absolute top-35 md:top-25 left-0 z-20 flex w-screen flex-col items-center font-light text-secondary">
                             <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
                                 <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
-                                    An cư
+                                    {content.about.secondHeadingLine1Part1}
                                 </span>
-                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">giữa thiên nhiên</span>
+                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">{content.about.secondHeadingLine1Part2}</span>
                             </div>
                             <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
                                 <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
-                                    An lành
+                                    {content.about.secondHeadingLine2Part1}
                                 </span>
-                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">từng hơi thở</span>
+                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">{content.about.secondHeadingLine2Part2}</span>
                             </div>
                         </div>
                         <img
-                            src="/3.jpg"
+                            src={resolveUploadUrl(content.about.bannerImage)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="mt-10 w-full object-contain hidden md:block sm:mt-0 rounded-b-3xl"
                         />
                         <img
-                            src="/3-mobile.png"
+                            src={resolveUploadUrl(content.about.bannerImageMobile)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="mt-60 w-full object-contain md:hidden rounded-b-3xl"
                         />
                         {/* Stats card */}
                         <div className="absolute bottom-0 mb-20 md:bottom-0 left-1/2 md:mb-10 w-[calc(100%-2rem)] max-w-6xl -translate-x-1/2 rounded-2xl bg-[#FFFFFFCC] px-6 py-8 backdrop-blur-xs sm:w-full sm:px-0 sm:py-5 sm:pr-7">
                             <p className="mx-auto max-w-xl text-center text-sm font-medium leading-relaxed text-black sm:text-base">
-                                Địa thế đắc địa hiếm có, Casamia Balanca Hoi An là nơi mỗi ngày cư dân sống an, sống khỏe cùng hệ sinh thái sông - rừng dừa - vịnh biển.
+                                {content.about.statsParagraph}
                             </p>
                             <div className="mt-5 grid grid-cols-2 gap-x-0 gap-y-8 sm:mt-5 sm:grid-cols-3 sm:gap-6 md:grid-cols-5 md:gap-0">
-                                {[
-                                    { label: 'Tổng\nquy mô', value: '31,1 ha' },
-                                    { label: 'Rừng dừa nước\ntự nhiên', value: '3,6 ha' },
-                                    { label: 'Diện tích cây xanh,\n mặt nước', value: '8 ha' },
-                                    { label: 'Mật độ\nxây dựng', value: '38%' },
-                                    { label: 'Cận hải - Cận giang \n- Cận lâm - Cận lộ', value: '04 cận' },
-                                ].map((stat, i) => (
+                                {content.about.stats.map((stat, i) => (
                                     <div
                                         key={stat.value}
                                         className={`text-center px-1${i === 4 ? ' max-sm:col-span-2 max-sm:flex max-sm:flex-col max-sm:items-center' : ''}${i % 2 !== 0 ? ' border-l border-black/20' : ''
@@ -734,8 +649,10 @@ function Home() {
                 <section id="map" className="relative z-0">
                     <div className="relative">
                         <img
-                            src="/map-balanca.svg"
+                            src="/map-balanca.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full hidden md:block object-cover rounded-3xl"
                         />
                         <div
@@ -746,6 +663,8 @@ function Home() {
                             <img
                                 src="/map-mobile-full.svg"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 onLoad={(e) => {
                                     const c = mobileMapScrollRef.current
                                     if (!c) return
@@ -758,6 +677,8 @@ function Home() {
                             <img
                                 src="/balanca-sign.png"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="peer/pin relative z-40 w-full object-contain hover:scale-120 transition-[scale] duration-500"
                             />
                             <span className="peer/inner absolute left-1/2 top-[150%] z-30 -translate-x-1/2 -translate-y-1/2 w-[380%] aspect-square rounded-full border border-dashed border-secondary transition-[scale] duration-600 hover:scale-105 peer-hover/pin:scale-105" />
@@ -769,20 +690,14 @@ function Home() {
                                 <div className="w-full md:w-auto md:pl-[23%] xl:pl-[40%]">
                                     <div className="flex flex-col items-center text-center md:items-end md:text-right">
                                         <h1 className="font-sagire leading-[1.3] text-5xl sm:leading-[1.05] sm:text-3xl md:text-5xl text-secondary px-5 md:px-0">
-                                            Khu đô thị sinh thái
+                                            {content.map.title}
                                         </h1>
                                         <span className="mt-2 font-inter font-medium uppercase text-lg sm:text-lg md:text-xl text-secondary">
-                                            Liền kề khu dự trữ sinh quyển thế giới
+                                            {content.map.subtitle}
                                         </span>
-                                        <div className="mt-2 md:mt-10 text-base font-medium text-justify text-black max-w-md">Dự án nằm liền kề rừng dừa Bảy Mẫu 200 năm tuổi, trong vùng đệm của khu dự trữ sinh quyển thế giới Cù Lao Chàm, nơi hội thủy của ba dòng sông lớn: Thu Bồn, Cổ Cò, Trường Giang.</div>
+                                        <div className="mt-2 md:mt-10 text-base font-medium text-justify text-black max-w-md">{content.map.description}</div>
                                         <div className="pointer-events-auto mt-6 w-full max-w-md overflow-y-auto max-h-60 location-scrollbar" data-lenis-prevent>
-                                            {[
-                                                { name: 'Rừng dừa Bảy Mẫu', time: '1 - 2 phút' },
-                                                { name: 'Biển Cửa Đại', time: '5 phút' },
-                                                { name: 'Bãi biển An Bàng', time: '5 - 7 phút' },
-                                                { name: 'Phố cổ Hội An', time: '5 - 10 phút' },
-                                                { name: 'Sân bay quốc tế Đà Nẵng', time: '30 - 40 phút' },
-                                            ].map((item, i, arr) => (
+                                            {content.map.locations.map((item, i, arr) => (
                                                 <div
                                                     key={`${item.name}-${i}`}
                                                     className={`location-item group flex items-center gap-3 px-4 py-3 cursor-default ${i < arr.length - 1 ? 'border-b border-gray-300' : ''}`}
@@ -811,23 +726,18 @@ function Home() {
                     <div className="mx-auto">
                         <div className="mx-auto max-w-7xl flex flex-col gap-1 px-6 sm:px-10 lg:px-14 mb-6 md:mb-0">
                             <h1 className="font-sagire px-6 md:px-0 text-5xl text-secondary leading-[1.3] text-center md:text-left">
-                                Sống theo nhịp Hội An
+                                {content.features.title}
                             </h1>
                             <span className="font-inter font-medium uppercase text-lg sm:text-lg md:text-xl text-secondary text-center md:text-left">
-                                Giữa dòng chảy quốc tế
+                                {content.features.subtitle}
                             </span>
                         </div>
                         <div className="mx-auto max-w-7xl 2xl:max-w-max flex flex-col gap-8 rounded-2xl pb-10 px-6 sm:px-10 sm:py-12 md:flex-row md:items-center md:gap-12 lg:px-14">
                             <p className="max-w-sm text-base text-justify leading-relaxed text-black font-medium md:shrink-0 md:text-base">
-                                Sống an lành giữa thiên nhiên và văn hóa bản địa, đồng thời kết nối linh hoạt với cộng đồng quốc tế. Tại đây, mỗi tiện ích được thiết kế để dung hòa hai nhịp: tận hưởng "vibe Hội An" tĩnh tại và trải nghiệm nhịp sống toàn cầu năng động.
+                                {content.features.description}
                             </p>
                             <div className="grid flex-1 grid-cols-2 gap-x-0 gap-y-8 sm:grid-cols-5 sm:gap-6 md:gap-0">
-                                {[
-                                    { value: '08', label: 'Ha\ncây xanh' },
-                                    { value: '05', label: 'Công viên\nchủ đề' },
-                                    { value: '19', label: 'Trụ hoa giấy\nkỷ lục' },
-                                    { value: '70 m', label: 'Đường kính\nhồ trung tâm' },
-                                ].map((stat, i) => (
+                                {content.features.stats.map((stat, i) => (
                                     <div
                                         key={stat.value}
                                         className={`max-sm:text-center px-5${i === 4 ? ' col-span-2 sm:col-span-1' : ''
@@ -884,6 +794,8 @@ function Home() {
                                                 <img
                                                     src={slide.src}
                                                     alt={slide.title}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     className="aspect-3/4 w-full object-cover hover:scale-105 transition-transform duration-500 sm:aspect-video"
                                                 />
                                                 <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/30 via-black/30 to-transparent backdrop-blur-[2px] px-6 pb-6 sm:px-10 sm:pb-8">
@@ -925,36 +837,42 @@ function Home() {
                         <img
                             src="/leaf.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none absolute -top-10 -right-70 hidden w-auto object-contain sm:block z-20"
                         />
 
                         <div className="absolute top-10 z-20 flex w-screen flex-col items-center font-light text-secondary">
-                            <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-2 md:gap-5">
+                            <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
                                 <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
-                                    An nhàn
+                                    {content.products.heading1Part1}
                                 </span>
-                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">khai thác</span>
+                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">{content.products.heading1Part2}</span>
                             </div>
-                            <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-2 md:gap-5 mt-2 md:mt-0">
+                            <div className="flex flex-col items-center sm:flex-row sm:justify-center md:items-start sm:gap-5">
                                 <span className="font-sagire text-7xl sm:text-3xl md:text-6xl">
-                                    An tâm
+                                    {content.products.heading2Part1}
                                 </span>
-                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">sinh lời</span>
+                                <span className="font-alishanty text-6xl sm:text-4xl md:text-7xl">{content.products.heading2Part2}</span>
                             </div>
                         </div>
                         <img
-                            src="/product.png"
+                            src={resolveUploadUrl(content.products.bannerImage)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="hidden md:block mt-10 w-full object-contain md:mt-0 rounded-b-3xl"
                         />
                         <img
-                            src="/product-mobile.png"
+                            src={resolveUploadUrl(content.products.bannerImageMobile)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="block md:hidden w-full object-contain rounded-b-3xl"
                         />
                         <div className="absolute bottom-0 left-1/2 md:mb-10 w-full max-w-6xl -translate-x-1/2 py-8 sm:py-5 px-6 md:px-0">
                             <p className="mx-auto max-w-2xl text-center text-sm font-medium leading-relaxed text-black md:text-white sm:text-base 2xl:text-lg">
-                                Lối kiến trúc giao thoa giữa di sản và tư duy xanh không chỉ tạo nên vẻ đẹp bền vững theo thời gian, mà còn được tính toán để tối ưu công năng lưu trú và trải nghiệm. Không gian vừa tinh tế, giàu bản sắc, vừa phù hợp với nhu cầu vận hành thực tế, giúp chủ sở hữu dễ dàng khai thác, tối ưu hiệu suất cho thuê, tạo dòng tiền ổn định.
+                                {content.products.description}
                             </p>
                         </div>
                     </div>
@@ -962,6 +880,8 @@ function Home() {
                         <img
                             src="/bg-pattern.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none object-cover hidden md:block"
                         />
                         {/* Overlay: title + description + award | carousel */}
@@ -970,7 +890,7 @@ function Home() {
                                 {/* Left column */}
                                 <div className="flex flex-col justify-center md:w-1/3 md:shrink-0 ">
                                     <h2 className="px-6 md:px-0 md:pl-0 font-sagire text-5xl leading-tight text-secondary sm:text-4xl text-center md:text-center max-w-md">
-                                        Kiệt tác xanh được thổi hồn bởi KTS
+                                        {content.products.architectTitle}
                                     </h2>
                                     {/* <div className="flex justify-center md:justify-start items-center">
                                         <p className="mt-2 text-center md:text-left font-sagire text-5xl leading-none text-secondary sm:text-5xl md:mt-2 md:text-4xl">
@@ -981,32 +901,26 @@ function Home() {
                                         </p>
                                     </div> */}
                                     <span className="mt-5 font-alishanty text-center font-medium text-secondary text-6xl md:mt-2 max-w-md">
-                                        Võ Trọng Nghĩa
+                                        {content.products.architectName}
                                     </span>
                                     <p className="px-6 md:px-0 mt-7 md:mt-5 text-base leading-relaxed text-center md:text-justify text-black max-w-md">
-                                        Kiến trúc dự án kế thừa tinh thần Hội An với mái ngói nâu xếp lớp, đá sa thạch Mỹ Sơn và được phát triển bởi KTS Võ Trọng Nghĩa theo định hướng xanh bền vững. Biệt thự thiết kế mở, thông tầng, hệ cửa kính lớn giúp tối ưu ánh sáng và thông gió, tạo không gian thoáng mát, gần gũi thiên nhiên.
+                                        {content.products.architectDescription}
                                     </p>
                                     <div className="mt-6 flex flex-col gap-5 px-6 md:px-0 max-w-md">
-                                        <div className="flex flex-col md:flex-row items-center md:items-center gap-4 min-w-0">
-                                            <img
-                                                src="/award.png"
-                                                alt="Asia Property Awards 2021"
-                                                className="w-60 shrink-0 object-contain sm:w-50"
-                                            />
-                                            <p className="min-w-0 text-base text-center md:text-left px-11 md:px-0 leading-relaxed text-black font-semibold">
-                                                Thiết kế kiến trúc cảnh quan đẹp nhất Việt Nam
-                                            </p>
-                                        </div>
-                                        <div className="flex flex-col md:flex-row items-center md:items-center gap-4 min-w-0">
-                                            <img
-                                                src="/award-2025.png"
-                                                alt="Dự án Đáng sống 2025"
-                                                className="w-60 shrink-0 object-contain sm:w-50 inverted-corners-lg"
-                                            />
-                                            <p className="min-w-0 text-base text-center md:text-left px-11 md:px-0 leading-relaxed text-black">
-                                                <span className="font-semibold">"Dự án Đáng sống 2025"</span> do VCCI và Tạp chí Diễn đàn Doanh nghiệp tổ chức.
-                                            </p>
-                                        </div>
+                                        {content.products.awards.map((award, i) => (
+                                            <div key={i} className="flex flex-col md:flex-row items-center md:items-center gap-4 min-w-0">
+                                                <img
+                                                    src={resolveUploadUrl(award.image)}
+                                                    alt={award.title}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    className="w-60 shrink-0 object-contain sm:w-50 inverted-corners-lg"
+                                                />
+                                                <p className="min-w-0 text-base text-center md:text-left px-11 md:px-0 leading-relaxed text-black font-semibold">
+                                                    {award.description}
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -1031,6 +945,8 @@ function Home() {
                                                         <img
                                                             src={src}
                                                             alt=""
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:w-full"
                                                         />
                                                     </div>
@@ -1060,6 +976,8 @@ function Home() {
                         <img
                             src="/bg-pattern-2.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none justify-self-end hidden md:block"
                         />
                         <div className="relative z-10 flex items-center pb-6 sm:py-5 md:absolute md:inset-0 md:mt-10">
@@ -1068,14 +986,14 @@ function Home() {
                                 <div className="relative flex min-w-0 w-full flex-col justify-start md:w-[65%] md:shrink-0">
                                     <div className="flex flex-col md:flex-row items-center mb-10">
                                         <h2 className="whitespace-nowrap px-6 text-center md:text-left font-alishanty text-5xl sm:text-6xl text-secondary md:pl-10 lg:pl-20">
-                                            Park Home
+                                            {content.products.parkHomeHeading}
                                         </h2>
                                         <div className="flex flex-col gap-2 text-center md:text-start mt-5 md:mt-0">
                                             <span className="font-sagire text-3xl md:text-4xl text-secondary">
-                                                Đón khách quốc tế,
+                                                {content.products.parkHomeSubheading1}
                                             </span>
                                             <span className="sm:whitespace-nowrap font-sagire text-3xl md:text-4xl text-secondary">
-                                                kích hoạt dòng tiền ngay lập tức
+                                                {content.products.parkHomeSubheading2}
                                             </span>
                                         </div>
                                     </div>
@@ -1090,7 +1008,7 @@ function Home() {
                                             className="flex md:h-full min-h-0 shrink-0 transition-transform duration-600 ease-in-out"
                                             style={{
                                                 width: `${prodGalleryLen * 100}%`,
-                                                transform: `translateX(-${(prodSlideIdx * 100) / prodGalleryLen}%)`,
+                                                transform: `translateX(-${(safeProdSlideIdx * 100) / prodGalleryLen}%)`,
                                             }}
                                         >
                                             {productGalleryImages.map((src, i) => (
@@ -1103,6 +1021,8 @@ function Home() {
                                                         <img
                                                             src={src}
                                                             alt=""
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:max-h-full md:max-w-full"
                                                         />
                                                     </div>
@@ -1123,14 +1043,14 @@ function Home() {
                                         <div className="relative z-10 flex items-center gap-8 sm:gap-12 max-sm:pl-0 max-sm:pr-0">
                                             {(
                                                 [
-                                                    { key: 'exterior' as const, label: 'Mẫu 1' },
-                                                    { key: 'interior' as const, label: 'Mẫu 2' },
+                                                    { key: 'exterior' as const, label: content.products.parkHomeExteriorLabel },
+                                                    { key: 'interior' as const, label: content.products.parkHomeInteriorLabel },
                                                 ] as const
                                             ).map((tab) => (
                                                 <button
                                                     key={tab.key}
                                                     type="button"
-                                                    onClick={() => setProductFilter(tab.key)}
+                                                    onClick={() => { setProdSlideIdx(0); setProductFilter(tab.key) }}
                                                     className={`relative cursor-pointer whitespace-nowrap pb-1 text-base font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${productFilter === tab.key
                                                         ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
                                                         : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
@@ -1144,10 +1064,10 @@ function Home() {
 
                                     <div className="mt-4 w-full max-md:max-w-none">
                                         <p className="text-base leading-relaxed text-black font-semibold mb-2">
-                                            {productFilter === 'exterior' ? 'Mẫu xây thô hoàn thiện mặt ngoài' : 'Mẫu hoàn thiện nội thất'}
+                                            {productFilter === 'exterior' ? content.products.parkHomeExteriorTitle : content.products.parkHomeInteriorTitle}
                                         </p>
                                         <p className="text-base text-justify leading-relaxed text-black ">
-                                            Park Home là dòng biệt thự lưu trú tại phân khu sôi động nhất Casamia Balanca Hội An, được thiết kế đa chức năng linh hoạt, tối ưu vận hành. Sản phẩm phù hợp đón đầu nhu cầu lưu trú dài hạn của khách quốc tế tại Hội An – Đà Nẵng, đồng thời là cơ hội đầu tư khan hiếm, tạo dòng tiền ngay.
+                                            {content.products.parkHomeDescription}
                                         </p>
                                     </div>
 
@@ -1184,6 +1104,8 @@ function Home() {
                         <img
                             src="/bg-pattern-3.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none object-cover hidden md:block"
                         />
                         <div className="relative z-10 flex items-stretch px-6 py-10 sm:px-10 sm:py-14 md:absolute md:inset-0 md:pr-0 md:pb-16 md:pt-0 2xl:pt-16 lg:pl-20">
@@ -1191,20 +1113,22 @@ function Home() {
                                 {/* Left column — 1/3 — title + logo + paragraph */}
                                 <div className="flex flex-col justify-center items-center md:items-start md:w-1/3 md:shrink-0">
                                     <div className="font-sagire text-secondary flex flex-col gap-2 text-center">
-                                        <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">Hợp tác vận hành</span>
-                                        <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">& Sinh lời ngay</span>
+                                        <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">{content.products.operationsTitle1}</span>
+                                        <span className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl">{content.products.operationsTitle2}</span>
                                     </div>
                                     <div className="flex flex-col items-center">
                                         <p className="mt-3 md:mt-5 text-sm font-medium text-center uppercase tracking-[0.15em] text-secondary sm:text-base">
-                                            Cùng đơn vị chuyên nghiệp
+                                            {content.products.operationsSubtitle}
                                         </p>
                                         <img
-                                            src="/logo-village.png"
+                                            src={resolveUploadUrl(content.products.villageLogoUrl)}
                                             alt="M Village"
+                                            loading="lazy"
+                                            decoding="async"
                                             className="mt-8 h-24 self-center object-contain sm:h-28 lg:h-32"
                                         />
                                         <p className="mt-6 max-w-md text-base text-center text-pretty leading-relaxed text-black">
-                                            Casamia Balanca thiết lập mô hình vận hành toàn diện, nói chủ đầu tư Đạt Phương kiến tạo nền tảng, M Village trực tiếp vận hành, và chủ nhà an tâm thụ hưởng đồng thời. Sự kết hợp giữa hệ sinh thái bài bản và đơn vị vận hành giàu kinh nghiệm, am hiểu khách quốc tế giúp tối ưu hiệu suất khai thác, đồng thời giải phóng hoàn toàn áp lực quản lý cho chủ nhà đầu tư ở xa.
+                                            {content.products.villageDescription}
                                         </p>
                                     </div>
 
@@ -1231,6 +1155,8 @@ function Home() {
                                                         <img
                                                             src={slide.src}
                                                             alt={slide.title}
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-105 md:aspect-auto md:h-full md:w-full"
                                                         />
                                                         {/* <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 via-black/30 to-transparent px-6 pb-6 sm:px-8 sm:pb-8">
@@ -1275,42 +1201,50 @@ function Home() {
                 <section id="value" className="relative">
                     <div className="relative rounded-t-3xl overflow-hidden">
                         <img
-                            src="/safety.png"
+                            src={resolveUploadUrl(content.value.bannerImage)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full object-contain hidden md:block"
                         />
                         <img
-                            src="/safety-mobile.png"
+                            src={resolveUploadUrl(content.value.bannerImageMobile)}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full object-contain block md:hidden"
                         />
                         <img
                             src="/gradient-from-top-r.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none hidden object-cover sm:block absolute top-0 right-0"
                         />
                         {/* Title + description overlay */}
                         <div className="pointer-events-none absolute top-10 md:top-20 justify-self-center md:right-[3%] flex md:pr-6 mx-6 md:mx-0">
                             <div className="text-center md:text-right lg:max-w-lg">
                                 <h2 className="text-secondary">
-                                    <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">An toàn</span>
-                                    <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}tích sản</span>
+                                    <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">{content.value.heading1Part1}</span>
+                                    <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}{content.value.heading1Part2}</span>
                                 </h2>
                                 <h2 className="mt-2 text-secondary sm:-mt-3">
-                                    <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">An giữ</span>
-                                    <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}truyền đời</span>
+                                    <span className="font-sagire text-7xl sm:text-5xl md:text-6xl lg:text-6xl">{content.value.heading2Part1}</span>
+                                    <span className="inline-block md:translate-y-[0.35em] px-5 font-alishanty text-6xl sm:text-5xl md:text-6xl">{' '}{content.value.heading2Part2}</span>
                                 </h2>
                                 <p className="mt-4 md:pl-5 text-base font-medium text-center text-pretty md:text-end justify-end text-black sm:mt-10">
-                                    100% biệt thự Casamia Balanca sở hữu lâu dài. Tọa lạc trên quỹ đất hiếm trong vùng sinh thái được quy hoạch bảo tồn nghiêm ngặt của Hội An.
+                                    {content.value.paragraph1}
                                 </p>
                                 <p className="mt-4 md:pl-5 text-base font-medium text-center text-pretty md:text-end justify-end text-black">
-                                    Tính pháp lý vững chắc đi cùng sự khan hiếm không thể mở rộng tạo nên giá trị bền vững theo thời gian, vừa là tài sản tích lũy an toàn, vừa có thể trao truyền cho nhiều thế hệ.
+                                    {content.value.paragraph2}
                                 </p>
                             </div>
                         </div>
                         <img
                             src="/gradient-from-b.png"
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="pointer-events-none object-cover sm:block w-full absolute bottom-0 right-0"
                         />
                     </div>
@@ -1318,60 +1252,46 @@ function Home() {
                         {/* Left — text + awards */}
                         <div className="flex flex-col px-6 md:px-0 justify-center md:w-[38%] md:shrink-0 md:pr-10 lg:pr-16 max-w-lg">
                             <h2 className="font-sagire text-center md:text-left text-4xl text-secondary sm:text-4xl md:text-5xl">
-                                Chủ đầu tư uy tín
+                                {content.value.developerTitle}
                             </h2>
-                            <p className="mt-2 text-center md:text-left text-sm font-semibold uppercase tracking-[0.15em] text-secondary">
-                                Top 10 thương hiệu phát triển bền vững
+                            <p className="mt-2 text-center text-balance md:text-left text-sm font-semibold uppercase tracking-[0.15em] text-secondary">
+                                {content.value.developerSubtitle}
                             </p>
                             <p className="mt-5 text-base text-center md:text-justify leading-relaxed text-black">
-                                Kiên định với triết lý phát triển bền vững, lấy con người làm trung tâm. Đạt Phương gắn bó sâu sắc với Hội An qua các công trình hạ tầng trọng điểm như cầu Đế Võng, Cửa Đại, tuyến ven biển Võ Chí Công…, tích lũy nền tảng về địa chất, thủy văn và cấu trúc đặc thù, từ đó kiến tạo những sản phẩm có giá trị thực, bền vững theo thời gian.
+                                {content.value.developerDescription}
                             </p>
                             {/* Awards */}
                             <div className="mt-10 md:mt-15 flex flex-col gap-5">
-                                <div className="relative px-4 md:px-16">
-                                    <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
-                                    <div className="relative flex items-center justify-center gap-7 py-4">
-                                        <img src="/award-top-10.png" alt="Top 10" className="h-28 w-28 shrink-0 object-contain -mt-8 sm:-mt-12" />
-                                        <div>
-                                            <span className="font-bold text-secondary text-base">TOP 10</span>
-                                            <p className="text-black text-base">thương hiệu phát triển bền vững (2025)</p>
+                                {content.value.awards.map((award, i) => (
+                                    <div key={i} className="relative px-4 md:px-16">
+                                        <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
+                                        <div className="relative flex items-center justify-center gap-7 py-4">
+                                            <img src={resolveUploadUrl(award.image)} alt={award.title} loading="lazy" decoding="async" className="h-28 w-28 shrink-0 object-contain" />
+                                            <div>
+                                                <span className="font-bold text-secondary text-base">{award.title}</span>
+                                                <p className="text-black text-base">{award.description}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="relative px-4 py-2 md:px-16">
-                                    <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
-                                    <div className="relative flex items-center justify-center gap-7">
-                                        <img src="/award-top-10(2).png" alt="Top 10" className="h-30 w-30 shrink-0 object-contain" />
-                                        <div className="">
-                                            <span className="font-bold text-secondary text-base">TOP 10</span>
-                                            <p className="text-black text-base">nhà thầu xây dựng hạ tầng - công nghiệp uy tín năm 2026</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="relative px-4 md:px-16">
-                                    <div className="absolute inset-0 inverted-corners-lg bg-[#FFE4AA]" />
-                                    <div className="relative flex items-center justify-center gap-7">
-                                        <img src="/award-top-500.png" alt="Top 500" className="h-30 w-30 shrink-0 object-contain" />
-                                        <div>
-                                            <span className="font-bold text-secondary text-base">TOP 500</span>
-                                            <p className="text-black text-base">doanh nghiệp tư nhân lớn nhất Việt Nam</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                         {/* Right — aerial image */}
                         <div className="relative min-h-[300px] flex-1 sm:min-h-[400px] pl-6 md:pl-0 mt-6 md:mt-0">
                             <div className="relative h-full w-full overflow-hidden inverted-corners-lg-l">
                                 <img
-                                    src="/exterior-2.jpg"
+                                    src={resolveUploadUrl(content.value.aerialImage)}
                                     alt="Casamia Balance aerial view"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
                             <img
                                 src="/cloud.png"
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/4 translate-y-[60%] w-40 sm:w-100 object-contain z-20"
                             />
                         </div>
@@ -1380,23 +1300,25 @@ function Home() {
                         {/* Left — scenery image */}
                         <div className="min-h-[300px] flex-1 overflow-hidden sm:min-h-[400px] inverted-corners-lg-r mr-6 md:mr-0">
                             <img
-                                src="/scenery.jpg"
+                                src={resolveUploadUrl(content.value.sceneryImage)}
                                 alt="Casamia Balance scenery"
+                                loading="lazy"
+                                decoding="async"
                                 className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
                             />
                         </div>
                         {/* Right — text + button */}
                         <div className="px-6 md:px-0 flex flex-col justify-center md:w-[42%] md:shrink-0 md:pl-10 lg:pl-16 max-w-lg">
                             <h2 className="font-sagire text-4xl leading-tight text-secondary text-center md:text-start sm:text-4xl md:text-5xl">
-                                03 lựa chọn "may đo" không gian
+                                {content.value.deliveryTitle}
                             </h2>
-                            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-secondary text-center md:text-start sm:text-sm">
-                                Phương án bàn giao linh hoạt,<br /> tối ưu cho khách hàng
+                            <p className="mt-1 text-sm text-balance font-semibold uppercase tracking-[0.15em] text-secondary text-center md:text-start sm:text-sm">
+                                {content.value.deliverySubtitle}
                             </p>
                             <ul className="mt-5 list-disc space-y-1 pl-7 leading-relaxed text-black text-base md:max-w-sm">
-                                <li>Hoàn thiện full nội thất - Tham gia chương trình ủy thác cho thuê</li>
-                                <li>Hoàn thiện nội thất cơ bản</li>
-                                <li>Xây thô hoàn thiện mặt ngoài</li>
+                                {content.value.deliveryItems.map((item, i) => (
+                                    <li key={i}>{item}</li>
+                                ))}
                             </ul>
                             <div className="mt-8 flex justify-center md:max-w-sm">
                                 <button
@@ -1412,6 +1334,8 @@ function Home() {
                     <img
                         src="/leaf.png"
                         alt=""
+                        loading="lazy"
+                        decoding="async"
                         className="pointer-events-none object-cover sm:block absolute -bottom-10 md:-bottom-30 right-0"
                     />
                 </section>
@@ -1444,6 +1368,10 @@ function Home() {
                                             <img
                                                 src={item.image}
                                                 alt={item.title}
+                                                loading="lazy"
+                                                decoding="async"
+                                                width={144}
+                                                height={96}
                                                 className="h-20 w-28 shrink-0 rounded-2xl object-cover sm:h-24 sm:w-36"
                                             />
                                             <div className="min-w-0">
@@ -1492,6 +1420,8 @@ function Home() {
                                                     <img
                                                         src={src}
                                                         alt="Thư viện Casamia Balanca"
+                                                        loading="lazy"
+                                                        decoding="async"
                                                         className="h-[250px] w-full rounded-3xl object-cover sm:h-[340px]"
                                                     />
                                                 </div>
@@ -1528,119 +1458,7 @@ function Home() {
                     </div>
                 </section>
 
-                <div className="relative overflow-hidden">
-                    <img
-                        src="/bg-footer.png"
-                        alt=""
-                        className="pointer-events-none absolute inset-0 h-full w-full scale-140 object-cover 2xl:scale-100"
-                    />
-
-                    <div className="relative mx-auto max-w-9xl px-6 pb-14 sm:px-10 sm:py-20 lg:px-20">
-                        <div className="flex flex-col-reverse gap-12 md:flex-row md:gap-16">
-                            {/* Left column — logo, info, socials */}
-                            <div className="md:w-[38%] md:shrink-0">
-                                <div className="items-center justify-center flex">
-                                    <img
-                                        src="/logo-footer.png"
-                                        alt="Casamia Balanca Hoi An"
-                                        className="w-44 object-contain sm:w-52 2xl:w-64"
-                                    />
-                                </div>
-
-                                <div className="mt-8 space-y-6 text-sm text-white/90 sm:text-base">
-                                    <div>
-                                        <h3 className="font-bold uppercase tracking-wider text-white">Văn phòng bán hàng</h3>
-                                        <p className="mt-2 flex items-start gap-2">
-                                            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                                            <span>Khu đô thị Casamia Balanca Hoi An, Phường Hội An Đông, Thành phố Đà Nẵng</span>
-                                        </p>
-                                        <p className="mt-1 flex items-center gap-2">
-                                            <Phone className="h-4 w-4 shrink-0" />
-                                            <span>(+84)90 136 22 88</span>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <p className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm">Cập nhật thông tin tại</p>
-                                    <div className="mt-3 flex gap-3">
-                                        <a href="#" className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" /></svg>
-                                        </a>
-                                        <a href="#" className="rounded-xl flex h-10 w-10 items-center justify-center bg-white text-secondary transition-opacity hover:opacity-90">
-                                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <p className="mt-6 text-xs text-white/50">
-                                    &copy;Bản quyền thuộc về Casamia Balanca Hội An
-                                </p>
-                            </div>
-
-                            {/* Right column — subscribe form */}
-                            <div className="flex-1">
-                                <div className="rounded-2xl bg-white px-8 py-8 sm:px-10 sm:py-10">
-                                    <h3 className="font-sagire text-center text-2xl text-secondary sm:text-3xl md:text-4xl">
-                                        Đăng ký nhận tư vấn
-                                    </h3>
-                                    <p className="mt-2 text-center text-xs text-black/70 sm:text-sm">
-                                        Vui lòng để lại thông tin.<br />
-                                        Tư vấn viên sẽ liên hệ quý khách trong thời gian sớm nhất.
-                                    </p>
-
-                                    <form className="mt-8 space-y-5" onSubmit={(e) => e.preventDefault()}>
-                                        <div className="flex flex-col gap-1">
-                                            <label className="text-xs font-semibold text-black/70 sm:text-sm">Họ tên</label>
-                                            <input
-                                                type="text"
-                                                placeholder="Điền thông tin của bạn"
-                                                className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                            />
-                                        </div>
-
-                                        <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-                                            <div className="flex flex-1 flex-col gap-1">
-                                                <label className="text-xs font-semibold text-black/70 sm:text-sm">Số điện thoại</label>
-                                                <input
-                                                    type="tel"
-                                                    placeholder="Tối thiểu 10 chữ số"
-                                                    className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                                />
-                                            </div>
-                                            <div className="flex flex-1 flex-col gap-1">
-                                                <label className="text-xs font-semibold text-black/70 sm:text-sm">Email</label>
-                                                <input
-                                                    type="email"
-                                                    placeholder="vidu@mail.com"
-                                                    className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-1">
-                                            <label className="text-xs font-semibold text-black/70 sm:text-sm">Yêu cầu tư vấn</label>
-                                            <input
-                                                type="text"
-                                                placeholder="Hãy để lại lời nhắn để tư vấn viên có thể hỗ trợ Quý khách"
-                                                className="border-b border-black/20 bg-transparent py-2 text-sm outline-none placeholder:text-black/30 focus:border-secondary"
-                                            />
-                                        </div>
-
-                                        <div className="flex justify-center pt-2">
-                                            <button
-                                                type="submit"
-                                                className="rounded-xl bg-secondary px-10 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:text-base"
-                                            >
-                                                Đăng ký tư vấn
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Footer data={content.footer} />
             </footer>
 
             {downloadOpen && (
@@ -1730,7 +1548,7 @@ function Home() {
                 </div>
             )}
 
-            <ScrollToTopButton />
+            <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
         </div>
     )
 }
