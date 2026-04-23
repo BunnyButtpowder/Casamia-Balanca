@@ -61,7 +61,7 @@ export default function News() {
                 <img
                   src={article.image}
                   alt={article.title}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="aspect-4/3 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="mt-4">
