@@ -93,6 +93,8 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
           <img
             src="/logo.png"
             alt="Casamia Balance Hoi An"
+            width={148}
+            height={56}
             className="h-10 w-auto object-contain sm:h-14"
           />
         </a>

@@ -15,57 +15,27 @@ function Home() {
     const [pageLoaded, setPageLoaded] = useState(false)
     useEffect(() => {
         let cancelled = false
-        const FALLBACK_MS = 20000
+        const FALLBACK_MS = 4000
         const fallback = setTimeout(() => { if (!cancelled) setPageLoaded(true) }, FALLBACK_MS)
 
-        const waitForImage = (img: HTMLImageElement) =>
-            new Promise<void>((resolve) => {
-                if (img.complete && img.naturalWidth > 0) return resolve()
-                const done = () => {
-                    img.removeEventListener('load', done)
-                    img.removeEventListener('error', done)
-                    resolve()
-                }
-                img.addEventListener('load', done)
-                img.addEventListener('error', done)
-            })
-
-        const waitForVideo = (video: HTMLVideoElement) =>
-            new Promise<void>((resolve) => {
-                if (video.readyState >= 3) return resolve()
-                const done = () => {
-                    video.removeEventListener('canplaythrough', done)
-                    video.removeEventListener('loadeddata', done)
-                    video.removeEventListener('error', done)
-                    resolve()
-                }
-                video.addEventListener('canplaythrough', done)
-                video.addEventListener('loadeddata', done)
-                video.addEventListener('error', done)
-            })
-
-        const waitForAll = async () => {
-            // Wait one frame so React has mounted the DOM.
+        const waitForHero = async () => {
             await new Promise((r) => requestAnimationFrame(() => r(null)))
-            const imgs = Array.from(document.images) as HTMLImageElement[]
-            const vids = Array.from(document.querySelectorAll('video')) as HTMLVideoElement[]
-            await Promise.all([
-                ...imgs.map(waitForImage),
-                ...vids.map(waitForVideo),
-            ])
+            const video = document.querySelector<HTMLVideoElement>('#hero video')
+            if (video && video.readyState < 2) {
+                await new Promise<void>((resolve) => {
+                    const done = () => { video.removeEventListener('loadeddata', done); video.removeEventListener('error', done); resolve() }
+                    video.addEventListener('loadeddata', done)
+                    video.addEventListener('error', done)
+                })
+            }
             if (!cancelled) setPageLoaded(true)
         }
 
-        if (document.readyState === 'complete') {
-            waitForAll()
-        } else {
-            window.addEventListener('load', waitForAll, { once: true })
-        }
+        waitForHero()
 
         return () => {
             cancelled = true
             clearTimeout(fallback)
-            window.removeEventListener('load', waitForAll)
         }
     }, [])
     useEffect(() => {
@@ -467,7 +437,7 @@ function Home() {
                 aria-hidden={pageLoaded && !contentLoading}
                 className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded && !contentLoading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
             >
-                <img src="/logo.png" alt="Casamia Balanca" className="w-40 object-contain sm:w-52 animate-pulse" />
+                <img src="/logo.png" alt="Casamia Balanca" width={208} height={80} className="w-40 object-contain sm:w-52 animate-pulse" />
                 <div className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-secondary/15">
                     <div className="h-full w-1/2 animate-[loader_1.2s_ease-in-out_infinite] bg-secondary" />
                 </div>
@@ -527,6 +497,8 @@ function Home() {
                         <img
                             src="/vector.png"
                             alt=""
+                            // eslint-disable-next-line
+                            {...{ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>}
                             className="h-full w-full object-cover"
                         />
                         <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-xs md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
@@ -540,8 +512,7 @@ function Home() {
                         <img
                             src="/leaf.png"
                             alt=""
-                            loading="lazy"
-                            decoding="async"
+
                             className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 2xl:bottom-30 sm:-right-40 md:-right-110 md:w-auto"
                         />
                     </div>
@@ -665,6 +636,8 @@ function Home() {
                                 alt=""
                                 loading="lazy"
                                 decoding="async"
+                                width={800}
+                                height={2620}
                                 onLoad={(e) => {
                                     const c = mobileMapScrollRef.current
                                     if (!c) return
