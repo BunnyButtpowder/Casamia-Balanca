@@ -1,26 +1,29 @@
 import { useEffect, useRef } from 'react'
-import Lenis from 'lenis'
+import type Lenis from 'lenis'
 
 export function useLenis() {
   const lenisRef = useRef<Lenis | null>(null)
 
   useEffect(() => {
-    // Defer Lenis init to after first paint to reduce main-thread work during load
+    // Dynamically import Lenis so it doesn't block the critical request chain.
+    // The actual init is deferred to idle time after first paint.
     const id = requestIdleCallback(() => {
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        touchMultiplier: 2,
-      })
+      import('lenis').then(({ default: Lenis }) => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          touchMultiplier: 2,
+        })
 
-      lenisRef.current = lenis
+        lenisRef.current = lenis
 
-      function raf(time: number) {
-        lenis.raf(time)
+        function raf(time: number) {
+          lenis.raf(time)
+          requestAnimationFrame(raf)
+        }
+
         requestAnimationFrame(raf)
-      }
-
-      requestAnimationFrame(raf)
+      })
     })
 
     return () => {

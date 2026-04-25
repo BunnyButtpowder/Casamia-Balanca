@@ -15,7 +15,9 @@ function Home() {
     const [pageLoaded, setPageLoaded] = useState(false)
     useEffect(() => {
         let cancelled = false
-        const FALLBACK_MS = 4000
+        // Reduced from 4s to 1.5s — hero poster image provides visual content;
+        // waiting longer just delays LCP without user benefit
+        const FALLBACK_MS = 1500
         const fallback = setTimeout(() => { if (!cancelled) setPageLoaded(true) }, FALLBACK_MS)
 
         const waitForHero = async () => {
@@ -64,6 +66,13 @@ function Home() {
     const contentRef = useRef<HTMLDivElement>(null)
     const footerRef = useRef<HTMLElement>(null)
     const spacerRef = useRef<HTMLDivElement>(null)
+    // Cached container width to avoid reading offsetWidth during touch handlers
+    const containerWidthRef = useRef(window.innerWidth)
+    useEffect(() => {
+        const updateWidth = () => { containerWidthRef.current = window.innerWidth }
+        window.addEventListener('resize', updateWidth)
+        return () => window.removeEventListener('resize', updateWidth)
+    }, [])
 
     useEffect(() => {
         const content = contentRef.current
@@ -71,9 +80,15 @@ function Home() {
         const spacer = spacerRef.current
         if (!content || !footer || !spacer) return
 
+        // Cache layout values to avoid repeated reads during scroll
+        let cachedFooterH = 0
+
         const updateLayout = () => {
+            // Batch reads
             const contentH = content.offsetHeight
             const footerH = footer.offsetHeight
+            cachedFooterH = footerH
+            // Batch writes
             spacer.style.height = `${footerH}px`
             content.style.top = `${-(contentH - window.innerHeight)}px`
         }
@@ -82,14 +97,14 @@ function Home() {
         const ro = new ResizeObserver(updateLayout)
         ro.observe(content)
         ro.observe(footer)
-        window.addEventListener('resize', updateLayout)
 
         let rafId = 0
         const handleScroll = () => {
             cancelAnimationFrame(rafId)
             rafId = requestAnimationFrame(() => {
+                // Only read spacer rect; use cached footerH to avoid extra reflow
                 const spacerRect = spacer.getBoundingClientRect()
-                const fh = footer.offsetHeight
+                const fh = cachedFooterH
                 if (spacerRect.top < window.innerHeight) {
                     const p = Math.min((window.innerHeight - spacerRect.top) / fh, 1)
                     const eased = 1 - (1 - p) * (1 - p) * (1 - p)
@@ -105,7 +120,6 @@ function Home() {
         return () => {
             cancelAnimationFrame(rafId)
             window.removeEventListener('scroll', handleScroll)
-            window.removeEventListener('resize', updateLayout)
             ro.disconnect()
         }
     }, [content])
@@ -162,7 +176,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - extDragRef.current.startX
         const elapsed = Date.now() - extDragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = extTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setExtDragOffset(0)
         if (!extIsLast && (dx < -threshold || (velocity > 0.3 && dx < 0))) {
@@ -217,7 +231,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - vilDragRef.current.startX
         const elapsed = Date.now() - vilDragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = vilTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setVilDragOffset(0)
         if (!vilIsLast && (dx < -threshold || (velocity > 0.3 && dx < 0))) {
@@ -337,7 +351,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - dragRef.current.startX
         const elapsed = Date.now() - dragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = trackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setAnimate(true)
         setDragOffset(0)
@@ -408,7 +422,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - galleryDragRef.current.startX
         const elapsed = Date.now() - galleryDragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = galleryTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setGalleryAnimate(true)
         setGalleryDragOffset(0)
@@ -429,7 +443,30 @@ function Home() {
         }
     }
 
-    if (!content) return null
+    if (!content) return (
+        <div className="min-h-screen overflow-x-clip">
+            {/* Loading overlay */}
+            <div className="fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm">
+                <img src="/logo.png" alt="Casamia Balanca" width={208} height={80} className="w-40 object-contain sm:w-52 animate-pulse" />
+                <div className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-secondary/15">
+                    <div className="h-full w-1/2 animate-[loader_1.2s_ease-in-out_infinite] bg-secondary" />
+                </div>
+                <style>{`@keyframes loader { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }`}</style>
+            </div>
+            {/* Skeleton hero — gives the browser an LCP candidate while API data loads */}
+            <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
+                <img src="/hero-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="relative z-10 px-4 text-center sm:px-6">
+                    <h1 className="leading-tight font-light text-white">
+                        <span className="block h-16 md:h-20" />
+                        <span className="block h-16 md:h-20" />
+                    </h1>
+                    <p className="mx-auto mt-4 max-w-xl text-xl text-white uppercase sm:mt-4 sm:text-base">&nbsp;</p>
+                </div>
+            </section>
+        </div>
+    )
 
     return (
         <div className="min-h-screen overflow-x-clip">
@@ -454,7 +491,7 @@ function Home() {
                         loop
                         muted
                         playsInline
-                        preload="metadata"
+                        preload="auto"
                         poster="/hero-poster.jpg"
                         width={1920}
                         height={1080}
@@ -498,7 +535,7 @@ function Home() {
                             src="/vector.png"
                             alt=""
                             // eslint-disable-next-line
-                            {...{ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>}
+                            {...{ fetchPriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>}
                             className="h-full w-full object-cover"
                         />
                         <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-xs md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
@@ -639,9 +676,12 @@ function Home() {
                                 width={800}
                                 height={2620}
                                 onLoad={(e) => {
-                                    const c = mobileMapScrollRef.current
-                                    if (!c) return
-                                    c.scrollLeft = (e.currentTarget.scrollWidth - c.clientWidth) / 1.55
+                                    const img = e.currentTarget
+                                    requestAnimationFrame(() => {
+                                        const c = mobileMapScrollRef.current
+                                        if (!c) return
+                                        c.scrollLeft = (img.scrollWidth - c.clientWidth) / 1.55
+                                    })
                                 }}
                                 className="h-full w-auto max-w-none"
                             />
