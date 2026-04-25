@@ -49,6 +49,7 @@
 
 html {
   scroll-behavior: auto; /* Lenis handles smooth scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrollbar from decorative elements */
 }
 
 body {

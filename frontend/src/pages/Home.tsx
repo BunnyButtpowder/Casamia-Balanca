@@ -459,7 +459,7 @@ function Home() {
     }
 
     if (!content) return (
-        <div className="min-h-screen overflow-x-clip">
+        <div className="min-h-screen">
             {/* Loading overlay */}
             <div className="fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm">
                 <img src="/logo.png" alt="Casamia Balanca" width={208} height={80} className="w-40 object-contain sm:w-52 animate-pulse" />
@@ -484,7 +484,7 @@ function Home() {
     )
 
     return (
-        <div className="min-h-screen overflow-x-clip">
+        <div className="min-h-screen">
             <div
                 aria-hidden={pageLoaded && !contentLoading}
                 className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded && !contentLoading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
