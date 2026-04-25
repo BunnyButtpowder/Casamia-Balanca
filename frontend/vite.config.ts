@@ -41,15 +41,15 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/react-router')) {
-            return 'vendor'
-          }
-          if (id.includes('node_modules/lenis')) {
-            return 'lenis'
-          }
-          if (id.includes('node_modules/lucide-react')) {
-            return 'lucide'
-          }
+          // Core framework — cached long-term, rarely changes
+          if (id.includes('node_modules/react-dom')) return 'react-dom'
+          if (id.includes('node_modules/react/') || id.includes('node_modules/scheduler')) return 'react'
+          // Router separate — only needed if using multi-page
+          if (id.includes('node_modules/react-router')) return 'router'
+          // Lenis — already lazy-loaded via dynamic import
+          if (id.includes('node_modules/lenis')) return 'lenis'
+          // Icons — tree-shaken but still a chunk
+          if (id.includes('node_modules/lucide-react')) return 'lucide'
         },
       },
     },

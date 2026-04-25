@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import Lenis from 'lenis'
+import type Lenis from 'lenis'
 
 const NAV_LEFT = ['Giới thiệu', 'Vị trí', 'Tiện ích']
 const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']

@@ -23,7 +23,7 @@ export default function Footer({ data: propData, className }: FooterProps) {
   return (
     <div className={`relative overflow-hidden rounded-t-3xl bg-secondary ${className}`}>
       <img
-        src="/bg-footer.png"
+        src="/bg-footer.webp"
         alt=""
         loading="lazy"
         decoding="async"
@@ -36,7 +36,7 @@ export default function Footer({ data: propData, className }: FooterProps) {
           <div className="md:w-[38%] md:shrink-0">
             <div className="items-center justify-center flex">
               <img
-                src="/logo-footer.png"
+                src="/logo-footer.webp"
                 alt="Casamia Balanca Hoi An"
                 loading="lazy"
                 decoding="async"

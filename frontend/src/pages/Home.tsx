@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
+import { usePageVisible } from '../hooks/useVisibility'
 import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
-import FloatingButtons from '../components/FloatingButtons'
+const FloatingButtons = lazy(() => import('../components/FloatingButtons'))
 import Footer from '../components/Footer'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
@@ -66,6 +67,8 @@ function Home() {
     const contentRef = useRef<HTMLDivElement>(null)
     const footerRef = useRef<HTMLElement>(null)
     const spacerRef = useRef<HTMLDivElement>(null)
+    // Pause all carousel timers when the tab is hidden
+    const pageVisible = usePageVisible()
     // Cached container width to avoid reading offsetWidth during touch handlers
     const containerWidthRef = useRef(window.innerWidth)
     useEffect(() => {
@@ -82,15 +85,21 @@ function Home() {
 
         // Cache layout values to avoid repeated reads during scroll
         let cachedFooterH = 0
+        let layoutRafId = 0
 
         const updateLayout = () => {
-            // Batch reads
-            const contentH = content.offsetHeight
-            const footerH = footer.offsetHeight
-            cachedFooterH = footerH
-            // Batch writes
-            spacer.style.height = `${footerH}px`
-            content.style.top = `${-(contentH - window.innerHeight)}px`
+            cancelAnimationFrame(layoutRafId)
+            // Defer to next frame so reads don't force a synchronous reflow
+            // when triggered by ResizeObserver during layout
+            layoutRafId = requestAnimationFrame(() => {
+                // Batch reads
+                const contentH = content.offsetHeight
+                const footerH = footer.offsetHeight
+                cachedFooterH = footerH
+                // Batch writes
+                spacer.style.height = `${footerH}px`
+                content.style.top = `${-(contentH - window.innerHeight)}px`
+            })
         }
         updateLayout()
 
@@ -119,6 +128,7 @@ function Home() {
         handleScroll()
         return () => {
             cancelAnimationFrame(rafId)
+            cancelAnimationFrame(layoutRafId)
             window.removeEventListener('scroll', handleScroll)
             ro.disconnect()
         }
@@ -139,9 +149,10 @@ function Home() {
     const extNext = () => setExtIdx((i) => Math.min(extMax, i + 1))
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => setExtIdx((i) => (i >= extMax ? 0 : i + 1)), 5000)
         return () => clearInterval(id)
-    }, [extMax])
+    }, [extMax, pageVisible])
 
     const [extDragOffset, setExtDragOffset] = useState(0)
     const extDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -195,9 +206,10 @@ function Home() {
     const vilNext = () => setVilIdx((i) => Math.min(vilMax, i + 1))
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => setVilIdx((i) => (i >= vilMax ? 0 : i + 1)), 5000)
         return () => clearInterval(id)
-    }, [vilMax])
+    }, [vilMax, pageVisible])
     const [vilDragOffset, setVilDragOffset] = useState(0)
     const vilDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
     const vilTrackRef = useRef<HTMLDivElement>(null)
@@ -289,9 +301,10 @@ function Home() {
     const prodNextRef = useRef(prodNext)
     prodNextRef.current = prodNext
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => prodNextRef.current(), 5000)
         return () => clearInterval(id)
-    }, [])
+    }, [pageVisible])
 
     const handleCatChange = (cat: string) => {
         setCarouselCat(cat)
@@ -309,12 +322,13 @@ function Home() {
     const nextSlide = () => { setAnimate(true); setSlideIdx((i) => i + 1) }
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => {
             setAnimate(true)
             setSlideIdx((i) => (i >= carouselSlides.length ? 1 : i + 1))
         }, 5000)
         return () => clearInterval(id)
-    }, [carouselCat, carouselSlides.length])
+    }, [carouselCat, carouselSlides.length, pageVisible])
 
     const [dragOffset, setDragOffset] = useState(0)
     const dragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -387,12 +401,13 @@ function Home() {
     const nextGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i + 1) }
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => {
             setGalleryAnimate(true)
             setGalleryIdx((i) => (i >= footerGallery.length ? 1 : i + 1))
         }, 5000)
         return () => clearInterval(id)
-    }, [])
+    }, [pageVisible])
 
     const handleGalleryTouchStart = (e: React.TouchEvent) => {
         setGalleryAnimate(false)
@@ -547,7 +562,7 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/leaf.png"
+                            src="/leaf.webp"
                             alt=""
 
                             className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 2xl:bottom-30 sm:-right-40 md:-right-110 md:w-auto"
@@ -588,14 +603,14 @@ function Home() {
 
                     <div className="relative">
                         <img
-                            src="/leaf.png"
+                            src="/leaf.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
                             className="pointer-events-none absolute top-0 left-4 w-90 md:w-auto object-contain sm:-top-25 sm:-left-20 sm:block z-10"
                         />
                         <img
-                            src="/gradient-from-t.png"
+                            src="/gradient-from-t.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -657,7 +672,7 @@ function Home() {
                 <section id="map" className="relative z-0">
                     <div className="relative">
                         <img
-                            src="/map-balanca.png"
+                            src="/map-balanca.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -848,7 +863,7 @@ function Home() {
                 <section id="products" className="relative pt-0">
                     <div className="relative">
                         <img
-                            src="/leaf.png"
+                            src="/leaf.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -987,7 +1002,7 @@ function Home() {
                     </div>
                     <div className="relative">
                         <img
-                            src="/bg-pattern-2.png"
+                            src="/bg-pattern-2.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1115,7 +1130,7 @@ function Home() {
                     </div>
                     <div className="relative">
                         <img
-                            src="/bg-pattern-3.png"
+                            src="/bg-pattern-3.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1228,7 +1243,7 @@ function Home() {
                             className="w-full object-contain block md:hidden"
                         />
                         <img
-                            src="/gradient-from-top-r.png"
+                            src="/gradient-from-top-r.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1254,7 +1269,7 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/gradient-from-b.png"
+                            src="/gradient-from-b.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1301,7 +1316,7 @@ function Home() {
                                 />
                             </div>
                             <img
-                                src="/cloud.png"
+                                src="/cloud.webp"
                                 alt=""
                                 loading="lazy"
                                 decoding="async"
@@ -1345,7 +1360,7 @@ function Home() {
                         </div>
                     </div>
                     <img
-                        src="/leaf.png"
+                        src="/leaf.webp"
                         alt=""
                         loading="lazy"
                         decoding="async"
@@ -1360,7 +1375,7 @@ function Home() {
                 <section
                     className="relative"
                     style={{
-                        backgroundImage: "url('/footer-pattern.png')",
+                        backgroundImage: "url('/footer-pattern.webp')",
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'auto',
@@ -1561,7 +1576,9 @@ function Home() {
                 </div>
             )}
 
-            <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
+            <Suspense fallback={null}>
+                <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
+            </Suspense>
         </div>
     )
 }

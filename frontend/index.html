@@ -18,15 +18,23 @@
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Preconnect to API server to reduce TTFB for first API call -->
+  <link rel="preconnect" href="https://api.casamiabalancahoian.vn" />
+  <!-- dns-prefetch fallback for browsers that don't support preconnect -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="https://api.casamiabalancahoian.vn" />
+  <link rel="dns-prefetch" href="https://img.youtube.com" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <!-- Preload critical above-fold assets with high priority -->
   <link rel="preload" as="image" href="/hero-poster.jpg" fetchpriority="high" />
   <link rel="preload" as="font" type="font/otf" href="/1FTV-Sagire.otf" crossorigin />
   <link rel="preload" as="font" type="font/otf" href="/1FTV-VIP-Alishanty-Signature.otf" crossorigin />
+  <!-- Defer non-critical Google Fonts — load async via media swap -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
     rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
-  <!-- Preconnect to API server to reduce TTFB for first API call -->
-  <link rel="preconnect" href="https://api.casamiabalancahoian.vn" />
   <!-- Google Tag Manager (deferred to window load to avoid blocking + CLS) -->
   <script>
     window.addEventListener('load', function () {

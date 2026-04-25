@@ -186,3 +186,16 @@ html.lenis, html.lenis body {
   mask-size: 51% 51%;
   mask-repeat: no-repeat;
 }
+
+/*
+ * content-visibility: auto lets the browser skip layout/paint for off-screen
+ * sections, dramatically reducing initial main-thread work. The intrinsic-size
+ * hint prevents CLS when sections enter the viewport.
+ */
+#map,
+#features,
+#products,
+#value {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
