@@ -5,6 +5,7 @@ import Footer from '../components/Footer'
 import ScrollToTopButton from '../components/ScrollToTopButton'
 import { GALLERY_CATEGORIES, GALLERY_ITEMS, type GalleryCategory } from '../data/gallery'
 import { trackEvent } from '../utils/tracking'
+import Seo from '../components/Seo'
 
 const ITEMS_PER_PAGE = 6
 
@@ -41,6 +42,11 @@ export default function Gallery() {
 
     return (
         <div className="min-h-screen bg-warm">
+            <Seo
+                title="Thư viện"
+                description="Thư viện hình ảnh và video dự án Casamia Balanca Hội An - Khu đô thị sinh thái liền kề rừng dừa Bảy Mẫu, Hội An."
+                url="/thu-vien"
+            />
             <Header />
 
             <main className="mx-auto max-w-6xl px-6 pt-28 pb-16 sm:px-10 sm:pt-32">
@@ -166,7 +172,7 @@ export default function Gallery() {
             </main>
 
             <ScrollToTopButton />
-            <Footer className="md:px-85" />
+            <Footer contentMaxWidth="max-w-6xl" />
         </div>
     )
 }

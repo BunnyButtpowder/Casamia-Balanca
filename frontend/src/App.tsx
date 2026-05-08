@@ -5,6 +5,7 @@ import ScrollToTop from './components/ScrollToTop'
 const News = lazy(() => import('./pages/News'))
 const NewsDetail = lazy(() => import('./pages/NewsDetail'))
 const Gallery = lazy(() => import('./pages/Gallery'))
+const LegalDocuments = lazy(() => import('./pages/LegalDocuments'))
 
 // Admin pages
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
@@ -32,6 +33,7 @@ function App() {
         <Route path="/tin-tuc" element={<Suspense fallback={null}><News /></Suspense>} />
         <Route path="/tin-tuc/:slug" element={<Suspense fallback={null}><NewsDetail /></Suspense>} />
         <Route path="/thu-vien" element={<Suspense fallback={null}><Gallery /></Suspense>} />
+        <Route path="/van-ban-phap-ly" element={<Suspense fallback={null}><LegalDocuments /></Suspense>} />
 
         {/* Admin routes */}
         <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />

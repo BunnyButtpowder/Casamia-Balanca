@@ -9,6 +9,7 @@ const FloatingButtons = lazy(() => import('../components/FloatingButtons'))
 import Footer from '../components/Footer'
 import ThankYouModal from '../components/ThankYouModal'
 import { trackEvent } from '../utils/tracking'
+import Seo from '../components/Seo'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
 
@@ -50,6 +51,17 @@ function Home() {
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
     const [thankYouOpen, setThankYouOpen] = useState(false)
+
+    // Auto-open download popup once after 10 seconds on the page
+    useEffect(() => {
+        const STORAGE_KEY = 'download_popup_shown'
+        if (sessionStorage.getItem(STORAGE_KEY)) return
+        const timer = setTimeout(() => {
+            setDownloadOpen(true)
+            sessionStorage.setItem(STORAGE_KEY, '1')
+        }, 10_000)
+        return () => clearTimeout(timer)
+    }, [])
     const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const handleDownloadSubmit = async (e: React.FormEvent) => {
@@ -490,6 +502,7 @@ function Home() {
 
     return (
         <div className="min-h-screen overflow-x-clip">
+            <Seo url="/" />
             <div
                 aria-hidden={pageLoaded && !contentLoading}
                 className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded && !contentLoading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}

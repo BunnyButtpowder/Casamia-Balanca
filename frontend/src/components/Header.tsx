@@ -25,7 +25,8 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
   const isHome = location.pathname === '/'
   const isNews =
     location.pathname.startsWith('/tin-tuc') ||
-    location.pathname.startsWith('/thu-vien')
+    location.pathname.startsWith('/thu-vien') ||
+    location.pathname.startsWith('/van-ban-phap-ly')
 
   useEffect(() => {
     if (!menuOpen) return
@@ -48,10 +49,11 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
     }
 
     if (href === '#contact') {
-      const target = document.documentElement.scrollHeight - window.innerHeight
       if (lenisRef?.current) {
-        lenisRef.current.scrollTo(target, { duration: 1.2 })
+        lenisRef.current.resize()
+        lenisRef.current.scrollTo(lenisRef.current.limit, { duration: 1.2 })
       } else {
+        const target = document.documentElement.scrollHeight - window.innerHeight
         window.scrollTo({ top: target, behavior: 'smooth' })
       }
       return
@@ -60,9 +62,13 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
     const el = document.querySelector(href) as HTMLElement | null
     if (!el) return
     if (lenisRef?.current) {
+      // Recalculate page dimensions so Lenis scrolls to the correct
+      // position even if content/images shifted layout after init.
+      lenisRef.current.resize()
       lenisRef.current.scrollTo(el, { offset: -88 })
     } else {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const top = el.getBoundingClientRect().top + window.scrollY - 88
+      window.scrollTo({ top, behavior: 'smooth' })
     }
   }
 

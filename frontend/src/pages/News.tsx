@@ -8,6 +8,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ScrollToTopButton from '../components/ScrollToTopButton'
 import { trackEvent } from '../utils/tracking'
+import Seo from '../components/Seo'
 
 const ITEMS_PER_PAGE = 9
 
@@ -63,6 +64,11 @@ export default function News() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Seo
+        title="Tin tức"
+        description="Cập nhật tin tức mới nhất về dự án Casamia Balanca Hội An - Thông tin dự án, sự kiện và thị trường bất động sản Hội An - Đà Nẵng."
+        url="/tin-tuc"
+      />
       <Header />
 
       <main className="mx-auto max-w-6xl px-6 pt-28 pb-16 sm:px-10 sm:pt-32">
@@ -174,7 +180,7 @@ export default function News() {
       </main>
 
       <ScrollToTopButton />
-      <Footer className="md:px-85"/>
+      <Footer contentMaxWidth="max-w-6xl" />
     </div>
   )
 }

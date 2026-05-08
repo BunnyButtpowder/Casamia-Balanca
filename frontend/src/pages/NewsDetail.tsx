@@ -7,6 +7,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ScrollToTopButton from '../components/ScrollToTopButton'
 import { trackEvent } from '../utils/tracking'
+import Seo from '../components/Seo'
 
 function resolveImage(image: string): string {
   if (!image) return ''
@@ -77,8 +78,16 @@ export default function NewsDetail() {
     )
   }
 
+  const excerpt = article.content.find((b) => b.type === 'text')?.value || ''
+
   return (
     <div className="min-h-screen bg-warm">
+      <Seo
+        title={article.title}
+        description={excerpt.slice(0, 200)}
+        image={resolveImage(article.image)}
+        url={`/tin-tuc/${article.slug}`}
+      />
       <Header />
 
       {/* Hero banner */}
@@ -175,7 +184,7 @@ export default function NewsDetail() {
       )}
 
       <ScrollToTopButton />
-      <Footer className="md:px-85"/>
+      <Footer contentMaxWidth="max-w-4xl" />
     </div>
   )
 }
