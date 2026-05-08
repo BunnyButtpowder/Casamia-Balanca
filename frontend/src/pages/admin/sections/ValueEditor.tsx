@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { ValueSection } from '../../../types/sections'
 import MediaUploader from '../components/MediaUploader'
+import { useToast } from '../../../components/Toast'
 
 export default function ValueEditor() {
   const [form, setForm] = useState<ValueSection | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('loading')
+  const toast = useToast()
 
   useEffect(() => {
     api.getSection<ValueSection>('value').then((data) => {
@@ -20,9 +22,11 @@ export default function ValueEditor() {
     try {
       await api.updateSection('value', form)
       setStatus('saved')
+      toast.success('Đã lưu thành công')
       setTimeout(() => setStatus('idle'), 2000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
     }
   }
 

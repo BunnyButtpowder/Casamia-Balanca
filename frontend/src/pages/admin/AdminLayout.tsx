@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { ToastProvider } from '../../components/Toast'
 
 const NAV_ITEMS = [
   { path: '/admin', label: 'Dashboard', exact: true },
@@ -31,6 +32,7 @@ export default function AdminLayout() {
   }
 
   return (
+    <ToastProvider>
     <div className="flex min-h-screen bg-gray-50">
       <aside className="fixed left-0 top-0 z-40 flex h-screen w-60 flex-col bg-gray-900 text-white">
         <div className="border-b border-gray-700 px-5 py-4">
@@ -67,5 +69,6 @@ export default function AdminLayout() {
         <Outlet />
       </main>
     </div>
+    </ToastProvider>
   )
 }

@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { ProductsSection } from '../../../types/sections'
 import MediaUploader from '../components/MediaUploader'
+import { useToast } from '../../../components/Toast'
 
 export default function ProductsEditor() {
   const [form, setForm] = useState<ProductsSection | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('loading')
+  const toast = useToast()
 
   useEffect(() => {
     api.getSection<ProductsSection>('products').then((data) => {
@@ -20,9 +22,11 @@ export default function ProductsEditor() {
     try {
       await api.updateSection('products', form)
       setStatus('saved')
+      toast.success('Đã lưu thành công')
       setTimeout(() => setStatus('idle'), 2000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
     }
   }
 

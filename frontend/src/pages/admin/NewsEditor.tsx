@@ -4,6 +4,7 @@ import { Trash2, GripVertical, ArrowUp, ArrowDown, Type, ImageIcon } from 'lucid
 import { api } from '../../services/api'
 import type { NewsArticle, ContentBlock, NewsCategory } from '../../types/news'
 import MediaUploader from './components/MediaUploader'
+import { useToast } from '../../components/Toast'
 
 const EMPTY_ARTICLE: Omit<NewsArticle, 'id' | 'created_at' | 'updated_at'> = {
   slug: '',
@@ -30,6 +31,7 @@ export default function NewsEditor() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const isNew = id === 'new'
+  const toast = useToast()
 
   const [form, setForm] = useState(EMPTY_ARTICLE)
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('idle')
@@ -104,11 +106,11 @@ export default function NewsEditor() {
 
   const handleSave = async () => {
     if (!form.title.trim()) {
-      alert('Vui lòng nhập tiêu đề bài viết.')
+      toast.error('Vui lòng nhập tiêu đề bài viết.')
       return
     }
     if (!form.slug.trim()) {
-      alert('Vui lòng nhập đường dẫn (slug).')
+      toast.error('Vui lòng nhập đường dẫn (slug).')
       return
     }
 
@@ -120,11 +122,13 @@ export default function NewsEditor() {
         await api.updateNews(Number(id), form)
       }
       setStatus('saved')
+      toast.success(isNew ? 'Tạo bài viết thành công' : 'Cập nhật bài viết thành công')
       setTimeout(() => {
         navigate('/admin/news')
       }, 1000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
       setTimeout(() => setStatus('idle'), 3000)
     }
   }

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { MapSection } from '../../../types/sections'
+import { useToast } from '../../../components/Toast'
 
 export default function MapEditor() {
   const [form, setForm] = useState<MapSection | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('loading')
+  const toast = useToast()
 
   useEffect(() => {
     api.getSection<MapSection>('map').then((data) => {
@@ -19,9 +21,11 @@ export default function MapEditor() {
     try {
       await api.updateSection('map', form)
       setStatus('saved')
+      toast.success('Đã lưu thành công')
       setTimeout(() => setStatus('idle'), 2000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
     }
   }
 

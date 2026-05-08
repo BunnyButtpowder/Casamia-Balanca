@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { HeroSection } from '../../../types/sections'
 import MediaUploader from '../components/MediaUploader'
+import { useToast } from '../../../components/Toast'
 
 export default function HeroEditor() {
   const [form, setForm] = useState<HeroSection>({
@@ -13,6 +14,7 @@ export default function HeroEditor() {
     subtitle: '',
   })
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('loading')
+  const toast = useToast()
 
   useEffect(() => {
     api.getSection<HeroSection>('hero').then((data) => {
@@ -26,9 +28,11 @@ export default function HeroEditor() {
     try {
       await api.updateSection('hero', form)
       setStatus('saved')
+      toast.success('Đã lưu thành công')
       setTimeout(() => setStatus('idle'), 2000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
     }
   }
 

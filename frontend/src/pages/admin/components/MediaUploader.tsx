@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Upload, X } from 'lucide-react'
 import { api, resolveUploadUrl } from '../../../services/api'
+import { useToast } from '../../../components/Toast'
 
 interface MediaUploaderProps {
   value: string
@@ -17,14 +18,15 @@ const ACCEPT_MAP = {
 export default function MediaUploader({ value, onChange, accept = 'image', label }: MediaUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const toast = useToast()
 
   const handleUpload = async (file: File) => {
     setUploading(true)
     try {
       const { url } = await api.uploadFile(file, value || undefined)
       onChange(url)
-    } catch {
-      // silently fail — parent handles error state
+    } catch (err) {
+      toast.error(`Tải lên thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
     } finally {
       setUploading(false)
     }

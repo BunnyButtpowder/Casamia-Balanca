@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { api } from '../../../services/api'
 import type { FooterSection } from '../../../types/sections'
 import MediaUploader from '../components/MediaUploader'
+import { useToast } from '../../../components/Toast'
 
 export default function FooterEditor() {
   const [form, setForm] = useState<FooterSection | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('loading')
+  const toast = useToast()
 
   useEffect(() => {
     api.getSection<FooterSection>('footer').then((data) => {
@@ -20,9 +22,11 @@ export default function FooterEditor() {
     try {
       await api.updateSection('footer', form)
       setStatus('saved')
+      toast.success('Đã lưu thành công')
       setTimeout(() => setStatus('idle'), 2000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
     }
   }
 
