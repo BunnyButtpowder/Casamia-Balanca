@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import Lenis from 'lenis'
+import type Lenis from 'lenis'
+import { trackEvent } from '../utils/tracking'
 
 const NAV_LEFT = ['Giới thiệu', 'Vị trí', 'Tiện ích']
 const NAV_RIGHT = ['Sản phẩm', 'Giá trị', 'Liên hệ']
@@ -22,7 +23,9 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/'
-  const isNews = location.pathname.startsWith('/tin-tuc')
+  const isNews =
+    location.pathname.startsWith('/tin-tuc') ||
+    location.pathname.startsWith('/thu-vien')
 
   useEffect(() => {
     if (!menuOpen) return
@@ -33,7 +36,8 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
     }
   }, [menuOpen])
 
-  const handleNavClick = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleNavClick = (href: string, label: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    trackEvent({ event: 'nav_click', event_category: 'navigation', event_label: label, nav_target: href })
     if (!href.startsWith('#') || href === '#') return
     e.preventDefault()
     setMenuOpen(false)
@@ -77,7 +81,7 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
                 key={item}
                 href={navHref(item)}
                 className={NAV_LINK_CLASS}
-                onClick={handleNavClick(navHref(item))}
+                onClick={handleNavClick(navHref(item), item)}
               >
                 {item}
               </a>
@@ -106,7 +110,7 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
                 key={item}
                 href={navHref(item)}
                 className={NAV_LINK_CLASS}
-                onClick={handleNavClick(navHref(item))}
+                onClick={handleNavClick(navHref(item), item)}
               >
                 {item}
               </a>
@@ -122,7 +126,7 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
               aria-label="Toggle menu"
               aria-expanded={menuOpen}
               className="z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 md:hidden"
-              onClick={() => setMenuOpen((v) => !v)}
+              onClick={() => { setMenuOpen((v) => !v); trackEvent({ event: 'menu_toggle', event_category: 'navigation', event_label: menuOpen ? 'close' : 'open' }) }}
             >
               <span
                 className={`h-0.5 w-6 rounded bg-secondary transition-transform duration-300 ${menuOpen ? 'translate-y-2 rotate-45' : ''}`}
@@ -149,7 +153,7 @@ export default function Header({ lenisRef }: { lenisRef?: React.RefObject<Lenis 
               key={item}
               href={navHref(item)}
               className="shrink-0 text-center text-lg font-medium tracking-widest text-secondary"
-              onClick={handleNavClick(navHref(item))}
+              onClick={handleNavClick(navHref(item), item)}
             >
               {item}
             </a>

@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { path: '/admin/products', label: 'Sản phẩm' },
   { path: '/admin/value', label: 'Giá trị' },
   { path: '/admin/footer', label: 'Footer' },
+  { path: '/admin/news', label: 'Tin tức' },
   { path: '/admin/contacts', label: 'Liên hệ' },
   { path: '/admin/downloads', label: 'Tải tài liệu' },
   { path: '/admin/change-password', label: 'Đổi mật khẩu' },

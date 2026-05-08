@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
 import mysql from 'mysql2/promise'
-import bcrypt from 'bcryptjs'
 
 dotenv.config()
 
@@ -58,19 +57,247 @@ async function seed() {
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `)
 
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS news_articles (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      slug VARCHAR(255) UNIQUE NOT NULL,
+      title VARCHAR(500) NOT NULL,
+      date VARCHAR(20) NOT NULL DEFAULT '',
+      image VARCHAR(500) NOT NULL DEFAULT '',
+      category VARCHAR(50) NOT NULL DEFAULT 'du-an',
+      source_url VARCHAR(500) NOT NULL DEFAULT '',
+      content JSON NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `)
+
   console.log('Tables created')
 
+  // Seed news articles
+  const newsArticles = [
+    {
+      slug: 'casamia-balanca-hoan-thien-cau-truc-phan-phoi',
+      title: 'Casamia Balanca Hội An hoàn thiện cấu trúc phân phối, định hình chiến lược tiếp cận thị trường',
+      date: '03.04.2026',
+      image: 'https://cafebiz.cafebizcdn.vn/zoom/700_438/162123310254002176/2026/4/3/photo1775212241238-1775212241358626267887-17752402681381521958106.jpg',
+      category: 'su-kien',
+      source_url: 'https://cafebiz.vn/casamia-balanca-hoi-an-hoan-thien-cau-truc-phan-phoi-dinh-hinh-chien-luoc-tiep-can-thi-truong-1762504133753.chn',
+      content: [
+        { type: 'text', value: 'Ngày 03/04/2026, tại Pullman Danang Beach Resort, Tập đoàn Đạt Phương chính thức tổ chức Lễ ký kết Đại lý chiến lược và ra mắt mô hình khai thác toàn diện dự án Casamia Balanca Hội An. Sự kiện được xem là dấu mốc quan trọng, hoàn thiện cấu trúc phân phối và tạo đà cho giai đoạn triển khai dự án ra thị trường.' },
+        { type: 'text', value: 'HOÀN THIỆN HỆ THỐNG PHÂN PHỐI' },
+        { type: 'text', value: 'Tại sự kiện, TATI INVEST được Chủ đầu tư lựa chọn là Tổng đại lý phân phối, đóng vai trò điều phối toàn bộ hệ thống bán hàng và triển khai chiến lược tiếp cận thị trường cho Casamia Balanca Hội An.' },
+        { type: 'text', value: 'Đồng hành cùng Tổng đại lý là 15 đơn vị phân phối chiến lược gồm BHS Miền Trung, CVR, FBG Land, Hiend Property, Phoenix Realty, RealHomes, Thái Minh, Tùng Long Property, Vạn Đạt Land, Win Real, Thiên Kim Real, Cen Miền Trung, Indochina Properties, Nam Dương Land và Quang Minh Property. Đây đều là những đơn vị giàu kinh nghiệm, được lựa chọn dựa trên các tiêu chí khắt khe về năng lực triển khai, uy tín thị trường và kinh nghiệm phân phối dòng sản phẩm bất động sản cao cấp.' },
+        { type: 'text', value: 'Việc thiết lập một hệ thống bán hàng đồng bộ, có định hướng rõ ràng được đánh giá là bước đi then chốt, không chỉ giúp kiểm soát chất lượng phân phối mà còn đảm bảo dự án được đưa ra thị trường một cách có chọn lọc, đúng tệp khách hàng.' },
+        { type: 'text', value: 'Chia sẻ tại sự kiện, ông Lương Minh Tuấn - Chủ tịch HĐQT Tập đoàn Đạt Phương nhấn mạnh: "Casamia Balanca Hội An là dự án trọng điểm trong chiến lược phát triển bất động sản sinh thái tại Hội An của chúng tôi. Việc lựa chọn tổng đại lý và hệ thống phân phối được thực hiện trên cơ sở đánh giá toàn diện, nhằm đảm bảo sản phẩm được đưa đến đúng khách hàng, đúng giá trị và đúng thời điểm của thị trường."' },
+        { type: 'text', value: 'Ở góc độ đơn vị phân phối, Chủ tịch TATI INVEST - Ông Trần Việt Dũng cũng khẳng định: "Chúng tôi không chỉ đơn thuần phân phối sản phẩm, mà còn đóng vai trò là cầu nối chiến lược giữa chủ đầu tư và thị trường. Với Casamia Balanca Hội An, mục tiêu là xây dựng chiến lược tiếp cận bài bản, đồng thời truyền tải trọn vẹn giá trị cốt lõi của dự án đến khách hàng và nhà đầu tư."' },
+        { type: 'text', value: 'CASAMIA BALANCA HỘI AN - LỜI GIẢI CHO BÀI TOÁN KHAI THÁC TOÀN DIỆN' },
+        { type: 'text', value: 'Sự kiện ký kết vừa hoàn thiện cấu trúc phân phối, vừa đặt nền móng cho giai đoạn đưa ra thị trường một sản phẩm đã được đầu tư bài bản ngay từ đầu.' },
+        { type: 'text', value: 'Casamia Balanca Hội An do Tập đoàn Đạt Phương phát triển - doanh nghiệp có hơn 20 năm kinh nghiệm trong lĩnh vực xây dựng hạ tầng, năng lượng và bất động sản. Kiên định với triết lý không đánh đổi giá trị dài hạn để lấy lợi nhuận ngắn hạn, Đạt Phương chú trọng hoàn thiện pháp lý, hạ tầng và hệ sinh thái ngay từ đầu, hướng đến các sản phẩm bền vững theo thời gian.' },
+        { type: 'text', value: 'Dự án tọa lạc liền kề rừng dừa Bảy Mẫu - vùng đệm của Khu dự trữ sinh quyển thế giới Cù Lao Chàm, với quy mô 31,1 ha, trong đó có 3,6 ha rừng dừa nước tự nhiên được bảo tồn. Yếu tố này tạo nên lợi thế sinh thái khác biệt đồng thời góp phần giữ gìn nét nguyên bản của thiên nhiên trong lòng đô thị.' },
+        { type: 'text', value: 'Bên cạnh đó, từng nét kiến trúc tại Casamia Balanca Hội An được định hình bởi kiến trúc sư Võ Trọng Nghĩa - một trong những tên tuổi tiêu biểu của kiến trúc xanh và bền vững. Ngôn ngữ thiết kế đề cao sự hài hòa giữa con người và thiên nhiên, đồng thời lồng ghép bản sắc di sản Hội An, tạo nên một không gian vừa mang giá trị nghỉ dưỡng, vừa có tiềm năng khai thác lưu trú dài hạn.' },
+        { type: 'text', value: 'Trong bối cảnh thị trường ngày càng đề cao giá trị sử dụng thực và khả năng khai thác dài hạn, mô hình "khai thác toàn diện" mà Casamia Balanca Hội An theo đuổi được xem là hướng đi phù hợp. Dự án không chỉ phục vụ nhu cầu an cư, mà còn mở ra cơ hội đầu tư với nhiều phương thức vận hành linh hoạt.' },
+        { type: 'text', value: 'Với nền tảng sản phẩm được chuẩn bị bài bản cùng hệ thống phân phối chuyên nghiệp vừa được kích hoạt, Casamia Balanca Hội An (Khu đô thị Cồn Tiến, phường Hội An Đông (xã Cẩm Thanh cũ), Đà Nẵng) được kỳ vọng sẽ trở thành một trong những điểm sáng của thị trường bất động sản năm 2026, đặc biệt trong phân khúc đô thị sinh thái gắn với giá trị khai thác bền vững.' },
+      ],
+    },
+    {
+      slug: 'dat-phuong-lua-chon-khong-danh-doi',
+      title: 'Đạt Phương và lựa chọn không đánh đổi: Khi giá trị dài hạn trở thành chiến lược phát triển',
+      date: '01.04.2026',
+      image: '/scenery.jpg',
+      category: 'du-an',
+      source_url: '',
+      content: [
+        { type: 'text', value: 'Thị trường bất động sản biến động, chạy theo "sóng" tiềm ẩn rủi ro chất lượng và giá trị. Đạt Phương chọn hướng đi bền vững, không đánh đổi tương lai sản phẩm để lấy lợi nhuận ngắn hạn, ưu tiên minh bạch và giá trị thực.' },
+        { type: 'text', value: 'Trong bối cảnh thị trường bất động sản biến động, xu hướng phát triển nhanh, tận dụng "sóng" để tối đa hóa lợi nhuận trở nên phổ biến. Tuy nhiên, cách tiếp cận này cũng có những rủi ro về chất lượng dự án, áp lực lên hạ tầng, môi trường sống bị thu hẹp và rủi ro cho nhà đầu tư khi giá trị thực không theo kịp kỳ vọng.' },
+        { type: 'text', value: 'Giữa bức tranh đó, một số doanh nghiệp chọn đi theo hướng khác - chậm hơn nhưng bền vững hơn. Đạt Phương là một trong những đại diện theo đuổi triết lý không đánh đổi tương lai của sản phẩm để lấy lợi nhuận ngắn hạn, đặc biệt trong bối cảnh thị trường ngày càng đòi hỏi sự minh bạch và giá trị thực.' },
+        { type: 'text', value: 'TRIẾT LÝ PHÁT TRIỂN BỀN VỮNG' },
+        { type: 'text', value: 'Đạt Phương không lựa chọn phát triển dàn trải, không chạy theo "sóng", doanh nghiệp lựa chọn nhịp độ có kiểm soát, đặt giá trị dài hạn và quyền lợi nhà đầu tư cũng như cư dân làm trọng tâm.' },
+        { type: 'text', value: 'Triết lý "chậm và chắc" không phải là sự thận trọng bị động, mà là chiến lược chủ động: tập trung nguồn lực để hoàn thiện sản phẩm, đầu tư vào quy hoạch và chất lượng sống. Điều này đồng nghĩa với việc mỗi dự án cần đủ thời gian để hoàn thiện về pháp lý, hạ tầng và hệ sinh thái trước khi đưa ra thị trường.' },
+        { type: 'text', value: 'Trong bối cảnh thị trường phân hóa, đây cũng là cách tiếp cận phù hợp với nhóm nhà đầu tư tìm kiếm giá trị bền vững, ưu tiên khả năng khai thác thực và mức độ ổn định hơn là những biến động giá ngắn hạn.' },
+        { type: 'text', value: 'NỀN TẢNG TỪ HẠ TẦNG' },
+        { type: 'text', value: 'Trước khi phát triển bất động sản, Đạt Phương đã có nền tảng vững chắc trong lĩnh vực xây dựng hạ tầng. Các công trình như cầu Đế Võng, cầu Cửa Đại không chỉ có quy mô lớn mà còn đóng vai trò kết nối khu vực Đà Nẵng - Nam Hội An, góp phần mở rộng không gian phát triển đô thị. Chất lượng thi công và tiến độ là những yếu tố quan trọng giúp doanh nghiệp tạo dựng uy tín trên thị trường.' },
+        { type: 'text', value: 'Kinh nghiệm từ hạ tầng mang lại cho Đạt Phương lợi thế khác biệt: tiếp cận bất động sản với góc nhìn tổng thể về quy hoạch, dòng chảy giao thông và khả năng vận hành lâu dài - những yếu tố cốt lõi nhưng thường bị xem nhẹ trong phát triển ngắn hạn.' },
+        { type: 'text', value: 'Theo đó, doanh nghiệp lựa chọn bước chuyển có định hướng sang xây dựng các đô thị sinh thái tại Hội An - nơi vẫn còn giữ được cấu trúc tự nhiên đặc trưng. Các khu đô thị được quy hoạch đồng bộ, tận dụng lợi thế sông nước, rừng dừa và cảnh quan bản địa, đồng thời phát triển có chọn lọc để tránh đô thị hóa dàn trải.' },
+        { type: 'text', value: 'KIẾN TRÚC XANH VÀ BỀN VỮNG' },
+        { type: 'text', value: 'Một điểm nhấn trong chiến lược của Đạt Phương là hợp tác với KTS Võ Trọng Nghĩa - đại diện tiêu biểu cho kiến trúc xanh và bền vững.' },
+        { type: 'text', value: 'Thiết kế không chỉ mang tính thẩm mỹ mà còn giải quyết bài toán khí hậu, môi trường và trải nghiệm sống. Các yếu tố như thông gió tự nhiên, vật liệu thân thiện hay không gian xanh được chú trọng, giúp giảm phụ thuộc vào năng lượng và nâng cao chất lượng sống.' },
+        { type: 'text', value: 'Cách tiếp cận này cũng đã được ghi nhận bằng các giải thưởng chuyên môn. Dự án Casamia Balanca (Casamia Cồn Tiến) từng nhận giải "Thiết kế kiến trúc cảnh quan đẹp nhất Việt Nam" (Best Landscape Architectural Design) tại giải thưởng PropertyGuru năm 2021. Đến ngày 25/12/2025, dự án tiếp tục được trao tặng danh hiệu "Dự án Đáng sống 2026" do VCCI và Tạp chí Diễn đàn Doanh nghiệp tổ chức.' },
+        { type: 'text', value: 'Những giải thưởng này không chỉ ghi nhận chất lượng thiết kế, mà còn cho thấy định hướng phát triển bền vững của dự án phù hợp với các tiêu chuẩn ngày càng khắt khe của thị trường.' },
+        { type: 'text', value: 'CASAMIA BALANCA - DỰ ÁN TIÊU BIỂU' },
+        { type: 'text', value: 'Casamia Balanca là dự án tiêu biểu cho triết lý phát triển của Đạt Phương. Dự án sở hữu 3,6ha rừng dừa nước tự nhiên, thuộc vùng đệm khu dự trữ sinh quyển rừng dừa Bảy Mẫu được UNESCO công nhận, hệ sinh thái này được giữ lại và bảo tồn nguyên vẹn như một phần cốt lõi của dự án.' },
+        { type: 'text', value: 'Với mật độ xây dựng khoảng 38%, phần lớn diện tích được dành cho cảnh quan, mặt nước và không gian mở, góp phần duy trì cân bằng sinh thái và tạo nên môi trường sống trong lành - yếu tố ngày càng quan trọng trong phát triển đô thị ven sông, ven biển.' },
+        { type: 'text', value: 'Ở góc độ đầu tư, các dự án của Đạt Phương hướng đến giá trị tích lũy theo thời gian, dựa trên quy hoạch, chất lượng xây dựng và môi trường sống. Thay vì tăng giá ngắn hạn, sản phẩm được định vị theo khả năng khai thác thực và tính bền vững.' },
+        { type: 'text', value: 'Thực tế cho thấy, cụm đô thị sinh thái Casamia không chỉ dừng ở quy hoạch mà đã đạt mức lấp đầy tích cực. Casamia Calm và Casamia Hội An đã hình thành cộng đồng cư dân ổn định là minh chứng cho giá trị thực của dự án.' },
+        { type: 'text', value: 'Kế hoạch phát triển hai khách sạn 5 sao do thương hiệu nổi tiếng Hilton quản lý tại 2 khu đô thị này tiếp tục củng cố niềm tin thị trường, cho thấy tiêu chuẩn chất lượng và năng lực triển khai của chủ đầu tư.' },
+        { type: 'text', value: 'Trong bối cảnh đô thị phát triển nhanh, bài toán không còn là xây bao nhiêu, mà là xây như thế nào để những giá trị được nâng tầm trong tương lai. Đạt Phương lựa chọn phát triển bền vững - nơi giá trị thực sự nằm ở những gì còn lại theo thời gian.' },
+      ],
+    },
+    {
+      slug: 'khong-dau-co-van-sinh-loi',
+      title: 'Không đầu cơ - vẫn sinh lời: Chủ đầu tư thay đổi cuộc chơi',
+      date: '30.03.2026',
+      image: 'https://cafefcdn.com/zoom/700_438/203337114487263232/2026/3/30/photo1774833036341-1774833036590477907134-17748444793221471939234.jpg',
+      category: 'du-an',
+      source_url: 'https://cafef.vn/khong-dau-co-van-sinh-loi-chu-dau-tu-thay-doi-cuoc-choi-188250330090617529.chn',
+      content: [
+        { type: 'text', value: 'Trong nhiều năm, bất động sản vận hành theo công thức quen thuộc: mua sớm - chờ tăng giá - bán ra hưởng chênh lệch. Tuy nhiên, khi thị trường bước vào giai đoạn điều chỉnh với tín dụng, pháp lý và thanh khoản bị siết chặt, mô hình này dần bộc lộ giới hạn.' },
+        { type: 'text', value: 'Thay vào đó, nhà đầu tư đang chuyển hướng sang những tài sản có khả năng tạo dòng tiền thực và giá trị khai thác dài hạn, kéo theo sự thay đổi trong vai trò của chủ đầu tư - từ người bán sản phẩm sang người kiến tạo và vận hành giá trị.' },
+        { type: 'text', value: 'TƯ DUY ĐẦU TƯ THAY ĐỔI' },
+        { type: 'text', value: 'Thị trường đang chứng kiến sự thay đổi rõ rệt trong tư duy đầu tư. Nếu trước đây tài sản được nắm giữ với kỳ vọng tăng giá, thì hiện nay, câu hỏi quan trọng hơn là: tài sản đó có thể tạo ra giá trị gì ngay khi sở hữu?' },
+        { type: 'text', value: 'Không ít nhà đầu tư đang đối mặt với thực tế tài sản không thể khai thác, không có dòng tiền, thậm chí bị bỏ không trong thời gian dài. Khi đó, lợi nhuận hoàn toàn phụ thuộc vào biến động thị trường. Ngược lại, những bất động sản có thể vận hành sớm, tạo dòng tiền ngay từ đầu lại mang đến sự ổn định và chủ động hơn. Đây là lý do mô hình "mua để khai thác" đang dần thay thế "mua chờ tăng giá".' },
+        { type: 'text', value: 'DỰ ÁN QUY MÔ VỪA - XU HƯỚNG MỚI' },
+        { type: 'text', value: 'Sau giai đoạn phát triển nóng, nhiều khu đô thị quy mô lớn rơi vào tình trạng thiếu cư dân, thiếu hoạt động, bị bỏ hoang trong thời gian dài - hình thành nên những "đô thị ma". Thực tế này khiến nhà đầu tư trở nên thận trọng hơn với các dự án phát triển dàn trải.' },
+        { type: 'text', value: 'Trong bối cảnh đó, các dự án quy mô vừa, được hoàn thiện sớm về hạ tầng, cảnh quan và tiện ích đang trở thành lựa chọn ưu tiên. Thay vì trải rộng, các dự án này tập trung vào khả năng lấp đầy nhanh, hình thành cộng đồng cư dân thực và nhịp sống rõ ràng.' },
+        { type: 'text', value: 'Đặc biệt, khi nằm tại các khu vực có sẵn nguồn cầu như các điểm đến du lịch hoặc trục phát triển mới, khả năng vận hành được kích hoạt sớm, giúp tài sản nhanh chóng tạo ra giá trị thực.' },
+        { type: 'text', value: 'GIÁ TRỊ SỐNG THỰC - NỀN TẢNG BỀN VỮNG' },
+        { type: 'text', value: 'Một dự án chỉ có thể vận hành hiệu quả khi nó thực sự "sống", có cư dân ở thật, có hoạt động và dòng khách ổn định. Điều này phụ thuộc vào chất lượng quy hoạch, mật độ xây dựng, không gian xanh và khả năng kết nối.' },
+        { type: 'text', value: 'Thực tế cho thấy, những tài sản nằm tại các khu vực có nhu cầu cao như trung tâm du lịch hoặc các đô thị lớn luôn duy trì giá trị tốt. Tại Hội An hay Đà Nẵng, dòng khách du lịch ổn định quanh năm giúp các bất động sản có khả năng khai thác lưu trú nhanh chóng đi vào vận hành.' },
+        { type: 'text', value: 'Đặc biệt, trong bối cảnh xu hướng sống xanh, sống chậm và gần gũi thiên nhiên ngày càng được ưa chuộng, các dự án có không gian sinh thái, mật độ thấp và trải nghiệm sống được đầu tư bài bản càng trở nên hấp dẫn.' },
+        { type: 'text', value: 'VAI TRÒ MỚI CỦA CHỦ ĐẦU TƯ' },
+        { type: 'text', value: 'Sự thay đổi trong tư duy đầu tư khiến dòng tiền thực trở thành yếu tố then chốt. Tuy nhiên, không phải tài sản nào cũng có thể tự vận hành hiệu quả, đặc biệt khi nhà đầu tư cá nhân ở xa hoặc thiếu kinh nghiệm và hệ sinh thái hỗ trợ.' },
+        { type: 'text', value: 'Chính vì vậy, vai trò của chủ đầu tư đang thay đổi rõ rệt. Thay vì dừng lại ở việc xây dựng và bàn giao, họ tham gia sâu hơn vào quá trình vận hành, xây dựng hệ sinh thái khai thác và đồng hành cùng nhà đầu tư.' },
+        { type: 'text', value: 'Ở khu vực miền Trung, trục Nam Đà Nẵng - Hội An cũng thể hiện xu hướng này rõ nét. Thay vì phát triển quy mô lớn, một số dự án lựa chọn quy mô vừa phải, hoàn thiện sớm và gắn với du lịch - sinh thái. Với lợi thế dòng khách ổn định quanh năm, Hội An được đánh giá là điểm đến tạo nền tảng để bất động sản nhanh chóng đi vào khai thác và tạo dòng tiền.' },
+        { type: 'text', value: 'Trong bối cảnh thị trường bất động sản đang bước vào một giai đoạn mới, nơi giá trị không còn đến từ đầu cơ, mà từ khả năng vận hành và khai thác. Một tài sản chỉ thực sự sinh lời bền vững khi được đặt trong một hệ sinh thái có dòng khách, có cộng đồng và có đời sống thực sự.' },
+      ],
+    },
+    {
+      slug: 'da-nang-mo-hinh-da-trung-tam',
+      title: 'Đà Nẵng bước vào mô hình đa trung tâm: Cực tăng trưởng mới sẽ nằm ở đâu?',
+      date: '30.03.2026',
+      image: 'https://cafebiz.cafebizcdn.vn/zoom/700_438/162123310254002176/2026/3/30/photo1774668487714-17746684878191873948148-1774843602299370626112.jpg',
+      category: 'du-an',
+      source_url: 'https://cafebiz.vn/da-nang-buoc-vao-mo-hinh-da-trung-tam-cuc-tang-truong-moi-se-nam-o-dau-176250330060225657.chn',
+      content: [
+        { type: 'text', value: 'Đà Nẵng đang thực hiện cuộc tái cấu trúc không gian theo hướng đa trung tâm, mở đường cho làn sóng giãn dân chủ động về phía Nam. Khu vực được xác định là trục phát triển mới bao gồm dải liên kết từ Đà Nẵng - Hội An - Nam Hội An.' },
+        { type: 'text', value: 'QUY HOẠCH PHÂN VÙNG CHIẾN LƯỢC' },
+        { type: 'text', value: 'Tại Singapore, các hoạt động cảng biển tập trung tại Tuas Port, trong khi Marina Bay và Sentosa Island phát triển thành trung tâm du lịch ven biển. Dubai, cảng Jebel Ali đóng vai trò trung tâm logistics, còn Dubai Marina hay Palm Jumeirah được quy hoạch cho du lịch và nghỉ dưỡng. Quy hoạch phân vùng nhằm tối ưu hóa chức năng từng khu vực đang mang lại hiệu quả kinh tế cho nhiều đô thị ven biển trên thế giới.' },
+        { type: 'text', value: 'Theo quy hoạch thành phố thời kỳ 2021-2030, tầm nhìn đến năm 2050, Đà Nẵng được định hướng trở thành trung tâm kinh tế - xã hội lớn của khu vực, với các trụ cột phát triển gồm du lịch, dịch vụ, logistics và công nghệ cao.' },
+        { type: 'text', value: 'CỰC PHÁT TRIỂN PHÍA BẮC' },
+        { type: 'text', value: 'Ở phía Bắc, khu vực Liên Chiểu đang nổi lên như cực phát triển logistics và công nghiệp chiến lược. Ngày 16/3, thông tin về siêu dự án cảng container Liên Chiểu với tổng mức đầu tư khoảng 1,7 tỷ USD, có sự tham gia của nhà thầu đến từ Hà Lan, đã tiếp tục củng cố vai trò của khu vực phía Bắc như một trung tâm logistics quy mô lớn của miền Trung.' },
+        { type: 'text', value: 'TRỤC PHÁT TRIỂN PHÍA NAM' },
+        { type: 'text', value: 'Trong khi đó, phía Nam thành phố, từ Đà Nẵng - kéo dài xuống Hội An và Nam Hội An, được định hướng phát triển thành một trục đô thị ven sông, ven biển, gắn với các giá trị sinh thái, di sản, nghỉ dưỡng. Sự phân vai này không chỉ tạo nên hai cực phát triển bổ trợ lẫn nhau, mà còn góp phần giảm thiểu xung đột không gian.' },
+        { type: 'text', value: 'Theo quy hoạch hạ tầng đã công bố, trục Đà Nẵng - Hội An - Nam Hội An đang từng bước khẳng định vị thế kinh tế nhờ mạng lưới giao thông ngày càng hoàn thiện.' },
+        { type: 'text', value: 'HẠ TẦNG KẾT NỐI' },
+        { type: 'text', value: 'Vị thế của khu vực này được củng cố bởi hai đầu mối chiến lược: Sân bay Quốc tế Đà Nẵng và Cảng Tiên Sa đang định hướng trở thành cảng du lịch chuyên đón tàu quốc tế.' },
+        { type: 'text', value: 'Song song, hạ tầng nội vùng tăng tốc với định hướng phát triển đường sắt đô thị kết nối sân bay Đà Nẵng - Hội An (2026-2031), cùng các trục ven biển và tuyến liên kết được nâng cấp, rút ngắn đáng kể thời gian di chuyển giữa các trung tâm du lịch.' },
+        { type: 'text', value: 'HÀNH LANG SINH THÁI - DU LỊCH' },
+        { type: 'text', value: 'Thực tế, một hành lang sinh thái - du lịch đã dần hình thành, quy tụ các khu đô thị ven sông, ven biển như Casamia (liền kề rừng dừa Bảy Mẫu), chuỗi resort cao cấp trải dài khu vực Thăng An - Thăng Bình. Đây là nền tảng để phát triển không gian sống gắn với thiên nhiên và trải nghiệm nghỉ dưỡng.' },
+        { type: 'text', value: 'Sự phát triển của hệ thống hạ tầng giao thông và hành lang sinh thái là động lực thu hút cộng đồng cư dân quốc tế, chuyên gia và nhóm làm việc từ xa có nhu cầu tìm kiếm môi trường sống xanh, tốt cho sức khỏe, nhưng vẫn gần kề hệ thống tiện ích y tế, giải trí, nghỉ dưỡng hiện đại.' },
+        { type: 'text', value: 'Nếu phía Bắc Đà Nẵng đóng vai trò động lực tăng trưởng công nghiệp, logistics và dòng chảy hàng hóa, thì phía Nam đang dần đảm nhiệm chức năng thu hút dòng người, dòng tiền và nâng chuẩn trải nghiệm sống.' },
+      ],
+    },
+    {
+      slug: 'da-nang-gian-dan-trung-tam',
+      title: 'Đà Nẵng giãn dân trung tâm: Hội An - Nam Hội An đón sóng dịch chuyển',
+      date: '27.03.2026',
+      image: 'https://images2.thanhnien.vn/zoom/1200_630/528068263637045248/2026/3/27/4-17746149291061490660457-93-0-826-1400-crop-1774615199262754279828.jpg',
+      category: 'du-an',
+      source_url: 'https://thanhnien.vn/da-nang-gian-dan-trung-tam-hoi-an-nam-hoi-an-don-song-dich-chuyen-185250327091427023.htm',
+      content: [
+        { type: 'text', value: 'Khu vực Nam Hội An đang trở thành điểm đến lý tưởng trong kế hoạch phân tán dân số của thành phố Đà Nẵng, sở hữu những lợi thế về tài nguyên đất, cơ sở hạ tầng và môi trường sống.' },
+        { type: 'text', value: 'Các khu vực phía nam Hội An và Nam Hội An đang đón nhận "sóng dịch chuyển" trong bối cảnh thành phố tái cấu trúc các khu vực trung tâm. Sự phát triển này phản ánh những nỗ lực quy hoạch đô thị rộng lớn nhằm quản lý hiệu quả hơn sự phân bổ dân số trên toàn bộ lãnh thổ của Đà Nẵng.' },
+        { type: 'text', value: 'XU HƯỚNG DỊCH CHUYỂN DÂN CƯ' },
+        { type: 'text', value: 'Khi dân số tăng nhanh, sự phân bố đang bộc lộ rõ những bất cân đối. Khu vực trung tâm Đà Nẵng, đặc biệt tại Hải Châu và Sơn Trà, hiện đã đạt mật độ cao, gây áp lực mạnh lên hạ tầng, giao thông và không gian sống.' },
+        { type: 'text', value: 'Ngược lại, dọc theo phía Nam, đặc biệt khu vực Hội An và vùng lân cận, vẫn còn nhiều dư địa phát triển với mật độ dân cư thấp, quỹ đất lớn và không gian sinh thái phong phú. Sự chênh lệch này tạo ra một nghịch lý: trung tâm ngày càng quá tải, vùng mở rộng chưa được khai thác tương xứng.' },
+        { type: 'text', value: 'HỘI AN - ĐIỂM ĐẾN MỚI' },
+        { type: 'text', value: 'Hội An đang nổi lên không chỉ là đô thị di sản, mà dần trở thành nơi sinh sống của cộng đồng quốc tế, lựa chọn của những người tìm kiếm môi trường sinh thái với không gian sống chậm, nhưng không tách rời tiện ích.' },
+        { type: 'text', value: 'Lợi thế của Hội An là vị trí chỉ cách trung tâm Đà Nẵng khoảng 30 phút di chuyển - đủ gần để duy trì kết nối với trung tâm và đủ xa để giữ được không gian sống chất lượng.' },
+        { type: 'text', value: 'Bài viết nhấn mạnh các cơ hội bất động sản và phát triển xuất hiện từ các sáng kiến quy hoạch đô thị chiến lược này, đặc biệt đối với khu vực Hội An và Nam Hội An.' },
+      ],
+    },
+    {
+      slug: 'moi-truong-song-dinh-hinh-tuong-lai',
+      title: 'Môi trường sống hôm nay định hình tương lai con trẻ như thế nào?',
+      date: '27.03.2026',
+      image: 'https://cdnphoto.dantri.com.vn/YbjmNgy6Zm9rxXCWJLlCENbiXs0=/zoom/1200_630/2026/03/27/fs009dantrihinh4thumb59ada89a-c548-4e9a-8c41-1fe079757037-cropped-1774604006837.jpg',
+      category: 'du-an',
+      source_url: 'https://dantri.com.vn/bat-dong-san/moi-truong-song-hom-nay-dinh-hinh-tuong-lai-con-tre-nhu-the-nao-20260327091500000.htm',
+      content: [
+        { type: 'text', value: 'Những năm gần đây, số ca bệnh ở trẻ em thường tăng vào thời điểm giao mùa khi nhiệt độ, độ ẩm và chất lượng không khí biến động. Môi trường sống của trẻ em có tác động đáng kể đến sức khỏe và phát triển của các em.' },
+        { type: 'text', value: 'Khi nhiệt độ, độ ẩm và chất lượng không khí thay đổi đột ngột, hệ miễn dịch của trẻ - vốn còn non yếu - dễ bị tổn thương.' },
+        { type: 'text', value: 'TẦM QUAN TRỌNG CỦA MÔI TRƯỜNG SỐNG' },
+        { type: 'text', value: 'Điều kiện sống chất lượng cao giúp trẻ phát triển toàn diện, từ thể chất đến tinh thần. Ngược lại, môi trường không đảm bảo tiêu chuẩn có thể gây ra các vấn đề sức khỏe dài hạn, ảnh hưởng đến tương lai của các em.' },
+        { type: 'text', value: 'Các nghiên cứu cho thấy trẻ em lớn lên trong môi trường xanh, gần gũi thiên nhiên có xu hướng phát triển tốt hơn cả về thể chất lẫn trí tuệ. Không gian sống với mật độ thấp, nhiều cây xanh và không khí trong lành tạo điều kiện lý tưởng cho sự phát triển toàn diện của trẻ.' },
+        { type: 'text', value: 'Việc lựa chọn môi trường sống phù hợp không chỉ là quyết định về nơi ở, mà còn là quyết định về tương lai của thế hệ tiếp theo. Các khu đô thị sinh thái với không gian xanh, tiện ích đồng bộ đang trở thành lựa chọn ưu tiên của nhiều gia đình có con nhỏ.' },
+      ],
+    },
+    {
+      slug: 'quy-hoach-ha-tang-phia-nam-da-nang',
+      title: 'Quy hoạch và hạ tầng: Lực đẩy cho hành lang phát triển mới phía Nam Đà Nẵng',
+      date: '25.03.2026',
+      image: 'https://cdnmedia.baotintuc.vn/Upload/WnaWBuGRde4qN1ggW27MaQ/files/2026/03/da-nang-25326.jpg',
+      category: 'du-an',
+      source_url: 'https://baotintuc.vn/bat-dong-san/quy-hoach-va-ha-tang-luc-day-cho-hanh-lang-phat-trien-moi-phia-nam-da-nang-20260325153000000.htm',
+      content: [
+        { type: 'text', value: 'Tại Singapore, các hoạt động cảng biển tập trung tại Tuas Port, trong khi Marina Bay và Sentosa Island phát triển thành trung tâm du lịch ven biển. Dubai, cảng Jebel Ali đóng vai trò trung tâm logistics, còn Dubai Marina hay Palm Jumeirah được quy hoạch cho du lịch và nghỉ dưỡng. Quy hoạch phân vùng nhằm tối ưu hóa chức năng từng khu vực đang mang lại hiệu quả kinh tế cho nhiều đô thị ven biển trên thế giới.' },
+        { type: 'text', value: 'QUY HOẠCH ĐÀ NẴNG 2021-2030' },
+        { type: 'text', value: 'Theo quy hoạch thành phố thời kỳ 2021-2030, tầm nhìn đến năm 2050, Đà Nẵng được định hướng trở thành trung tâm kinh tế - xã hội lớn của khu vực, với các trụ cột phát triển gồm du lịch, dịch vụ, logistics và công nghệ cao.' },
+        { type: 'text', value: 'Ở phía Bắc, khu vực Liên Chiểu đang nổi lên như cực phát triển logistics và công nghiệp chiến lược. Ngày 16/3, thông tin về siêu dự án cảng container Liên Chiểu với tổng mức đầu tư khoảng 1,7 tỷ USD đã tiếp tục củng cố vai trò của khu vực phía Bắc như một trung tâm logistics quy mô lớn của miền Trung.' },
+        { type: 'text', value: 'TRỤC ĐÔ THỊ VEN SÔNG VEN BIỂN' },
+        { type: 'text', value: 'Trong khi đó, phía Nam thành phố, từ Đà Nẵng kéo dài xuống Hội An và Nam Hội An, được định hướng phát triển thành một trục đô thị ven sông, ven biển, gắn với các giá trị sinh thái, di sản, nghỉ dưỡng.' },
+        { type: 'text', value: 'Vị thế của khu vực này được củng cố bởi hai đầu mối chiến lược: Sân bay Quốc tế Đà Nẵng và Cảng Tiên Sa đang định hướng trở thành cảng du lịch chuyên đón tàu quốc tế. Đây là những "điểm dẫn" trực tiếp đưa dòng khách quốc tế về khu vực phía Nam.' },
+        { type: 'text', value: 'HẠ TẦNG NỘI VÙNG TĂNG TỐC' },
+        { type: 'text', value: 'Song song, hạ tầng nội vùng tăng tốc với định hướng phát triển đường sắt đô thị kết nối sân bay Đà Nẵng - Hội An (2026-2031), cùng các trục ven biển và tuyến liên kết được nâng cấp, rút ngắn đáng kể thời gian di chuyển giữa các trung tâm du lịch.' },
+        { type: 'text', value: 'Đáng chú ý, trong danh mục 219 dự án kêu gọi đầu tư công bố ngày 12/3, khu vực phía Nam tiếp tục xuất hiện nhiều cấu phần chiến lược như trung tâm điều trị đột quỵ, can thiệp tim mạch hay khu dữ liệu công nghệ quy mô lớn. Điều này cho thấy trục phát triển này đang mở rộng khỏi phạm vi du lịch nghỉ dưỡng.' },
+        { type: 'text', value: 'HÀNH LANG SINH THÁI - DU LỊCH' },
+        { type: 'text', value: 'Thực tế, một hành lang sinh thái - du lịch đã dần hình thành, quy tụ các khu đô thị ven sông, ven biển như Casamia (liền kề rừng dừa Bảy Mẫu), chuỗi resort cao cấp trải dài khu vực Thăng An - Thăng Bình.' },
+        { type: 'text', value: 'Sự phát triển của hệ thống hạ tầng giao thông và hành lang sinh thái là động lực thu hút cộng đồng cư dân quốc tế, chuyên gia và nhóm làm việc từ xa có nhu cầu tìm kiếm môi trường sống xanh, tốt cho sức khỏe, nhưng vẫn gần kề hệ thống tiện ích hiện đại.' },
+        { type: 'text', value: 'Nếu phía Bắc Đà Nẵng đóng vai trò động lực tăng trưởng công nghiệp, logistics và dòng chảy hàng hóa, thì phía Nam đang dần đảm nhiệm chức năng thu hút dòng người, dòng tiền và nâng chuẩn trải nghiệm sống.' },
+      ],
+    },
+    {
+      slug: 'da-nang-tai-cau-truc-khong-gian-song',
+      title: 'Từ đô thị 1,2 triệu dân đến mục tiêu 3-4 triệu dân: Đà Nẵng tái cấu trúc không gian sống sau sáp nhập',
+      date: '25.03.2026',
+      image: 'https://i.ex-cdn.com/theleader.vn/files/content/2026/03/24/193234-9560.jpg',
+      category: 'du-an',
+      source_url: 'https://theleader.vn/tu-do-thi-12-trieu-dan-den-muc-tieu-3-4-trieu-dan-da-nang-tai-cau-truc-khong-gian-song-sau-sap-nhap-d38888.html',
+      content: [
+        { type: 'text', value: 'Khi không gian phát triển được mở rộng sau sáp nhập, Đà Nẵng đang bước vào một giai đoạn mới - vận hành như một vùng đô thị mở rộng với quy mô dân số hàng triệu người.' },
+        { type: 'text', value: 'Trong bối cảnh đó, bài toán không chỉ là tăng trưởng, mà là phân bổ lại dân cư, tái tổ chức không gian sống và định hình chuẩn đô thị mới. Trục Đà Nẵng - Hội An vì thế đang dần trở thành hướng phát triển tất yếu.' },
+        { type: 'text', value: 'QUY MÔ DÂN SỐ MỞ RỘNG' },
+        { type: 'text', value: 'Đà Nẵng không còn là một đô thị hơn 1 triệu dân, mà đang vận hành trong một không gian phát triển mở rộng, trải dài theo trục ven biển về phía Nam, nơi các hoạt động kinh tế, du lịch và dân cư ngày càng gắn kết chặt chẽ. Trong cấu trúc này, Đà Nẵng mở rộng đã hình thành một không gian dân cư khoảng 2,7 triệu người. Trong thập kỷ tới, có thể vượt mốc 3 triệu người, tiến tới 4-4,5 triệu người trong dài hạn.' },
+        { type: 'text', value: 'Sự thay đổi về quy mô kéo theo thay đổi về cách phát triển. Áp lực không còn nằm trong phạm vi một thành phố, mà đã trở thành bài toán của một vùng đô thị lớn, với yêu cầu cao hơn về hạ tầng, môi trường sống và phân bổ dân cư.' },
+        { type: 'text', value: 'BẤT CÂN ĐỐI DÂN SỐ' },
+        { type: 'text', value: 'Khi dân số tăng nhanh, sự phân bố đang bộc lộ rõ những bất cân đối. Khu vực trung tâm Đà Nẵng - đặc biệt tại Hải Châu và Sơn Trà - hiện đã đạt mật độ khoảng 8.000-9.000 người/km², tiệm cận ngưỡng cao của các đô thị lớn, gây áp lực mạnh lên hạ tầng, giao thông và không gian sống.' },
+        { type: 'text', value: 'Ngược lại, dọc theo phía Nam, đặc biệt khu vực Hội An và vùng lân cận, vẫn còn nhiều dư địa phát triển với mật độ dân cư thấp, quỹ đất lớn và không gian sinh thái phong phú.' },
+        { type: 'text', value: 'DÒNG DỊCH CHUYỂN MỚI' },
+        { type: 'text', value: 'Trong bối cảnh đó, việc giãn dân trở thành định hướng mang tính cấu trúc. Đáng chú ý, tăng trưởng dân cư hiện nay chủ yếu đến từ các dòng dịch chuyển mới: nhân lực chất lượng cao, đặc biệt trong lĩnh vực công nghệ, tài chính, dịch vụ; người làm việc linh hoạt, không phụ thuộc vị trí địa lý; cộng đồng chuyên gia và người nước ngoài tìm kiếm môi trường sống chất lượng cao.' },
+        { type: 'text', value: 'Ngoài ra, xu hướng du lịch không còn dừng ở ngắn hạn, mà chuyển sang lưu trú dài ngày, kết hợp làm việc và trải nghiệm.' },
+        { type: 'text', value: 'HỘI AN - ĐIỂM HỘI TỤ' },
+        { type: 'text', value: 'Trong dòng dịch chuyển đó, Hội An đang nổi lên như một điểm hội tụ, không chỉ là đô thị di sản, Hội An dần trở thành nơi sinh sống của cộng đồng quốc tế, lựa chọn của những người tìm kiếm môi trường sinh thái với không gian sống chậm, nhưng không tách rời tiện ích.' },
+        { type: 'text', value: 'Lợi thế của Hội An là vị trí chỉ cách trung tâm Đà Nẵng khoảng 30 phút di chuyển, đủ gần để duy trì kết nối với trung tâm và đủ xa để giữ được không gian sống chất lượng.' },
+        { type: 'text', value: 'Trong bối cảnh hạ tầng giao thông đang ngày càng hoàn thiện và mô hình làm việc thay đổi, khái niệm "trung tâm" cũng đang được định nghĩa lại. Nếu trước đây, sống gần trung tâm là ưu tiên, thì nay không gian sống trở thành yếu tố quyết định và khoảng cách không còn là rào cản lớn.' },
+        { type: 'text', value: 'TÁI PHÂN BỔ DÂN CƯ QUY MÔ VÙNG' },
+        { type: 'text', value: 'Việc phát triển về phía Nam không đơn thuần là giãn dân, mà là tái phân bổ dân cư trên quy mô vùng nhằm giảm áp lực vùng lõi và định nghĩa lại chuẩn sống đô thị. Trong đó, trung tâm Đà Nẵng giữ vai trò kinh tế - dịch vụ, Hội An và vùng lân cận trở thành không gian sống cân bằng.' },
+        { type: 'text', value: 'Khi quy mô dân số tiến tới 3-4 triệu người, mô hình phát triển tập trung sẽ không còn phù hợp, thay vào đó là cấu trúc đa điểm, nơi mỗi khu vực đảm nhận một vai trò riêng trong tổng thể định hướng phát triển.' },
+        { type: 'text', value: 'Trục Đà Nẵng - Hội An - Nam Hội An vì thế trở thành lời giải cho bài toán làm thế nào để một vùng đô thị hàng triệu dân vẫn duy trì được chất lượng sống. Và trong câu chuyện đó, Hội An và vùng lân cận đang dần chuyển mình - từ một điểm đến du lịch - trở thành một điểm đến để sống, nơi cân bằng giữa kết nối và tĩnh tại, giữa phát triển và bền vững.' },
+      ],
+    },
+  ]
+
+  for (const article of newsArticles) {
+    await connection.query(
+      `INSERT INTO news_articles (slug, title, date, image, category, source_url, content) VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE title = VALUES(title), date = VALUES(date), image = VALUES(image), category = VALUES(category), source_url = VALUES(source_url), content = VALUES(content)`,
+      [article.slug, article.title, article.date, article.image, article.category, article.source_url, JSON.stringify(article.content)]
+    )
+    console.log(`Seeded news article: ${article.slug}`)
+  }
+
   // Insert admin user (password: admin123)
-  const passwordHash = await bcrypt.hash('admin123', 10)
-  await connection.query(
-    `INSERT INTO admin_users (username, password_hash) VALUES (?, ?)
-     ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)`,
-    ['admin', passwordHash]
-  )
+  // const passwordHash = await bcrypt.hash('admin123', 10)
+  // await connection.query(
+  //   `INSERT INTO admin_users (username, password_hash) VALUES (?, ?)
+  //    ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)`,
+  //   ['admin', passwordHash]
+  // )
 
-  console.log('Admin user created (username: admin, password: admin123)')
+  // console.log('Admin user created (username: admin, password: admin123)')
 
-  // Seed sections
+  /*
+  // Seed sections (disabled: avoid overwriting existing section content)
   const sections: Record<string, unknown> = {
     hero: {
       videoUrl: '/hero.mp4',
@@ -234,6 +461,7 @@ async function seed() {
     )
     console.log(`Seeded section: ${key}`)
   }
+  */
 
   console.log('Seed completed successfully!')
   await connection.end()

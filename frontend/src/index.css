@@ -49,6 +49,7 @@
 
 html {
   scroll-behavior: auto; /* Lenis handles smooth scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrollbar from decorative elements */
 }
 
 body {
@@ -185,4 +186,17 @@ html.lenis, html.lenis body {
     linear-gradient(#000 0 0, #000 100%) 100% 100%;
   mask-size: 51% 51%;
   mask-repeat: no-repeat;
+}
+
+/*
+ * content-visibility: auto lets the browser skip layout/paint for off-screen
+ * sections, dramatically reducing initial main-thread work. The intrinsic-size
+ * hint prevents CLS when sections enter the viewport.
+ */
+#map,
+#features,
+#products,
+#value {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }

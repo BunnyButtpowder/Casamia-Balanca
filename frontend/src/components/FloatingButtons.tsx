@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ChevronUp, Phone } from 'lucide-react'
+import { trackEvent } from '../utils/tracking'
 
 interface FloatingButtonsProps {
   phone: string
@@ -50,6 +51,7 @@ export default function FloatingButtons({ phone, facebookUrl, zaloUrl }: Floatin
         rel="noopener noreferrer"
         aria-label="Facebook"
         className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition-transform hover:scale-110"
+        onClick={() => trackEvent({ event: 'social_click', event_category: 'social', event_label: 'facebook_floating' })}
       >
         <FacebookIcon />
       </a>
@@ -59,6 +61,7 @@ export default function FloatingButtons({ phone, facebookUrl, zaloUrl }: Floatin
         rel="noopener noreferrer"
         aria-label="Zalo"
         className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0068FF] text-white shadow-lg transition-transform hover:scale-110"
+        onClick={() => trackEvent({ event: 'social_click', event_category: 'social', event_label: 'zalo_floating' })}
       >
         <ZaloIcon />
       </a>
@@ -66,12 +69,13 @@ export default function FloatingButtons({ phone, facebookUrl, zaloUrl }: Floatin
         href={`tel:${cleanPhone}`}
         aria-label="Gọi điện"
         className="flex h-11 w-11 items-center justify-center rounded-full bg-green-500 text-white shadow-lg transition-transform hover:scale-110"
+        onClick={() => trackEvent({ event: 'phone_click', event_category: 'contact', event_label: 'phone_floating' })}
       >
         <Phone className="h-5 w-5" />
       </a>
       <button
         type="button"
-        onClick={scrollToTop}
+        onClick={() => { scrollToTop(); trackEvent({ event: 'scroll_to_top', event_category: 'navigation', event_label: 'floating_button' }) }}
         aria-label="Lên đầu trang"
         className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-secondary text-white shadow-lg transition-transform hover:scale-110"
       >

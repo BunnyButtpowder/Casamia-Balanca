@@ -1,11 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
+import { usePageVisible } from '../hooks/useVisibility'
 import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
-import FloatingButtons from '../components/FloatingButtons'
+const FloatingButtons = lazy(() => import('../components/FloatingButtons'))
 import Footer from '../components/Footer'
+import ThankYouModal from '../components/ThankYouModal'
+import { trackEvent } from '../utils/tracking'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
 
@@ -15,7 +18,9 @@ function Home() {
     const [pageLoaded, setPageLoaded] = useState(false)
     useEffect(() => {
         let cancelled = false
-        const FALLBACK_MS = 4000
+        // Reduced from 4s to 1.5s — hero poster image provides visual content;
+        // waiting longer just delays LCP without user benefit
+        const FALLBACK_MS = 1500
         const fallback = setTimeout(() => { if (!cancelled) setPageLoaded(true) }, FALLBACK_MS)
 
         const waitForHero = async () => {
@@ -44,6 +49,7 @@ function Home() {
     }, [pageLoaded])
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
+    const [thankYouOpen, setThankYouOpen] = useState(false)
     const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const handleDownloadSubmit = async (e: React.FormEvent) => {
@@ -51,9 +57,11 @@ function Home() {
         try {
             await api.submitDownload(downloadForm)
         } catch { /* ignore */ }
+        trackEvent({ event: 'form_submit', event_category: 'lead', event_label: 'download_form' })
         window.open(content!.map.downloadUrl, '_blank', 'noopener,noreferrer')
         setDownloadOpen(false)
         setDownloadForm({ name: '', phone: '', city: '', email: '' })
+        setThankYouOpen(true)
     }
     const [galleryIdx, setGalleryIdx] = useState(1)
     const [galleryAnimate, setGalleryAnimate] = useState(true)
@@ -64,6 +72,15 @@ function Home() {
     const contentRef = useRef<HTMLDivElement>(null)
     const footerRef = useRef<HTMLElement>(null)
     const spacerRef = useRef<HTMLDivElement>(null)
+    // Pause all carousel timers when the tab is hidden
+    const pageVisible = usePageVisible()
+    // Cached container width to avoid reading offsetWidth during touch handlers
+    const containerWidthRef = useRef(window.innerWidth)
+    useEffect(() => {
+        const updateWidth = () => { containerWidthRef.current = window.innerWidth }
+        window.addEventListener('resize', updateWidth)
+        return () => window.removeEventListener('resize', updateWidth)
+    }, [])
 
     useEffect(() => {
         const content = contentRef.current
@@ -71,25 +88,37 @@ function Home() {
         const spacer = spacerRef.current
         if (!content || !footer || !spacer) return
 
+        // Cache layout values to avoid repeated reads during scroll
+        let cachedFooterH = 0
+        let layoutRafId = 0
+
         const updateLayout = () => {
-            const contentH = content.offsetHeight
-            const footerH = footer.offsetHeight
-            spacer.style.height = `${footerH}px`
-            content.style.top = `${-(contentH - window.innerHeight)}px`
+            cancelAnimationFrame(layoutRafId)
+            // Defer to next frame so reads don't force a synchronous reflow
+            // when triggered by ResizeObserver during layout
+            layoutRafId = requestAnimationFrame(() => {
+                // Batch reads
+                const contentH = content.offsetHeight
+                const footerH = footer.offsetHeight
+                cachedFooterH = footerH
+                // Batch writes
+                spacer.style.height = `${footerH}px`
+                content.style.top = `${-(contentH - window.innerHeight)}px`
+            })
         }
         updateLayout()
 
         const ro = new ResizeObserver(updateLayout)
         ro.observe(content)
         ro.observe(footer)
-        window.addEventListener('resize', updateLayout)
 
         let rafId = 0
         const handleScroll = () => {
             cancelAnimationFrame(rafId)
             rafId = requestAnimationFrame(() => {
+                // Only read spacer rect; use cached footerH to avoid extra reflow
                 const spacerRect = spacer.getBoundingClientRect()
-                const fh = footer.offsetHeight
+                const fh = cachedFooterH
                 if (spacerRect.top < window.innerHeight) {
                     const p = Math.min((window.innerHeight - spacerRect.top) / fh, 1)
                     const eased = 1 - (1 - p) * (1 - p) * (1 - p)
@@ -104,8 +133,8 @@ function Home() {
         handleScroll()
         return () => {
             cancelAnimationFrame(rafId)
+            cancelAnimationFrame(layoutRafId)
             window.removeEventListener('scroll', handleScroll)
-            window.removeEventListener('resize', updateLayout)
             ro.disconnect()
         }
     }, [content])
@@ -125,9 +154,10 @@ function Home() {
     const extNext = () => setExtIdx((i) => Math.min(extMax, i + 1))
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => setExtIdx((i) => (i >= extMax ? 0 : i + 1)), 5000)
         return () => clearInterval(id)
-    }, [extMax])
+    }, [extMax, pageVisible])
 
     const [extDragOffset, setExtDragOffset] = useState(0)
     const extDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -162,7 +192,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - extDragRef.current.startX
         const elapsed = Date.now() - extDragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = extTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setExtDragOffset(0)
         if (!extIsLast && (dx < -threshold || (velocity > 0.3 && dx < 0))) {
@@ -181,9 +211,10 @@ function Home() {
     const vilNext = () => setVilIdx((i) => Math.min(vilMax, i + 1))
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => setVilIdx((i) => (i >= vilMax ? 0 : i + 1)), 5000)
         return () => clearInterval(id)
-    }, [vilMax])
+    }, [vilMax, pageVisible])
     const [vilDragOffset, setVilDragOffset] = useState(0)
     const vilDragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
     const vilTrackRef = useRef<HTMLDivElement>(null)
@@ -217,7 +248,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - vilDragRef.current.startX
         const elapsed = Date.now() - vilDragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = vilTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setVilDragOffset(0)
         if (!vilIsLast && (dx < -threshold || (velocity > 0.3 && dx < 0))) {
@@ -275,9 +306,10 @@ function Home() {
     const prodNextRef = useRef(prodNext)
     prodNextRef.current = prodNext
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => prodNextRef.current(), 5000)
         return () => clearInterval(id)
-    }, [])
+    }, [pageVisible])
 
     const handleCatChange = (cat: string) => {
         setCarouselCat(cat)
@@ -295,12 +327,13 @@ function Home() {
     const nextSlide = () => { setAnimate(true); setSlideIdx((i) => i + 1) }
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => {
             setAnimate(true)
             setSlideIdx((i) => (i >= carouselSlides.length ? 1 : i + 1))
         }, 5000)
         return () => clearInterval(id)
-    }, [carouselCat, carouselSlides.length])
+    }, [carouselCat, carouselSlides.length, pageVisible])
 
     const [dragOffset, setDragOffset] = useState(0)
     const dragRef = useRef<{ startX: number; startY: number; locked: boolean | null; startTime: number } | null>(null)
@@ -337,7 +370,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - dragRef.current.startX
         const elapsed = Date.now() - dragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = trackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setAnimate(true)
         setDragOffset(0)
@@ -373,12 +406,13 @@ function Home() {
     const nextGallery = () => { setGalleryAnimate(true); setGalleryIdx((i) => i + 1) }
 
     useEffect(() => {
+        if (!pageVisible) return
         const id = setInterval(() => {
             setGalleryAnimate(true)
             setGalleryIdx((i) => (i >= footerGallery.length ? 1 : i + 1))
         }, 5000)
         return () => clearInterval(id)
-    }, [])
+    }, [pageVisible])
 
     const handleGalleryTouchStart = (e: React.TouchEvent) => {
         setGalleryAnimate(false)
@@ -408,7 +442,7 @@ function Home() {
         const dx = e.changedTouches[0].clientX - galleryDragRef.current.startX
         const elapsed = Date.now() - galleryDragRef.current.startTime
         const velocity = Math.abs(dx) / elapsed
-        const containerW = galleryTrackRef.current?.parentElement?.offsetWidth ?? window.innerWidth
+        const containerW = containerWidthRef.current
         const threshold = containerW * 0.2
         setGalleryAnimate(true)
         setGalleryDragOffset(0)
@@ -429,7 +463,30 @@ function Home() {
         }
     }
 
-    if (!content) return null
+    if (!content) return (
+        <div className="min-h-screen overflow-x-clip">
+            {/* Loading overlay */}
+            <div className="fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm">
+                <img src="/logo.png" alt="Casamia Balanca" width={208} height={80} className="w-40 object-contain sm:w-52 animate-pulse" />
+                <div className="mt-8 h-1 w-40 overflow-hidden rounded-full bg-secondary/15">
+                    <div className="h-full w-1/2 animate-[loader_1.2s_ease-in-out_infinite] bg-secondary" />
+                </div>
+                <style>{`@keyframes loader { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }`}</style>
+            </div>
+            {/* Skeleton hero — gives the browser an LCP candidate while API data loads */}
+            <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
+                <img src="/hero-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="relative z-10 px-4 text-center sm:px-6">
+                    <h1 className="leading-tight font-light text-white">
+                        <span className="block h-16 md:h-20" />
+                        <span className="block h-16 md:h-20" />
+                    </h1>
+                    <p className="mx-auto mt-4 max-w-xl text-xl text-white uppercase sm:mt-4 sm:text-base">&nbsp;</p>
+                </div>
+            </section>
+        </div>
+    )
 
     return (
         <div className="min-h-screen overflow-x-clip">
@@ -454,7 +511,7 @@ function Home() {
                         loop
                         muted
                         playsInline
-                        preload="metadata"
+                        preload="auto"
                         poster="/hero-poster.jpg"
                         width={1920}
                         height={1080}
@@ -498,7 +555,7 @@ function Home() {
                             src="/vector.png"
                             alt=""
                             // eslint-disable-next-line
-                            {...{ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>}
+                            {...{ fetchPriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>}
                             className="h-full w-full object-cover"
                         />
                         <div className="absolute -bottom-50 left-1/2 z-10 mx-auto w-full max-w-xs md:max-w-4xl -translate-x-1/2 px-6 text-center sm:bottom-12 md:bottom-24 2xl:bottom-30">
@@ -510,7 +567,7 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/leaf.png"
+                            src="/leaf.webp"
                             alt=""
 
                             className="pointer-events-none absolute -bottom-10 -right-35 w-70 object-contain sm:bottom-0 2xl:bottom-30 sm:-right-40 md:-right-110 md:w-auto"
@@ -532,7 +589,7 @@ function Home() {
                                 ) : (
                                     <button
                                         type="button"
-                                        onClick={() => setTvcLoaded(true)}
+                                        onClick={() => { setTvcLoaded(true); trackEvent({ event: 'video_play', event_category: 'engagement', event_label: 'tvc_video' }) }}
                                         className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black"
                                     >
                                         <img
@@ -551,14 +608,14 @@ function Home() {
 
                     <div className="relative">
                         <img
-                            src="/leaf.png"
+                            src="/leaf.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
                             className="pointer-events-none absolute top-0 left-4 w-90 md:w-auto object-contain sm:-top-25 sm:-left-20 sm:block z-10"
                         />
                         <img
-                            src="/gradient-from-t.png"
+                            src="/gradient-from-t.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -620,7 +677,7 @@ function Home() {
                 <section id="map" className="relative z-0">
                     <div className="relative">
                         <img
-                            src="/map-balanca.png"
+                            src="/map-balanca.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -639,9 +696,12 @@ function Home() {
                                 width={800}
                                 height={2620}
                                 onLoad={(e) => {
-                                    const c = mobileMapScrollRef.current
-                                    if (!c) return
-                                    c.scrollLeft = (e.currentTarget.scrollWidth - c.clientWidth) / 1.55
+                                    const img = e.currentTarget
+                                    requestAnimationFrame(() => {
+                                        const c = mobileMapScrollRef.current
+                                        if (!c) return
+                                        c.scrollLeft = (img.scrollWidth - c.clientWidth) / 1.55
+                                    })
                                 }}
                                 className="h-full w-auto max-w-none"
                             />
@@ -808,7 +868,7 @@ function Home() {
                 <section id="products" className="relative pt-0">
                     <div className="relative">
                         <img
-                            src="/leaf.png"
+                            src="/leaf.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -947,7 +1007,7 @@ function Home() {
                     </div>
                     <div className="relative">
                         <img
-                            src="/bg-pattern-2.png"
+                            src="/bg-pattern-2.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1063,7 +1123,7 @@ function Home() {
                                         </div>
                                         <button
                                             type="button"
-                                            onClick={() => setDownloadOpen(true)}
+                                            onClick={() => { setDownloadOpen(true); trackEvent({ event: 'download_click', event_category: 'engagement', event_label: 'download_button_products' }) }}
                                             className="rounded-xl shrink-0 bg-[#0F4672] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
                                         >
                                             Tải tài liệu dự án
@@ -1075,7 +1135,7 @@ function Home() {
                     </div>
                     <div className="relative">
                         <img
-                            src="/bg-pattern-3.png"
+                            src="/bg-pattern-3.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1188,7 +1248,7 @@ function Home() {
                             className="w-full object-contain block md:hidden"
                         />
                         <img
-                            src="/gradient-from-top-r.png"
+                            src="/gradient-from-top-r.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1214,7 +1274,7 @@ function Home() {
                             </div>
                         </div>
                         <img
-                            src="/gradient-from-b.png"
+                            src="/gradient-from-b.webp"
                             alt=""
                             loading="lazy"
                             decoding="async"
@@ -1261,7 +1321,7 @@ function Home() {
                                 />
                             </div>
                             <img
-                                src="/cloud.png"
+                                src="/cloud.webp"
                                 alt=""
                                 loading="lazy"
                                 decoding="async"
@@ -1296,7 +1356,7 @@ function Home() {
                             <div className="mt-8 flex justify-center md:max-w-sm">
                                 <button
                                     type="button"
-                                    onClick={() => setDownloadOpen(true)}
+                                    onClick={() => { setDownloadOpen(true); trackEvent({ event: 'download_click', event_category: 'engagement', event_label: 'download_button_value' }) }}
                                     className="rounded-xl bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:text-base"
                                 >
                                     Tải tài liệu dự án
@@ -1305,7 +1365,7 @@ function Home() {
                         </div>
                     </div>
                     <img
-                        src="/leaf.png"
+                        src="/leaf.webp"
                         alt=""
                         loading="lazy"
                         decoding="async"
@@ -1320,7 +1380,7 @@ function Home() {
                 <section
                     className="relative"
                     style={{
-                        backgroundImage: "url('/footer-pattern.png')",
+                        backgroundImage: "url('/footer-pattern.webp')",
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'auto',
@@ -1337,6 +1397,7 @@ function Home() {
                                             key={item.slug}
                                             to={`/tin-tuc/${item.slug}`}
                                             className="group flex items-start gap-4 text-white/90 transition-opacity hover:opacity-90"
+                                            onClick={() => trackEvent({ event: 'news_click', event_category: 'engagement', event_label: item.slug })}
                                         >
                                             <img
                                                 src={item.image}
@@ -1359,6 +1420,7 @@ function Home() {
                                 <Link
                                     to="/tin-tuc"
                                     className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
+                                    onClick={() => trackEvent({ event: 'link_click', event_category: 'engagement', event_label: 'view_all_news' })}
                                 >
                                     Xem thêm
                                     <ChevronRight className="h-4 w-4" />
@@ -1419,13 +1481,14 @@ function Home() {
                                     </button>
                                 </div>
 
-                                <a
-                                    href="#"
-                                    className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
+                                <Link
+                                    to="/thu-vien"
+                                    className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80"
+                                    onClick={() => trackEvent({ event: 'link_click', event_category: 'engagement', event_label: 'view_gallery' })}
                                 >
                                     Xem thêm
                                     <ChevronRight className="h-4 w-4" />
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -1440,88 +1503,112 @@ function Home() {
                     onClick={() => setDownloadOpen(false)}
                 >
                     <div
-                        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+                        className="relative w-full max-w-3xl rounded-2xl bg-warm p-6 shadow-2xl sm:p-10"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             type="button"
                             aria-label="Close"
                             onClick={() => setDownloadOpen(false)}
-                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:bg-black/5 hover:text-black cursor-pointer"
+                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-black/50 hover:bg-black/5 hover:text-black cursor-pointer sm:right-4 sm:top-4"
                         >
                             <X className="h-5 w-5" />
                         </button>
-                        <h3 className="font-sagire text-2xl text-secondary sm:text-3xl">
+                        <h3 className="text-center font-sagire text-3xl text-secondary sm:text-4xl">
                             Tải tài liệu dự án
                         </h3>
-                        <form onSubmit={handleDownloadSubmit} className="mt-5 flex flex-col gap-3">
-                            <input
-                                type="text"
-                                required
-                                minLength={2}
-                                maxLength={60}
-                                pattern="[\p{L}\s'\-\.]+"
-                                title="Chỉ được nhập chữ cái và khoảng trắng"
-                                placeholder="Họ và tên"
-                                value={downloadForm.name}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
-                                    setDownloadForm((f) => ({ ...f, name: v }))
-                                }}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <input
-                                type="tel"
-                                required
-                                inputMode="numeric"
-                                pattern="[0-9]{9,11}"
-                                maxLength={11}
-                                title="Số điện thoại phải gồm 9-11 chữ số"
-                                placeholder="Số điện thoại"
-                                value={downloadForm.phone}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/\D/g, '').slice(0, 11)
-                                    setDownloadForm((f) => ({ ...f, phone: v }))
-                                }}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <input
-                                type="text"
-                                required
-                                minLength={2}
-                                maxLength={60}
-                                pattern="[\p{L}\s'\-\.]+"
-                                title="Chỉ được nhập chữ cái và khoảng trắng"
-                                placeholder="Nơi ở (Tỉnh/Thành)"
-                                value={downloadForm.city}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
-                                    setDownloadForm((f) => ({ ...f, city: v }))
-                                }}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <input
-                                type="email"
-                                required
-                                pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
-                                title="Vui lòng nhập email hợp lệ"
-                                placeholder="Email"
-                                value={downloadForm.email}
-                                onChange={(e) => setDownloadForm((f) => ({ ...f, email: e.target.value.trim() }))}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <button
-                                type="submit"
-                                className="mt-2 rounded-xl bg-secondary px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer"
-                            >
-                                Tải tài liệu dự án
-                            </button>
+                        <form onSubmit={handleDownloadSubmit} className="mt-6 flex flex-col gap-5 sm:mt-8 sm:gap-6">
+                            <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-4 sm:pb-3">
+                                <span className="text-sm font-semibold text-primary sm:w-32 sm:shrink-0">Họ tên</span>
+                                <input
+                                    type="text"
+                                    required
+                                    minLength={2}
+                                    maxLength={60}
+                                    pattern="[\p{L}\s'\-\.]+"
+                                    title="Chỉ được nhập chữ cái và khoảng trắng"
+                                    placeholder="Điền thông tin của bạn"
+                                    value={downloadForm.name}
+                                    onChange={(e) => {
+                                        const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
+                                        setDownloadForm((f) => ({ ...f, name: v }))
+                                    }}
+                                    className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                />
+                            </label>
+
+                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-8">
+                                <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-8 sm:pb-3">
+                                    <span className="text-sm font-semibold text-primary sm:w-28 sm:shrink-0">Số điện thoại</span>
+                                    <input
+                                        type="tel"
+                                        required
+                                        inputMode="numeric"
+                                        pattern="[0-9]{9,11}"
+                                        maxLength={11}
+                                        title="Số điện thoại phải gồm 9-11 chữ số"
+                                        placeholder="Tối thiểu 10 chữ số"
+                                        value={downloadForm.phone}
+                                        onChange={(e) => {
+                                            const v = e.target.value.replace(/\D/g, '').slice(0, 11)
+                                            setDownloadForm((f) => ({ ...f, phone: v }))
+                                        }}
+                                        className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                    />
+                                </label>
+
+                                <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-4 sm:pb-3">
+                                    <span className="text-sm font-semibold text-primary sm:w-16 sm:shrink-0">Email</span>
+                                    <input
+                                        type="email"
+                                        required
+                                        pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                                        title="Vui lòng nhập email hợp lệ"
+                                        placeholder="vidu@mail.com"
+                                        value={downloadForm.email}
+                                        onChange={(e) => setDownloadForm((f) => ({ ...f, email: e.target.value.trim() }))}
+                                        className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                    />
+                                </label>
+                            </div>
+
+                            <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-4 sm:pb-3">
+                                <span className="text-sm font-semibold text-primary sm:w-32 sm:shrink-0">Nơi ở</span>
+                                <input
+                                    type="text"
+                                    required
+                                    minLength={2}
+                                    maxLength={60}
+                                    pattern="[\p{L}\s'\-\.]+"
+                                    title="Chỉ được nhập chữ cái và khoảng trắng"
+                                    placeholder="Tỉnh/Thành"
+                                    value={downloadForm.city}
+                                    onChange={(e) => {
+                                        const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
+                                        setDownloadForm((f) => ({ ...f, city: v }))
+                                    }}
+                                    className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                />
+                            </label>
+
+                            <div className="mt-4 flex justify-center sm:mt-6">
+                                <button
+                                    type="submit"
+                                    className="rounded-md bg-secondary px-8 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-white transition-opacity hover:opacity-90 cursor-pointer sm:text-sm"
+                                >
+                                    Tải tài liệu dự án
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             )}
 
-            <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
+            <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
+
+            <Suspense fallback={null}>
+                <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
+            </Suspense>
         </div>
     )
 }
