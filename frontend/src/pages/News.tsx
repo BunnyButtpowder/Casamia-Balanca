@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Share2, Calendar } from 'lucide-react'
 import { NEWS_ARTICLES as STATIC_ARTICLES, NEWS_CATEGORIES } from '../data/news'
 import { api, resolveUploadUrl } from '../services/api'
@@ -27,6 +27,7 @@ function getExcerpt(article: NewsArticle | { content: string[] }): string {
 }
 
 export default function News() {
+  const navigate = useNavigate()
   const [activeCategory, setActiveCategory] = useState('all')
   const [page, setPage] = useState(1)
   const [articles, setArticles] = useState<NewsArticle[]>([])
@@ -90,51 +91,64 @@ export default function News() {
           <>
             {/* Articles grid */}
             <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {paginated.map((article) => (
-                <Link
-                  key={article.slug}
-                  to={`/tin-tuc/${article.slug}`}
-                  className="group"
-                  onClick={() => trackEvent({ event: 'news_click', event_category: 'engagement', event_label: article.slug })}
-                >
-                  <div className="rounded-b-xl bg-cream">
-                    <div className="overflow-hidden rounded-xl">
-                      <img
-                        src={resolveImage(article.image)}
-                        alt={article.title}
-                        className="aspect-4/3 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="line-clamp-2 text-sm font-semibold leading-6 text-primary sm:text-base">
-                        {article.title}
-                      </h3>
-                      <p className="mt-2 line-clamp-3 text-xs leading-5 text-black/50 sm:text-sm">
-                        {getExcerpt(article)}
-                      </p>
-                      <div className="mt-3 flex items-center justify-between">
-                        <p className="text-xs tracking-[0.15em] text-black/55 flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5" /> {article.date}
+              {paginated.map((article) => {
+                const goToArticle = () => {
+                  trackEvent({ event: 'news_click', event_category: 'engagement', event_label: article.slug })
+                  navigate(`/tin-tuc/${article.slug}`)
+                }
+                return (
+                  <div
+                    key={article.slug}
+                    role="link"
+                    tabIndex={0}
+                    onClick={goToArticle}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        goToArticle()
+                      }
+                    }}
+                    className="group cursor-pointer"
+                  >
+                    <div className="rounded-b-xl bg-cream">
+                      <div className="overflow-hidden rounded-xl">
+                        <img
+                          src={resolveImage(article.image)}
+                          alt={article.title}
+                          className="aspect-4/3 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <h3 className="line-clamp-2 text-sm font-semibold leading-6 text-primary sm:text-base">
+                          {article.title}
+                        </h3>
+                        <p className="mt-2 line-clamp-3 text-xs leading-5 text-black/50 sm:text-sm">
+                          {getExcerpt(article)}
                         </p>
-                        <div className="flex items-center gap-2">
-                          {article.source_url && (
-                            <a
-                              href={article.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-secondary/70 hover:text-secondary"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Nguồn
-                            </a>
-                          )}
-                          <Share2 className="h-3.5 w-3.5 text-black/30" />
+                        <div className="mt-3 flex items-center justify-between">
+                          <p className="text-xs tracking-[0.15em] text-black/55 flex items-center gap-1">
+                            <Calendar className="h-3.5 w-3.5" /> {article.date}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            {article.source_url && (
+                              <a
+                                href={article.source_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-secondary/70 hover:text-secondary"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                Nguồn
+                              </a>
+                            )}
+                            <Share2 className="h-3.5 w-3.5 text-black/30" />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </Link>
-              ))}
+                )
+              })}
             </div>
 
             {/* Pagination */}
