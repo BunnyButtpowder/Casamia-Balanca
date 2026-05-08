@@ -1,15 +1,74 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { NEWS_ARTICLES } from '../data/news'
+import { NEWS_ARTICLES as STATIC_ARTICLES } from '../data/news'
+import { api, resolveUploadUrl } from '../services/api'
+import type { NewsArticle, ContentBlock } from '../types/news'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ScrollToTopButton from '../components/ScrollToTopButton'
+import { trackEvent } from '../utils/tracking'
+
+function resolveImage(image: string): string {
+  if (!image) return ''
+  if (image.startsWith('http') || image.startsWith('/')) return image.startsWith('/uploads') ? resolveUploadUrl(image) : image
+  return image
+}
+
+function staticToContentBlocks(content: string[]): ContentBlock[] {
+  return content.map((c) => ({ type: 'text' as const, value: c }))
+}
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>()
-  const article = NEWS_ARTICLES.find((a) => a.slug === slug)
-  const otherArticles = NEWS_ARTICLES.filter((a) => a.slug !== slug)
+  const [article, setArticle] = useState<NewsArticle | null>(null)
+  const [otherArticles, setOtherArticles] = useState<NewsArticle[]>([])
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
 
-  if (!article) {
+  useEffect(() => {
+    setLoading(true)
+    setNotFound(false)
+
+    api.getNews()
+      .then((articles) => {
+        const found = articles.find((a) => a.slug === slug)
+        if (found) {
+          setArticle(found)
+          setOtherArticles(articles.filter((a) => a.slug !== slug))
+        } else {
+          setNotFound(true)
+        }
+      })
+      .catch(() => {
+        // Fallback to static data
+        const staticArticle = STATIC_ARTICLES.find((a) => a.slug === slug)
+        if (staticArticle) {
+          setArticle({
+            ...staticArticle,
+            content: staticToContentBlocks(staticArticle.content),
+          })
+          setOtherArticles(
+            STATIC_ARTICLES.filter((a) => a.slug !== slug).map((a) => ({
+              ...a,
+              content: staticToContentBlocks(a.content),
+            }))
+          )
+        } else {
+          setNotFound(true)
+        }
+      })
+      .finally(() => setLoading(false))
+  }, [slug])
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-warm">
+        <p className="text-sm text-black/40">Đang tải...</p>
+      </div>
+    )
+  }
+
+  if (notFound || !article) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-warm">
         <p className="text-lg text-primary">Bài viết không tồn tại.</p>
@@ -25,7 +84,7 @@ export default function NewsDetail() {
       {/* Hero banner */}
       <div className="relative h-[280px] w-full sm:h-[380px] lg:h-[460px]">
         <img
-          src={article.image}
+          src={resolveImage(article.image)}
           alt={article.title}
           className="h-full w-full object-cover"
         />
@@ -38,28 +97,45 @@ export default function NewsDetail() {
           {article.title}
         </h1>
         <p className="mt-3 text-sm tracking-[0.15em] text-black/40">{article.date}</p>
+        {article.source_url && (
+          <p className="mt-1 text-sm text-black/40">
+            Nguồn:{' '}
+            <a
+              href={article.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-secondary/70 underline hover:text-secondary"
+            >
+              {new URL(article.source_url).hostname}
+            </a>
+          </p>
+        )}
 
         <div className="mt-8 space-y-5 text-[15px] leading-7 text-black/80 sm:text-base sm:leading-8">
-          {article.content.map((paragraph, i) => {
-            const isHeading = paragraph === paragraph.toUpperCase() && paragraph.length > 10
+          {article.content.map((block, i) => {
+            if (block.type === 'image') {
+              return (
+                <div key={i} className="my-6 overflow-hidden rounded-2xl">
+                  <img
+                    src={resolveImage(block.value)}
+                    alt=""
+                    className="h-[240px] w-full object-cover sm:h-[340px] lg:h-[420px]"
+                  />
+                </div>
+              )
+            }
+            // Text block
+            const text = block.value
+            const isHeading = text === text.toUpperCase() && text.length > 10
             if (isHeading) {
               return (
                 <h2 key={i} className="mt-4 text-base font-bold text-primary sm:text-lg">
-                  {paragraph}
+                  {text}
                 </h2>
               )
             }
-            return <p key={i}>{paragraph}</p>
+            return <p key={i}>{text}</p>
           })}
-        </div>
-
-        {/* Inline image */}
-        <div className="my-10 overflow-hidden rounded-2xl">
-          <img
-            src={article.image}
-            alt={article.title}
-            className="h-[240px] w-full object-cover sm:h-[340px] lg:h-[420px]"
-          />
         </div>
       </article>
 
@@ -76,10 +152,11 @@ export default function NewsDetail() {
                   key={item.slug}
                   to={`/tin-tuc/${item.slug}`}
                   className="group overflow-hidden rounded-2xl bg-white shadow-md transition-shadow hover:shadow-lg"
+                  onClick={() => trackEvent({ event: 'news_click', event_category: 'engagement', event_label: item.slug })}
                 >
                   <div className="overflow-hidden">
                     <img
-                      src={item.image}
+                      src={resolveImage(item.image)}
                       alt={item.title}
                       className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />

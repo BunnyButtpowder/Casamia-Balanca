@@ -1,6 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 const BACKEND_BASE = API_BASE.replace(/\/api$/, '')
 import type { Contact } from '../types/contact'
+import type { NewsArticle } from '../types/news'
 
 export function resolveUploadUrl(path: string): string {
   if (!path) return ''
@@ -55,6 +56,22 @@ export const api = {
     }),
   getContacts: () => apiFetch<Array<Contact>>('/contacts'),
   getDownloads: () => apiFetch<Array<Record<string, unknown>>>('/downloads'),
+  // News CRUD
+  getNews: () => apiFetch<NewsArticle[]>('/news'),
+  getNewsArticle: (id: number) => apiFetch<NewsArticle>(`/news/${id}`),
+  createNews: (data: Omit<NewsArticle, 'id' | 'created_at' | 'updated_at'>) =>
+    apiFetch<NewsArticle>('/news', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateNews: (id: number, data: Omit<NewsArticle, 'id' | 'created_at' | 'updated_at'>) =>
+    apiFetch<NewsArticle>(`/news/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteNews: (id: number) =>
+    apiFetch<{ success: boolean }>(`/news/${id}`, { method: 'DELETE' }),
+
   uploadFile: async (file: File, oldPath?: string): Promise<{ url: string }> => {
     const token = localStorage.getItem('admin_token')
     const formData = new FormData()

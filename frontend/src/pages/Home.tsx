@@ -7,6 +7,8 @@ import { NEWS_ARTICLES } from '../data/news'
 import Header from '../components/Header'
 const FloatingButtons = lazy(() => import('../components/FloatingButtons'))
 import Footer from '../components/Footer'
+import ThankYouModal from '../components/ThankYouModal'
+import { trackEvent } from '../utils/tracking'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
 
@@ -47,6 +49,7 @@ function Home() {
     }, [pageLoaded])
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
+    const [thankYouOpen, setThankYouOpen] = useState(false)
     const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const handleDownloadSubmit = async (e: React.FormEvent) => {
@@ -54,9 +57,11 @@ function Home() {
         try {
             await api.submitDownload(downloadForm)
         } catch { /* ignore */ }
+        trackEvent({ event: 'form_submit', event_category: 'lead', event_label: 'download_form' })
         window.open(content!.map.downloadUrl, '_blank', 'noopener,noreferrer')
         setDownloadOpen(false)
         setDownloadForm({ name: '', phone: '', city: '', email: '' })
+        setThankYouOpen(true)
     }
     const [galleryIdx, setGalleryIdx] = useState(1)
     const [galleryAnimate, setGalleryAnimate] = useState(true)
@@ -459,7 +464,7 @@ function Home() {
     }
 
     if (!content) return (
-        <div className="min-h-screen">
+        <div className="min-h-screen overflow-x-clip">
             {/* Loading overlay */}
             <div className="fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm">
                 <img src="/logo.png" alt="Casamia Balanca" width={208} height={80} className="w-40 object-contain sm:w-52 animate-pulse" />
@@ -484,7 +489,7 @@ function Home() {
     )
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen overflow-x-clip">
             <div
                 aria-hidden={pageLoaded && !contentLoading}
                 className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded && !contentLoading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
@@ -584,7 +589,7 @@ function Home() {
                                 ) : (
                                     <button
                                         type="button"
-                                        onClick={() => setTvcLoaded(true)}
+                                        onClick={() => { setTvcLoaded(true); trackEvent({ event: 'video_play', event_category: 'engagement', event_label: 'tvc_video' }) }}
                                         className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black"
                                     >
                                         <img
@@ -1118,7 +1123,7 @@ function Home() {
                                         </div>
                                         <button
                                             type="button"
-                                            onClick={() => setDownloadOpen(true)}
+                                            onClick={() => { setDownloadOpen(true); trackEvent({ event: 'download_click', event_category: 'engagement', event_label: 'download_button_products' }) }}
                                             className="rounded-xl shrink-0 bg-[#0F4672] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
                                         >
                                             Tải tài liệu dự án
@@ -1351,7 +1356,7 @@ function Home() {
                             <div className="mt-8 flex justify-center md:max-w-sm">
                                 <button
                                     type="button"
-                                    onClick={() => setDownloadOpen(true)}
+                                    onClick={() => { setDownloadOpen(true); trackEvent({ event: 'download_click', event_category: 'engagement', event_label: 'download_button_value' }) }}
                                     className="rounded-xl bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:text-base"
                                 >
                                     Tải tài liệu dự án
@@ -1392,6 +1397,7 @@ function Home() {
                                             key={item.slug}
                                             to={`/tin-tuc/${item.slug}`}
                                             className="group flex items-start gap-4 text-white/90 transition-opacity hover:opacity-90"
+                                            onClick={() => trackEvent({ event: 'news_click', event_category: 'engagement', event_label: item.slug })}
                                         >
                                             <img
                                                 src={item.image}
@@ -1414,6 +1420,7 @@ function Home() {
                                 <Link
                                     to="/tin-tuc"
                                     className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
+                                    onClick={() => trackEvent({ event: 'link_click', event_category: 'engagement', event_label: 'view_all_news' })}
                                 >
                                     Xem thêm
                                     <ChevronRight className="h-4 w-4" />
@@ -1474,13 +1481,14 @@ function Home() {
                                     </button>
                                 </div>
 
-                                <a
-                                    href="#"
-                                    className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white"
+                                <Link
+                                    to="/thu-vien"
+                                    className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80"
+                                    onClick={() => trackEvent({ event: 'link_click', event_category: 'engagement', event_label: 'view_gallery' })}
                                 >
                                     Xem thêm
                                     <ChevronRight className="h-4 w-4" />
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -1495,86 +1503,108 @@ function Home() {
                     onClick={() => setDownloadOpen(false)}
                 >
                     <div
-                        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+                        className="relative w-full max-w-3xl rounded-2xl bg-warm p-6 shadow-2xl sm:p-10"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             type="button"
                             aria-label="Close"
                             onClick={() => setDownloadOpen(false)}
-                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:bg-black/5 hover:text-black cursor-pointer"
+                            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-black/50 hover:bg-black/5 hover:text-black cursor-pointer sm:right-4 sm:top-4"
                         >
                             <X className="h-5 w-5" />
                         </button>
-                        <h3 className="font-sagire text-2xl text-secondary sm:text-3xl">
+                        <h3 className="text-center font-sagire text-3xl text-secondary sm:text-4xl">
                             Tải tài liệu dự án
                         </h3>
-                        <form onSubmit={handleDownloadSubmit} className="mt-5 flex flex-col gap-3">
-                            <input
-                                type="text"
-                                required
-                                minLength={2}
-                                maxLength={60}
-                                pattern="[\p{L}\s'\-\.]+"
-                                title="Chỉ được nhập chữ cái và khoảng trắng"
-                                placeholder="Họ và tên"
-                                value={downloadForm.name}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
-                                    setDownloadForm((f) => ({ ...f, name: v }))
-                                }}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <input
-                                type="tel"
-                                required
-                                inputMode="numeric"
-                                pattern="[0-9]{9,11}"
-                                maxLength={11}
-                                title="Số điện thoại phải gồm 9-11 chữ số"
-                                placeholder="Số điện thoại"
-                                value={downloadForm.phone}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/\D/g, '').slice(0, 11)
-                                    setDownloadForm((f) => ({ ...f, phone: v }))
-                                }}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <input
-                                type="text"
-                                required
-                                minLength={2}
-                                maxLength={60}
-                                pattern="[\p{L}\s'\-\.]+"
-                                title="Chỉ được nhập chữ cái và khoảng trắng"
-                                placeholder="Nơi ở (Tỉnh/Thành)"
-                                value={downloadForm.city}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
-                                    setDownloadForm((f) => ({ ...f, city: v }))
-                                }}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <input
-                                type="email"
-                                required
-                                pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
-                                title="Vui lòng nhập email hợp lệ"
-                                placeholder="Email"
-                                value={downloadForm.email}
-                                onChange={(e) => setDownloadForm((f) => ({ ...f, email: e.target.value.trim() }))}
-                                className="w-full rounded-lg border border-black/15 px-4 py-3 text-sm outline-none focus:border-secondary"
-                            />
-                            <button
-                                type="submit"
-                                className="mt-2 rounded-xl bg-secondary px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer"
-                            >
-                                Tải tài liệu dự án
-                            </button>
+                        <form onSubmit={handleDownloadSubmit} className="mt-6 flex flex-col gap-5 sm:mt-8 sm:gap-6">
+                            <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-4 sm:pb-3">
+                                <span className="text-sm font-semibold text-primary sm:w-32 sm:shrink-0">Họ tên</span>
+                                <input
+                                    type="text"
+                                    required
+                                    minLength={2}
+                                    maxLength={60}
+                                    pattern="[\p{L}\s'\-\.]+"
+                                    title="Chỉ được nhập chữ cái và khoảng trắng"
+                                    placeholder="Điền thông tin của bạn"
+                                    value={downloadForm.name}
+                                    onChange={(e) => {
+                                        const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
+                                        setDownloadForm((f) => ({ ...f, name: v }))
+                                    }}
+                                    className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                />
+                            </label>
+
+                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-8">
+                                <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-8 sm:pb-3">
+                                    <span className="text-sm font-semibold text-primary sm:w-28 sm:shrink-0">Số điện thoại</span>
+                                    <input
+                                        type="tel"
+                                        required
+                                        inputMode="numeric"
+                                        pattern="[0-9]{9,11}"
+                                        maxLength={11}
+                                        title="Số điện thoại phải gồm 9-11 chữ số"
+                                        placeholder="Tối thiểu 10 chữ số"
+                                        value={downloadForm.phone}
+                                        onChange={(e) => {
+                                            const v = e.target.value.replace(/\D/g, '').slice(0, 11)
+                                            setDownloadForm((f) => ({ ...f, phone: v }))
+                                        }}
+                                        className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                    />
+                                </label>
+
+                                <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-4 sm:pb-3">
+                                    <span className="text-sm font-semibold text-primary sm:w-16 sm:shrink-0">Email</span>
+                                    <input
+                                        type="email"
+                                        required
+                                        pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                                        title="Vui lòng nhập email hợp lệ"
+                                        placeholder="vidu@mail.com"
+                                        value={downloadForm.email}
+                                        onChange={(e) => setDownloadForm((f) => ({ ...f, email: e.target.value.trim() }))}
+                                        className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                    />
+                                </label>
+                            </div>
+
+                            <label className="flex flex-col gap-2 border-b border-black/15 pb-2 transition-colors focus-within:border-secondary sm:flex-row sm:items-center sm:gap-4 sm:pb-3">
+                                <span className="text-sm font-semibold text-primary sm:w-32 sm:shrink-0">Nơi ở</span>
+                                <input
+                                    type="text"
+                                    required
+                                    minLength={2}
+                                    maxLength={60}
+                                    pattern="[\p{L}\s'\-\.]+"
+                                    title="Chỉ được nhập chữ cái và khoảng trắng"
+                                    placeholder="Tỉnh/Thành"
+                                    value={downloadForm.city}
+                                    onChange={(e) => {
+                                        const v = e.target.value.replace(/[^\p{L}\s'\-\.]/gu, '')
+                                        setDownloadForm((f) => ({ ...f, city: v }))
+                                    }}
+                                    className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-black/40"
+                                />
+                            </label>
+
+                            <div className="mt-4 flex justify-center sm:mt-6">
+                                <button
+                                    type="submit"
+                                    className="rounded-md bg-secondary px-8 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-white transition-opacity hover:opacity-90 cursor-pointer sm:text-sm"
+                                >
+                                    Tải tài liệu dự án
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             )}
+
+            <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
 
             <Suspense fallback={null}>
                 <FloatingButtons phone={content.footer.phone} facebookUrl={content.footer.socialLinks.facebook} zaloUrl={content.footer.socialLinks.zalo} />
