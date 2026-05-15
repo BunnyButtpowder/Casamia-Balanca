@@ -6,7 +6,7 @@ import { AuthRequest } from '../middleware/auth.js'
 export async function getNews(_req: Request, res: Response) {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM news_articles ORDER BY created_at DESC'
+      'SELECT * FROM news_articles ORDER BY STR_TO_DATE(date, "%d.%m.%Y") DESC'
     )
     const articles = rows.map((row) => ({
       ...row,

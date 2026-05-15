@@ -7,6 +7,7 @@ import contactsRoutes from './routes/contacts.routes.js'
 import downloadsRoutes from './routes/downloads.routes.js'
 import uploadRoutes from './routes/upload.routes.js'
 import newsRoutes from './routes/news.routes.js'
+import galleryRoutes from './routes/gallery.routes.js'
 
 dotenv.config()
 
@@ -56,6 +57,7 @@ app.use('/api/contacts', contactsRoutes)
 app.use('/api/downloads', downloadsRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/news', newsRoutes)
+app.use('/api/gallery', galleryRoutes)
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`)
