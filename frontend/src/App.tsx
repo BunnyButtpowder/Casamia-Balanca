@@ -23,6 +23,8 @@ const DownloadsList = lazy(() => import('./pages/admin/DownloadsList'))
 const ChangePassword = lazy(() => import('./pages/admin/ChangePassword'))
 const NewsList = lazy(() => import('./pages/admin/NewsList'))
 const NewsEditor = lazy(() => import('./pages/admin/NewsEditor'))
+const GalleryList = lazy(() => import('./pages/admin/GalleryList'))
+const GalleryEditor = lazy(() => import('./pages/admin/GalleryEditor'))
 
 function App() {
   return (
@@ -48,6 +50,8 @@ function App() {
           <Route path="footer" element={<FooterEditor />} />
           <Route path="news" element={<NewsList />} />
           <Route path="news/:id" element={<NewsEditor />} />
+          <Route path="gallery" element={<GalleryList />} />
+          <Route path="gallery/:id" element={<GalleryEditor />} />
           <Route path="contacts" element={<ContactsList />} />
           <Route path="downloads" element={<DownloadsList />} />
           <Route path="change-password" element={<ChangePassword />} />

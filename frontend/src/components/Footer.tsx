@@ -11,9 +11,10 @@ interface FooterProps {
   className?: string
   /** Override the inner content container's max-width (default: max-w-9xl) */
   contentMaxWidth?: string
+  id?: string
 }
 
-export default function Footer({ data: propData, className, contentMaxWidth }: FooterProps) {
+export default function Footer({ data: propData, className, contentMaxWidth, id }: FooterProps) {
   const [fetched, setFetched] = useState<FooterSection | null>(null)
   const [thankYouOpen, setThankYouOpen] = useState(false)
 
@@ -27,7 +28,7 @@ export default function Footer({ data: propData, className, contentMaxWidth }: F
   if (!data) return null
 
   return (
-    <div className={`relative overflow-hidden rounded-t-3xl bg-secondary ${className}`}>
+    <div id={id} className={`relative overflow-hidden rounded-t-3xl bg-secondary ${className}`}>
       <img
         src="/bg-footer.webp"
         alt=""

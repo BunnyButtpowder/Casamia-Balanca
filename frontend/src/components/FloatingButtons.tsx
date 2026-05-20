@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChevronUp, Phone } from 'lucide-react'
+import { ChevronUp, Phone, View } from 'lucide-react'
 import { trackEvent } from '../utils/tracking'
 
 interface FloatingButtonsProps {
@@ -37,6 +37,16 @@ export default function FloatingButtons({ phone, zaloUrl }: FloatingButtonsProps
         visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
       }`}
     >
+      <a
+        href="https://3dscanning.vn/360/balanca-360/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Xem 360°"
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-transform hover:scale-110"
+        onClick={() => trackEvent({ event: '360_click', event_category: 'navigation', event_label: '360_floating' })}
+      >
+        <View className="h-5 w-5" />
+      </a>
       <a
         href={zaloUrl}
         target="_blank"

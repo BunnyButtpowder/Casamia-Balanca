@@ -2,6 +2,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 const BACKEND_BASE = API_BASE.replace(/\/api$/, '')
 import type { Contact } from '../types/contact'
 import type { NewsArticle } from '../types/news'
+import type { GalleryItem } from '../data/gallery'
 
 export function resolveUploadUrl(path: string): string {
   if (!path) return ''
@@ -71,6 +72,22 @@ export const api = {
     }),
   deleteNews: (id: number) =>
     apiFetch<{ success: boolean }>(`/news/${id}`, { method: 'DELETE' }),
+
+  // Gallery CRUD
+  getGallery: () => apiFetch<GalleryItem[]>('/gallery'),
+  getGalleryItem: (id: number) => apiFetch<GalleryItem>(`/gallery/${id}`),
+  createGalleryItem: (data: Omit<GalleryItem, 'id' | 'created_at' | 'updated_at'>) =>
+    apiFetch<GalleryItem>('/gallery', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateGalleryItem: (id: number, data: Omit<GalleryItem, 'id' | 'created_at' | 'updated_at'>) =>
+    apiFetch<GalleryItem>(`/gallery/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteGalleryItem: (id: number) =>
+    apiFetch<{ success: boolean }>(`/gallery/${id}`, { method: 'DELETE' }),
 
   uploadFile: async (file: File, oldPath?: string): Promise<{ url: string }> => {
     const token = localStorage.getItem('admin_token')

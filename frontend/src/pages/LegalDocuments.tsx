@@ -100,6 +100,17 @@ export default function LegalDocuments() {
             </section>
           ))}
         </div>
+
+        <div className="mt-12 flex justify-center">
+          <a
+            href="https://drive.google.com/drive/u/0/folders/1o4w-yDpXIIyn46WDIz1eE01uB4ltk7yH"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl bg-secondary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+          >
+            Xem chi tiết
+          </a>
+        </div>
       </main>
 
       <ScrollToTopButton />

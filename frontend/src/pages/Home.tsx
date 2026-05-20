@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
 import { usePageVisible } from '../hooks/useVisibility'
 import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { NEWS_ARTICLES } from '../data/news'
+import type { NewsArticle } from '../types/news'
 import Header from '../components/Header'
 const FloatingButtons = lazy(() => import('../components/FloatingButtons'))
 import Footer from '../components/Footer'
@@ -17,6 +17,10 @@ function Home() {
     const lenisRef = useLenis()
     const { data: content, loading: contentLoading } = useHomeContent()
     const [pageLoaded, setPageLoaded] = useState(false)
+    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
+    useEffect(() => {
+        api.getNews().then((articles) => setNewsArticles(articles.slice(0, 3))).catch(() => {})
+    }, [])
     useEffect(() => {
         let cancelled = false
         // Reduced from 4s to 1.5s — hero poster image provides visual content;
@@ -62,6 +66,15 @@ function Home() {
         }, 10_000)
         return () => clearTimeout(timer)
     }, [])
+
+    useEffect(() => {
+        if (!downloadOpen) return
+        const prevOverflow = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
+        return () => {
+            document.body.style.overflow = prevOverflow
+        }
+    }, [downloadOpen])
     const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const handleDownloadSubmit = async (e: React.FormEvent) => {
@@ -748,7 +761,7 @@ function Home() {
                                                     key={`${item.name}-${i}`}
                                                     className={`location-item group flex items-center gap-3 px-4 py-3 cursor-default ${i < arr.length - 1 ? 'border-b border-gray-300' : ''}`}
                                                 >
-                                                    <MapPin className="w-4 h-4 shrink-0 text-[#0F4672] group-hover:text-secondary transition-colors duration-300" />
+                                                    <MapPin className="w-4 h-4 shrink-0 text-navy group-hover:text-secondary transition-colors duration-300" />
                                                     <span className="flex-1 text-sm text-start font-medium text-black group-hover:text-secondary group-hover:translate-x-1.5 transition-all duration-300">{item.name}</span>
                                                     <span className="text-sm font-semibold text-black group-hover:text-secondary transition-colors duration-300 whitespace-nowrap">{item.time}</span>
                                                 </div>
@@ -793,7 +806,7 @@ function Home() {
                                         <p className="font-sagire text-5xl text-secondary sm:text-3xl md:text-4xl">
                                             {stat.value}
                                         </p>
-                                        <p className="mt-2 whitespace-pre-line text-base leading-snug font-medium text-[#0F4672] sm:text-base 2xl:text-lg">
+                                        <p className="mt-2 whitespace-pre-line text-base leading-snug font-medium text-navy sm:text-base 2xl:text-lg">
                                             {stat.label}
                                         </p>
                                     </div>
@@ -814,7 +827,7 @@ function Home() {
                                             onClick={() => handleCatChange(tab.key)}
                                             className={`relative cursor-pointer whitespace-nowrap pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${carouselCat === tab.key
                                                 ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
-                                                : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                                                : 'text-navy after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
                                                 }`}
                                         >
                                             {tab.label}
@@ -1099,7 +1112,7 @@ function Home() {
                                                     onClick={() => { setProdSlideIdx(0); setProductFilter(tab.key) }}
                                                     className={`relative cursor-pointer whitespace-nowrap pb-1 text-base font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${productFilter === tab.key
                                                         ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
-                                                        : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                                                        : 'text-navy after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
                                                         }`}
                                                 >
                                                     {tab.label}
@@ -1137,7 +1150,7 @@ function Home() {
                                         <button
                                             type="button"
                                             onClick={() => { setDownloadOpen(true); trackEvent({ event: 'download_click', event_category: 'engagement', event_label: 'download_button_products' }) }}
-                                            className="rounded-xl shrink-0 bg-[#0F4672] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
+                                            className="rounded-xl shrink-0 bg-navy px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
                                         >
                                             Tải tài liệu dự án
                                         </button>
@@ -1389,7 +1402,7 @@ function Home() {
             <div ref={spacerRef} />
 
             {/* Footer */}
-            <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
+            <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
                 <section
                     className="relative"
                     style={{
@@ -1405,7 +1418,7 @@ function Home() {
                             <div>
                                 <h3 className="font-sagire text-4xl text-white sm:text-5xl text-center md:text-left">Tin tức</h3>
                                 <div className="mt-8 space-y-5">
-                                    {NEWS_ARTICLES.slice(0, 3).map((item) => (
+                                    {newsArticles.map((item) => (
                                         <Link
                                             key={item.slug}
                                             to={`/tin-tuc/${item.slug}`}
@@ -1413,7 +1426,7 @@ function Home() {
                                             onClick={() => trackEvent({ event: 'news_click', event_category: 'engagement', event_label: item.slug })}
                                         >
                                             <img
-                                                src={item.image}
+                                                src={resolveUploadUrl(item.image)}
                                                 alt={item.title}
                                                 loading="lazy"
                                                 decoding="async"
@@ -1507,7 +1520,7 @@ function Home() {
                     </div>
                 </section>
 
-                <Footer data={content.footer} />
+                <Footer id="contact"  data={content.footer} />
             </footer>
 
             {downloadOpen && (

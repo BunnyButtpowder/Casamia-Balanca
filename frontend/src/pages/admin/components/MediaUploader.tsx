@@ -81,7 +81,7 @@ export default function MediaUploader({ value, onChange, accept = 'image', label
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-6 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 disabled:opacity-50"
+          className="cursor-pointer flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-6 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 disabled:opacity-50"
         >
           {uploading ? (
             <>
