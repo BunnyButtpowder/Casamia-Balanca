@@ -3,19 +3,37 @@ import { Link } from 'react-router-dom'
 import { useLenis } from '../hooks/useLenis'
 import { usePageVisible } from '../hooks/useVisibility'
 import { MapPin, ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { NEWS_ARTICLES } from '../data/news'
+import type { NewsArticle } from '../types/news'
 import Header from '../components/Header'
 const FloatingButtons = lazy(() => import('../components/FloatingButtons'))
 import Footer from '../components/Footer'
 import ThankYouModal from '../components/ThankYouModal'
 import { trackEvent } from '../utils/tracking'
+import Seo from '../components/Seo'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
+
+function getYouTubeId(url: string): string | null {
+    try {
+        const u = new URL(url)
+        if (u.hostname === 'youtu.be') return u.pathname.slice(1) || null
+        if (u.hostname.endsWith('youtube.com') || u.hostname === 'm.youtube.com') {
+            if (u.pathname === '/watch') return u.searchParams.get('v')
+            if (u.pathname.startsWith('/embed/')) return u.pathname.split('/')[2] || null
+            if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2] || null
+        }
+    } catch { return null }
+    return null
+}
 
 function Home() {
     const lenisRef = useLenis()
     const { data: content, loading: contentLoading } = useHomeContent()
     const [pageLoaded, setPageLoaded] = useState(false)
+    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
+    useEffect(() => {
+        api.getNews().then((articles) => setNewsArticles(articles.slice(0, 3))).catch(() => {})
+    }, [])
     useEffect(() => {
         let cancelled = false
         // Reduced from 4s to 1.5s — hero poster image provides visual content;
@@ -50,6 +68,26 @@ function Home() {
     const mobileMapScrollRef = useRef<HTMLDivElement>(null)
     const [downloadOpen, setDownloadOpen] = useState(false)
     const [thankYouOpen, setThankYouOpen] = useState(false)
+
+    // Auto-open download popup once after 10 seconds on the page
+    useEffect(() => {
+        const STORAGE_KEY = 'download_popup_shown'
+        if (sessionStorage.getItem(STORAGE_KEY)) return
+        const timer = setTimeout(() => {
+            setDownloadOpen(true)
+            sessionStorage.setItem(STORAGE_KEY, '1')
+        }, 10_000)
+        return () => clearTimeout(timer)
+    }, [])
+
+    useEffect(() => {
+        if (!downloadOpen) return
+        const prevOverflow = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
+        return () => {
+            document.body.style.overflow = prevOverflow
+        }
+    }, [downloadOpen])
     const [tvcLoaded, setTvcLoaded] = useState(false)
     const [downloadForm, setDownloadForm] = useState({ name: '', phone: '', city: '', email: '' })
     const handleDownloadSubmit = async (e: React.FormEvent) => {
@@ -490,6 +528,7 @@ function Home() {
 
     return (
         <div className="min-h-screen overflow-x-clip">
+            <Seo url="/" />
             <div
                 aria-hidden={pageLoaded && !contentLoading}
                 className={`fixed inset-0 z-200 flex flex-col items-center justify-center bg-warm transition-opacity duration-700 ${pageLoaded && !contentLoading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
@@ -505,20 +544,31 @@ function Home() {
 
                 {/* Hero */}
                 <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
-                    <video
-                        src={resolveUploadUrl(content.hero.videoUrl)}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="auto"
-                        poster="/hero-poster.jpg"
-                        width={1920}
-                        height={1080}
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
+                    {getYouTubeId(content.hero.videoUrl) ? (
+                        <iframe
+                            className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+                            src={`https://www.youtube.com/embed/${getYouTubeId(content.hero.videoUrl)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeId(content.hero.videoUrl)}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
+                            title="Hero Video"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            style={{ border: 0, width: '100vw', height: '56.25vw', minHeight: '100vh', minWidth: '177.78vh', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                    ) : (
+                        <video
+                            src={resolveUploadUrl(content.hero.videoUrl)}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            preload="auto"
+                            poster="/hero-poster.jpg"
+                            width={1920}
+                            height={1080}
+                            className="absolute inset-0 h-full w-full object-cover"
+                        />
+                    )}
                     <div className="absolute inset-0 bg-black/10" />
-                    <div className="relative z-10 px-4 text-center sm:px-6">
+                    {/* <div className="relative z-10 px-4 text-center sm:px-6">
                         <h1 className="leading-tight font-light text-white">
                             <span className="-ml-6 flex items-center justify-center gap-3 sm:-ml-10 md:-ml-27">
                                 <span className="text-7xl font-alishanty md:text-7xl">{content.hero.titleLine1Word1}</span>
@@ -532,11 +582,11 @@ function Home() {
                         <p className="mx-auto mt-4 max-w-xl text-xl text-white uppercase sm:mt-4 sm:text-base">
                             {content.hero.subtitle}
                         </p>
-                    </div>
+                    </div> */}
 
                     {/* Scroll indicator */}
                     <div className="absolute bottom-0 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
-                        <div className="h-[27vh] w-px bg-[#fff7e953] sm:h-[26vh]" />
+                        {/* <div className="h-[27vh] w-px bg-[#fff7e953] sm:h-[26vh]" /> */}
                         <img
                             src="/scroll-down.png"
                             alt="Scroll down"
@@ -735,7 +785,7 @@ function Home() {
                                                     key={`${item.name}-${i}`}
                                                     className={`location-item group flex items-center gap-3 px-4 py-3 cursor-default ${i < arr.length - 1 ? 'border-b border-gray-300' : ''}`}
                                                 >
-                                                    <MapPin className="w-4 h-4 shrink-0 text-[#0F4672] group-hover:text-secondary transition-colors duration-300" />
+                                                    <MapPin className="w-4 h-4 shrink-0 text-navy group-hover:text-secondary transition-colors duration-300" />
                                                     <span className="flex-1 text-sm text-start font-medium text-black group-hover:text-secondary group-hover:translate-x-1.5 transition-all duration-300">{item.name}</span>
                                                     <span className="text-sm font-semibold text-black group-hover:text-secondary transition-colors duration-300 whitespace-nowrap">{item.time}</span>
                                                 </div>
@@ -780,7 +830,7 @@ function Home() {
                                         <p className="font-sagire text-5xl text-secondary sm:text-3xl md:text-4xl">
                                             {stat.value}
                                         </p>
-                                        <p className="mt-2 whitespace-pre-line text-base leading-snug font-medium text-[#0F4672] sm:text-base 2xl:text-lg">
+                                        <p className="mt-2 whitespace-pre-line text-base leading-snug font-medium text-navy sm:text-base 2xl:text-lg">
                                             {stat.label}
                                         </p>
                                     </div>
@@ -801,7 +851,7 @@ function Home() {
                                             onClick={() => handleCatChange(tab.key)}
                                             className={`relative cursor-pointer whitespace-nowrap pb-1 text-sm font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${carouselCat === tab.key
                                                 ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
-                                                : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                                                : 'text-navy after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
                                                 }`}
                                         >
                                             {tab.label}
@@ -1086,7 +1136,7 @@ function Home() {
                                                     onClick={() => { setProdSlideIdx(0); setProductFilter(tab.key) }}
                                                     className={`relative cursor-pointer whitespace-nowrap pb-1 text-base font-semibold tracking-widest transition-colors duration-300 sm:text-sm 2xl:text-base uppercase ${productFilter === tab.key
                                                         ? 'text-secondary after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-secondary'
-                                                        : 'text-[#0F4672] after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
+                                                        : 'text-navy after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:scale-x-100'
                                                         }`}
                                                 >
                                                     {tab.label}
@@ -1124,7 +1174,7 @@ function Home() {
                                         <button
                                             type="button"
                                             onClick={() => { setDownloadOpen(true); trackEvent({ event: 'download_click', event_category: 'engagement', event_label: 'download_button_products' }) }}
-                                            className="rounded-xl shrink-0 bg-[#0F4672] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
+                                            className="rounded-xl shrink-0 bg-navy px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 cursor-pointer sm:px-5 sm:py-4 sm:text-sm"
                                         >
                                             Tải tài liệu dự án
                                         </button>
@@ -1376,7 +1426,7 @@ function Home() {
             <div ref={spacerRef} />
 
             {/* Footer */}
-            <footer ref={footerRef} id="contact" className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
+            <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-3xl bg-secondary will-change-transform" style={{ transform: 'translateY(100%)' }}>
                 <section
                     className="relative"
                     style={{
@@ -1392,7 +1442,7 @@ function Home() {
                             <div>
                                 <h3 className="font-sagire text-4xl text-white sm:text-5xl text-center md:text-left">Tin tức</h3>
                                 <div className="mt-8 space-y-5">
-                                    {NEWS_ARTICLES.slice(0, 3).map((item) => (
+                                    {newsArticles.map((item) => (
                                         <Link
                                             key={item.slug}
                                             to={`/tin-tuc/${item.slug}`}
@@ -1400,7 +1450,7 @@ function Home() {
                                             onClick={() => trackEvent({ event: 'news_click', event_category: 'engagement', event_label: item.slug })}
                                         >
                                             <img
-                                                src={item.image}
+                                                src={resolveUploadUrl(item.image)}
                                                 alt={item.title}
                                                 loading="lazy"
                                                 decoding="async"
@@ -1494,7 +1544,7 @@ function Home() {
                     </div>
                 </section>
 
-                <Footer data={content.footer} />
+                <Footer id="contact"  data={content.footer} />
             </footer>
 
             {downloadOpen && (

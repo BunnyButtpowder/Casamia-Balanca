@@ -9,10 +9,17 @@ const CATEGORY_LABELS: Record<string, string> = {
   'su-kien': 'Sự kiện',
 }
 
+const CATEGORY_FILTERS = [
+  { value: 'all', label: 'Tất cả' },
+  { value: 'du-an', label: 'Thông tin dự án' },
+  { value: 'su-kien', label: 'Sự kiện' },
+]
+
 export default function NewsList() {
   const [articles, setArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<number | null>(null)
+  const [filter, setFilter] = useState('all')
 
   useEffect(() => {
     api.getNews()
@@ -34,6 +41,8 @@ export default function NewsList() {
     }
   }
 
+  const filtered = filter === 'all' ? articles : articles.filter((a) => a.category === filter)
+
   if (loading) return <div className="text-gray-500">Đang tải...</div>
 
   return (
@@ -41,7 +50,7 @@ export default function NewsList() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Quản lý tin tức</h1>
-          <p className="mt-1 text-sm text-gray-500">{articles.length} bài viết</p>
+          <p className="mt-1 text-sm text-gray-500">{filtered.length} / {articles.length} bài viết</p>
         </div>
         <Link
           to="/admin/news/new"
@@ -52,26 +61,45 @@ export default function NewsList() {
         </Link>
       </div>
 
-      {articles.length === 0 ? (
-        <div className="rounded-xl bg-white p-12 text-center shadow-sm">
-          <p className="text-gray-500">Chưa có bài viết nào.</p>
-          <Link
-            to="/admin/news/new"
-            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+      <div className="mb-4 flex gap-2">
+        {CATEGORY_FILTERS.map((cat) => (
+          <button
+            key={cat.value}
+            type="button"
+            onClick={() => setFilter(cat.value)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              filter === cat.value
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100'
+            }`}
           >
-            <Plus size={16} />
-            Tạo bài viết đầu tiên
-          </Link>
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="rounded-xl bg-white p-12 text-center shadow-sm">
+          <p className="text-gray-500">{filter === 'all' ? 'Chưa có bài viết nào.' : 'Không có bài viết nào trong danh mục này.'}</p>
+          {filter === 'all' && (
+            <Link
+              to="/admin/news/new"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              <Plus size={16} />
+              Tạo bài viết đầu tiên
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
-          {articles.map((article) => (
+          {filtered.map((article) => (
             <div
               key={article.id}
               className="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm"
             >
               {/* Thumbnail */}
-              <div className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+              <div className="h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-gray-100">
                 {article.image ? (
                   <img
                     src={resolveUploadUrl(article.image)}
@@ -123,7 +151,7 @@ export default function NewsList() {
                   type="button"
                   onClick={() => article.id != null && handleDelete(article.id)}
                   disabled={deleting === article.id}
-                  className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                  className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                   title="Xóa"
                 >
                   <Trash2 size={16} />

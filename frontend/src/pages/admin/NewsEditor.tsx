@@ -4,6 +4,7 @@ import { Trash2, GripVertical, ArrowUp, ArrowDown, Type, ImageIcon } from 'lucid
 import { api } from '../../services/api'
 import type { NewsArticle, ContentBlock, NewsCategory } from '../../types/news'
 import MediaUploader from './components/MediaUploader'
+import { useToast } from '../../components/Toast'
 
 const EMPTY_ARTICLE: Omit<NewsArticle, 'id' | 'created_at' | 'updated_at'> = {
   slug: '',
@@ -30,6 +31,7 @@ export default function NewsEditor() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const isNew = id === 'new'
+  const toast = useToast()
 
   const [form, setForm] = useState(EMPTY_ARTICLE)
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'saved' | 'error'>('idle')
@@ -104,11 +106,11 @@ export default function NewsEditor() {
 
   const handleSave = async () => {
     if (!form.title.trim()) {
-      alert('Vui lòng nhập tiêu đề bài viết.')
+      toast.error('Vui lòng nhập tiêu đề bài viết.')
       return
     }
     if (!form.slug.trim()) {
-      alert('Vui lòng nhập đường dẫn (slug).')
+      toast.error('Vui lòng nhập đường dẫn (slug).')
       return
     }
 
@@ -120,11 +122,13 @@ export default function NewsEditor() {
         await api.updateNews(Number(id), form)
       }
       setStatus('saved')
+      toast.success(isNew ? 'Tạo bài viết thành công' : 'Cập nhật bài viết thành công')
       setTimeout(() => {
         navigate('/admin/news')
       }, 1000)
-    } catch {
+    } catch (err) {
       setStatus('error')
+      toast.error(`Lưu thất bại: ${err instanceof Error ? err.message : 'Lỗi không xác định'}`)
       setTimeout(() => setStatus('idle'), 3000)
     }
   }
@@ -208,11 +212,13 @@ export default function NewsEditor() {
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-600">Ngày đăng</label>
             <input
-              type="text"
-              value={form.date}
-              onChange={(e) => updateField('date', e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
-              placeholder="dd.mm.yyyy"
+              type="date"
+              value={form.date.split('.').reverse().join('-')}
+              onChange={(e) => {
+                const [y, m, d] = e.target.value.split('-')
+                updateField('date', `${d}.${m}.${y}`)
+              }}
+              className="cursor-pointer w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
         </div>
@@ -260,7 +266,7 @@ export default function NewsEditor() {
             <button
               type="button"
               onClick={() => addBlock('text')}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50"
+              className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50"
             >
               <Type size={14} />
               Thêm đoạn văn
@@ -268,7 +274,7 @@ export default function NewsEditor() {
             <button
               type="button"
               onClick={() => addBlock('image')}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50"
+              className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50"
             >
               <ImageIcon size={14} />
               Thêm hình ảnh
@@ -301,7 +307,7 @@ export default function NewsEditor() {
                     type="button"
                     onClick={() => moveBlock(index, -1)}
                     disabled={index === 0}
-                    className="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 disabled:opacity-30"
+                    className="cursor-pointer rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 disabled:opacity-30"
                     title="Di chuyển lên"
                   >
                     <ArrowUp size={14} />
@@ -310,7 +316,7 @@ export default function NewsEditor() {
                     type="button"
                     onClick={() => moveBlock(index, 1)}
                     disabled={index === form.content.length - 1}
-                    className="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 disabled:opacity-30"
+                    className="cursor-pointer rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 disabled:opacity-30"
                     title="Di chuyển xuống"
                   >
                     <ArrowDown size={14} />
@@ -318,7 +324,7 @@ export default function NewsEditor() {
                   <button
                     type="button"
                     onClick={() => removeBlock(index)}
-                    className="rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
+                    className="cursor-pointer rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
                     title="Xóa"
                   >
                     <Trash2 size={14} />

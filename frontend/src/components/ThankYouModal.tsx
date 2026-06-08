@@ -40,21 +40,21 @@ export default function ThankYouModal({
             aria-modal="true"
         >
             <div
-                className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-warm shadow-2xl sm:max-w-md"
+                className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-warm shadow-2xl sm:max-w-md pt-10"
                 onClick={(e) => e.stopPropagation()}
             >
                 <img
                     src="/popup-bg.png"
                     alt=""
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 top-0 mx-auto w-full select-none"
+                    className="pointer-events-none absolute inset-x-0 top-0 mx-auto mt-5 select-none"
                 />
 
                 <div className="relative flex flex-col items-center px-6 pt-14 pb-8 text-center sm:px-10 sm:pt-16 sm:pb-10">
                     <Check
                         className="text-secondary"
                         strokeWidth={3}
-                        size={72}
+                        size={152}
                         aria-hidden="true"
                     />
 

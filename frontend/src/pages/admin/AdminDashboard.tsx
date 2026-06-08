@@ -12,6 +12,7 @@ const SECTIONS = [
 
 const DATA_SECTIONS = [
   { path: '/admin/news', label: 'Tin tức', desc: 'Quản lý bài viết, hình ảnh tin tức' },
+  { path: '/admin/gallery', label: 'Thư viện', desc: 'Quản lý hình ảnh, video, tài liệu' },
   { path: '/admin/contacts', label: 'Liên hệ', desc: 'Danh sách đăng ký tư vấn' },
   { path: '/admin/downloads', label: 'Tải tài liệu', desc: 'Danh sách yêu cầu tải tài liệu' },
 ]

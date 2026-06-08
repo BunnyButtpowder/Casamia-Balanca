@@ -8,6 +8,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ScrollToTopButton from '../components/ScrollToTopButton'
 import { trackEvent } from '../utils/tracking'
+import Seo from '../components/Seo'
 
 const ITEMS_PER_PAGE = 9
 
@@ -63,10 +64,15 @@ export default function News() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Seo
+        title="Tin tức"
+        description="Cập nhật tin tức mới nhất về dự án Casamia Balanca Hội An - Thông tin dự án, sự kiện và thị trường bất động sản Hội An - Đà Nẵng."
+        url="/tin-tuc"
+      />
       <Header />
 
       <main className="mx-auto max-w-6xl px-6 pt-28 pb-16 sm:px-10 sm:pt-32">
-        <h1 className="font-sagire text-4xl text-secondary sm:text-5xl">Tin tức</h1>
+        <h1 className="font-sagire text-4xl text-secondary sm:text-6xl xl:text-7xl">Tin tức</h1>
 
         {/* Filter tabs */}
         <div className="mt-6 flex gap-6 border-b border-black/10">
@@ -75,9 +81,9 @@ export default function News() {
               key={cat.value}
               type="button"
               onClick={() => handleCategoryChange(cat.value)}
-              className={`pb-3 text-sm font-medium tracking-wide transition-colors ${activeCategory === cat.value
+              className={`cursor-pointer pb-3 text-sm font-medium tracking-wide transition-colors uppercase ${activeCategory === cat.value
                   ? 'border-b-2 border-secondary text-secondary'
-                  : 'text-black/40 hover:text-black/70'
+                  : 'text-navy/70 hover:text-navy'
                 }`}
             >
               {cat.label}
@@ -159,7 +165,7 @@ export default function News() {
                     key={p}
                     type="button"
                     onClick={() => setPage(p)}
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors ${page === p
+                    className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors ${page === p
                         ? 'bg-secondary text-white'
                         : 'text-black/50 hover:bg-black/5'
                       }`}
@@ -174,7 +180,7 @@ export default function News() {
       </main>
 
       <ScrollToTopButton />
-      <Footer className="md:px-85"/>
+      <Footer contentMaxWidth="max-w-6xl" />
     </div>
   )
 }

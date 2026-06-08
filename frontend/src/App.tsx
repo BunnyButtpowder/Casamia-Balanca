@@ -5,6 +5,7 @@ import ScrollToTop from './components/ScrollToTop'
 const News = lazy(() => import('./pages/News'))
 const NewsDetail = lazy(() => import('./pages/NewsDetail'))
 const Gallery = lazy(() => import('./pages/Gallery'))
+const LegalDocuments = lazy(() => import('./pages/LegalDocuments'))
 
 // Admin pages
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
@@ -22,6 +23,8 @@ const DownloadsList = lazy(() => import('./pages/admin/DownloadsList'))
 const ChangePassword = lazy(() => import('./pages/admin/ChangePassword'))
 const NewsList = lazy(() => import('./pages/admin/NewsList'))
 const NewsEditor = lazy(() => import('./pages/admin/NewsEditor'))
+const GalleryList = lazy(() => import('./pages/admin/GalleryList'))
+const GalleryEditor = lazy(() => import('./pages/admin/GalleryEditor'))
 
 function App() {
   return (
@@ -32,6 +35,7 @@ function App() {
         <Route path="/tin-tuc" element={<Suspense fallback={null}><News /></Suspense>} />
         <Route path="/tin-tuc/:slug" element={<Suspense fallback={null}><NewsDetail /></Suspense>} />
         <Route path="/thu-vien" element={<Suspense fallback={null}><Gallery /></Suspense>} />
+        <Route path="/van-ban-phap-ly" element={<Suspense fallback={null}><LegalDocuments /></Suspense>} />
 
         {/* Admin routes */}
         <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />
@@ -46,6 +50,8 @@ function App() {
           <Route path="footer" element={<FooterEditor />} />
           <Route path="news" element={<NewsList />} />
           <Route path="news/:id" element={<NewsEditor />} />
+          <Route path="gallery" element={<GalleryList />} />
+          <Route path="gallery/:id" element={<GalleryEditor />} />
           <Route path="contacts" element={<ContactsList />} />
           <Route path="downloads" element={<DownloadsList />} />
           <Route path="change-password" element={<ChangePassword />} />
