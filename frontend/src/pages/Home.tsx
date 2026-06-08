@@ -13,6 +13,19 @@ import Seo from '../components/Seo'
 import { useHomeContent } from '../hooks/useHomeContent'
 import { api, resolveUploadUrl } from '../services/api'
 
+function getYouTubeId(url: string): string | null {
+    try {
+        const u = new URL(url)
+        if (u.hostname === 'youtu.be') return u.pathname.slice(1) || null
+        if (u.hostname.endsWith('youtube.com') || u.hostname === 'm.youtube.com') {
+            if (u.pathname === '/watch') return u.searchParams.get('v')
+            if (u.pathname.startsWith('/embed/')) return u.pathname.split('/')[2] || null
+            if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2] || null
+        }
+    } catch { return null }
+    return null
+}
+
 function Home() {
     const lenisRef = useLenis()
     const { data: content, loading: contentLoading } = useHomeContent()
@@ -531,20 +544,31 @@ function Home() {
 
                 {/* Hero */}
                 <section className="relative flex h-screen items-center justify-center overflow-hidden rounded-b-4xl" id="hero">
-                    <video
-                        src={resolveUploadUrl(content.hero.videoUrl)}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="auto"
-                        poster="/hero-poster.jpg"
-                        width={1920}
-                        height={1080}
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
+                    {getYouTubeId(content.hero.videoUrl) ? (
+                        <iframe
+                            className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+                            src={`https://www.youtube.com/embed/${getYouTubeId(content.hero.videoUrl)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeId(content.hero.videoUrl)}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
+                            title="Hero Video"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            style={{ border: 0, width: '100vw', height: '56.25vw', minHeight: '100vh', minWidth: '177.78vh', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                    ) : (
+                        <video
+                            src={resolveUploadUrl(content.hero.videoUrl)}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            preload="auto"
+                            poster="/hero-poster.jpg"
+                            width={1920}
+                            height={1080}
+                            className="absolute inset-0 h-full w-full object-cover"
+                        />
+                    )}
                     <div className="absolute inset-0 bg-black/10" />
-                    <div className="relative z-10 px-4 text-center sm:px-6">
+                    {/* <div className="relative z-10 px-4 text-center sm:px-6">
                         <h1 className="leading-tight font-light text-white">
                             <span className="-ml-6 flex items-center justify-center gap-3 sm:-ml-10 md:-ml-27">
                                 <span className="text-7xl font-alishanty md:text-7xl">{content.hero.titleLine1Word1}</span>
@@ -558,11 +582,11 @@ function Home() {
                         <p className="mx-auto mt-4 max-w-xl text-xl text-white uppercase sm:mt-4 sm:text-base">
                             {content.hero.subtitle}
                         </p>
-                    </div>
+                    </div> */}
 
                     {/* Scroll indicator */}
                     <div className="absolute bottom-0 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
-                        <div className="h-[27vh] w-px bg-[#fff7e953] sm:h-[26vh]" />
+                        {/* <div className="h-[27vh] w-px bg-[#fff7e953] sm:h-[26vh]" /> */}
                         <img
                             src="/scroll-down.png"
                             alt="Scroll down"

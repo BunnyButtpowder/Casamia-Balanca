@@ -50,7 +50,19 @@ export default function HeroEditor() {
       <div className="space-y-5 rounded-xl bg-white p-6 shadow-sm">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Video</label>
-          <MediaUploader value={form.videoUrl} onChange={(url) => setForm({ ...form, videoUrl: url })} accept="video" />
+          <p className="mb-2 text-xs text-gray-500">Dán link YouTube hoặc tải lên file video.</p>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">URL YouTube</label>
+            <input
+              type="url"
+              value={form.videoUrl?.startsWith('/uploads') ? '' : form.videoUrl}
+              onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+          </div>
+          <p className="mt-3 text-xs text-gray-400">Hoặc tải lên video trực tiếp:</p>
+          <MediaUploader value={form.videoUrl?.startsWith('/uploads') ? form.videoUrl : ''} onChange={(url) => setForm({ ...form, videoUrl: url })} accept="video" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
