@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import pool from '../config/db.js'
 import { RowDataPacket } from 'mysql2'
+import { sendDownloadNotification } from '../utils/email.js'
 
 export async function submitDownload(req: Request, res: Response) {
   const { name, phone, city, email } = req.body
@@ -13,6 +14,9 @@ export async function submitDownload(req: Request, res: Response) {
     await pool.query(
       'INSERT INTO download_submissions (name, phone, city, email) VALUES (?, ?, ?, ?)',
       [name, phone, city || null, email || null]
+    )
+    sendDownloadNotification({ name, phone, city, email }).catch((err) =>
+      console.error('Send download email error:', err)
     )
     res.json({ success: true })
   } catch (err) {

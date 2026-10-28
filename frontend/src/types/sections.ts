@@ -1,5 +1,7 @@
 export interface HeroSection {
   videoUrl: string
+  imageUrl: string
+  imageUrlMobile: string
   titleLine1Word1: string
   titleLine1Word2: string
   titleLine2Word1: string

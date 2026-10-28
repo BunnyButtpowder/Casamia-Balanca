@@ -7,6 +7,8 @@ import { useToast } from '../../../components/Toast'
 export default function HeroEditor() {
   const [form, setForm] = useState<HeroSection>({
     videoUrl: '',
+    imageUrl: '',
+    imageUrlMobile: '',
     titleLine1Word1: '',
     titleLine1Word2: '',
     titleLine2Word1: '',
@@ -56,13 +58,23 @@ export default function HeroEditor() {
             <input
               type="url"
               value={form.videoUrl?.startsWith('/uploads') ? '' : form.videoUrl}
-              onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+              onChange={(e) => setForm({ ...form, videoUrl: e.target.value, imageUrl: e.target.value ? '' : form.imageUrl })}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
               placeholder="https://www.youtube.com/watch?v=..."
             />
           </div>
           <p className="mt-3 text-xs text-gray-400">Hoặc tải lên video trực tiếp:</p>
-          <MediaUploader value={form.videoUrl?.startsWith('/uploads') ? form.videoUrl : ''} onChange={(url) => setForm({ ...form, videoUrl: url })} accept="video" />
+          <MediaUploader value={form.videoUrl?.startsWith('/uploads') ? form.videoUrl : ''} onChange={(url) => setForm({ ...form, videoUrl: url, imageUrl: url ? '' : form.imageUrl })} accept="video" />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Ảnh nền (Desktop)</label>
+          <p className="mb-2 text-xs text-gray-500">Chỉ dùng video hoặc ảnh, không dùng cả hai. Tải ảnh lên sẽ xóa video hiện tại.</p>
+          <MediaUploader value={form.imageUrl || ''} onChange={(url) => setForm({ ...form, imageUrl: url, videoUrl: url ? '' : form.videoUrl })} accept="image" />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Ảnh nền (Mobile)</label>
+          <p className="mb-2 text-xs text-gray-500">Ảnh hiển thị trên màn hình điện thoại. Nếu để trống sẽ dùng ảnh desktop.</p>
+          <MediaUploader value={form.imageUrlMobile || ''} onChange={(url) => setForm({ ...form, imageUrlMobile: url, videoUrl: url ? '' : form.videoUrl })} accept="image" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

@@ -553,7 +553,7 @@ function Home() {
                             allowFullScreen
                             style={{ border: 0, width: '100vw', height: '56.25vw', minHeight: '100vh', minWidth: '177.78vh', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                         />
-                    ) : (
+                    ) : content.hero.videoUrl ? (
                         <video
                             src={resolveUploadUrl(content.hero.videoUrl)}
                             autoPlay
@@ -566,6 +566,20 @@ function Home() {
                             height={1080}
                             className="absolute inset-0 h-full w-full object-cover"
                         />
+                    ) : (
+                        <picture>
+                            {content.hero.imageUrlMobile && (
+                                <source media="(max-width: 767px)" srcSet={resolveUploadUrl(content.hero.imageUrlMobile)} />
+                            )}
+                            <img
+                                src={content.hero.imageUrl ? resolveUploadUrl(content.hero.imageUrl) : '/hero-poster.jpg'}
+                                alt=""
+                                fetchPriority="high"
+                                width={1920}
+                                height={1080}
+                                className="absolute inset-0 h-full w-full object-cover object-center"
+                            />
+                        </picture>
                     )}
                     <div className="absolute inset-0 bg-black/10" />
                     {/* <div className="relative z-10 px-4 text-center sm:px-6">

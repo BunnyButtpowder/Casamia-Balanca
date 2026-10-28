@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import pool from '../config/db.js'
 import { RowDataPacket } from 'mysql2'
+import { sendContactNotification } from '../utils/email.js'
 
 export async function submitContact(req: Request, res: Response) {
   const { name, phone, email, message } = req.body
@@ -13,6 +14,9 @@ export async function submitContact(req: Request, res: Response) {
     await pool.query(
       'INSERT INTO contact_submissions (name, phone, email, message) VALUES (?, ?, ?, ?)',
       [name, phone, email || null, message || null]
+    )
+    sendContactNotification({ name, phone, email, message }).catch((err) =>
+      console.error('Send contact email error:', err)
     )
     res.json({ success: true })
   } catch (err) {
